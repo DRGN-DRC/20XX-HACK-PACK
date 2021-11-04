@@ -1,0 +1,339 @@
+Default Game Settings
+Just as the name says on the tin... sets default match settings like game mode (stock, time, etc.), stock count, time limit, friendly fire, items, stage selection, and more.
+<https://smashboards.com/threads/the-dol-mod-topic.326347/post-14772499>
+[SypherPhoenix, Achilles, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x3D1A4A -----
+
+00020300 0A000000
+01000000 08080000
+0800FFFF FFFF0200
+00000000 0000FFFF
+FFFFFFFF FFFF0101
+01010001 0000FFFF
+FFFF
+
+ -> 
+
+010004000A00
+080101000000080800000800FFFFFFFF
+FF00000000000000FFFFFFFF00000000
+0000000000000000E70000B0
+
+
+	-==-
+
+
+OnBoot Function, v1.2
+- unlock features
+- PAL mode check
+- memcard debug flag load (should accept v4.06/4.07/5.0 save files)
+[Achilles, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801bfa28 --- 8001001C -> Branch
+
+3C60803F 6063A154
+3C808046 60849B94
+80A30000 80C40000
+7C062800 4082008C
+88A40004 2C050000
+40820010 80A30004
+90A40004 4800002C
+A0C40004 2C06342E
+40820068 A0C40006
+2C063036 41A2FFE0
+A0A40006 2C053037
+41A2FFD4 4800004C
+38A01558 3863FFFC
+3884FFFC 3CC0803F
+60C6A4CC 7C033000
+4180001C 3CC0803F
+60C6A848 7C033000
+4080000C 38630004
+4BFFFFDC 84C40004
+94C30004 38A5FFFC
+2C050000 40A2FFC8
+38600000 906D9368
+3C608040 8063AF70
+38630030 3C80803F
+9864115C 3C608040
+8863A2E4 3C80803F
+9864C5C7 986411AC
+3C608017 60632898
+7C6803A6 4E800021
+38C00064 3C608040
+8063A300 2C030000
+41820008 38C00070
+3C60803C 60631F38
+84A30008 A0850002
+2C044D68 4182000C
+98C50005 4BFFFFEC
+38600000 3CA0803B
+60A5CDE0 1CC30003
+7CA53214 88C50000
+88E50001 2C06001B
+40800070 3C80803D
+608451A0 1CA30004
+7C8428AE 3CA0803C
+60A51F44 1CC60008
+7CA5302E 8CC50001
+2C06002E 40A2FFF8
+38C00064 2C030000
+40820014 2C040004
+4082000C 98C5FFFF
+48000008 98C50001
+3884FFFF 2C040000
+40A2FFCC 2C0700FF
+41820010 7CE63B78
+38E000FF 4BFFFF98
+38630001 2C030003
+41A2FFF8 2C030020
+41A0FF64 38800000
+3C608000 9083335C
+3C608046 38800001
+9883B660 9883B8E0
+8001001C 48000000
+
+
+	-==-
+
+
+Disable Trophy Messages
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8015d984 --- 7C0802A6 -> 4e800020
+
+
+	-==-
+
+
+Unlock All Characters & Stages & Random Stage Select
+[??]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x1614A8 ----- A0BF0000 -> 38A007FF
+-------------- 0x16109C ----- A0BF0000 -> 38A007FF
+-------------- 0x170160 ----- A0BF0000 -> 38A007FF
+
+
+	-==-
+
+
+Unlock All-Star Mode, Random Select, Sound Test, Score Display, and Every Special Message
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8015d94c --- 808D8840 -> 4e800020
+
+
+	-==-
+
+
+Disable 1P Ending MTH and THP Screens
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801aa7d0 --- 800DB174 -> Branch
+
+3C608047 60639D30
+88030000 2C000018
+4080001C 2C000015
+41800014 88030002
+98030001 38000001
+9803000C 800DB174
+48000000
+
+
+	-==-
+
+
+Disable Language Switch
+- cannot access language switch screen
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8022d1e4 --- 38600001 -> 48000154
+
+
+	-==-
+
+
+Disable Archive Videos Menu
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8022cf04 --- 38600001 -> 480001e0
+
+
+	-==-
+
+
+Flush Cache on Scene Change
+[Dan Salvato]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801A4B70 --- 4E800020 -> Branch
+
+3C608000 3C80003C
+3D808000 618C543C
+7D8903A6 4E800420
+48000000
+
+
+	-==-
+
+
+All 51 Event Matches Open
+- matches are not automatically completed
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ------ 0x249aa4 ---- 2C1F0005 -> 48000058
+1.02 ------ 0x15fac8 ---- 4182000C -> 60000000
+
+
+	-==-
+
+
+Widescreen
+- new 20XX modifications
+[Dan Salvato/Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80021abc --- 38600006 -> Branch
+
+3C608040 8063A3D0
+2C030000 41820010
+38600001 3C808000
+90643324 38600006
+48000000
+
+
+1.02 ----- 0x8036A4A8 --- C03F0034 -> Branch
+
+C03F0034 3C608040
+80A3A3D0 2C050000
+4182007C 3C608000
+80033324 2C000001
+41820060 2C050004
+41820038 2C050003
+41820018 2C050002
+4182001C 3C004080
+3C604040 48000024
+3C0042B8 3C60427C
+48000018 3C004438
+3C60440E 4800000C
+3C0041B8 3C6041A8
+90010030 90610034
+C0010030 EC210032
+C0010034 EC210024
+38000000 3C608000
+90033324 281E0000
+48000000
+
+
+	-==-
+
+
+Disable USB Screenshot Function Branches
+Required in order to use any of the "USB Screenshot" Regions. A.k.a. the MCC Regions; these regions contain functions for Dolphin's OS Multi-Channel Communication API.
+[Achilles]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x1A1B64 ----- 480838F9 -> 60000000
+-------------- 0x1A1C50 ----- 480838BD -> 60000000
+
+# Normally, if the "Screenshot Regions" are used in MCM, it will automatically
+# apply these nops. However, that's not done in this case since we're actually
+# using a custom code region by a different name.
+
+
+	-==-
+
+
+Disable Title Screen Match Transitions
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801A1C58 --- 800DB078 -> 38000000
+
+
+	-==-
+
+
+Memory Card File Name Changes
+[Achilles]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x3b7c5c ----- 5375 -> 5858 # (SuperSmashBros... to XXperSmashBros..)
+-------------- 0x3b7c3c ----- 47616D65 -> 32305858 # (Game --> 20XX)
+
+
+	-==-
+
+
+HAL Heap 4 Size Increase
+Increases the size of the heap used for animation file preloading.
+This is needed to accomodate larger 20XX animation files.
+[DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+#NTSC 1.02 ---- 0x3B73AC ----- 0064B400 -> 00A00000 # HAL Heap 3
+NTSC 1.02 ---- 0x3B73BC ----- 0096C800 -> 009AC800
+
+
+	-==-
+
+!
+Half frame video lag reduction + poll drift fix BETA
+<https://smashboards.com/threads/video-lag-reduction-codes-for-console.501438/>
+[tauKhan]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801A4D98 ---- 481EE0E9 -> Branch
+
+8062A6F4 2C030001 # updateFunction
+40820028 8062A6F0
+2C030002 4182001C
+386DBD88 3D808034
+618CBA14 7D8803A6
+4E800021 4BFFFFD4
+60000000 00000000
+
+------------- 0x801A5050 ---- 38600000 -> Branch
+
+8062A6F4 2C030001 # updateFunction
+40820044 8062A6F0
+2C030002 40820038
+4800001C 8062A6F0
+2C030002 41820028
+8062A6F4 2C030001
+4082001C 386DBD88
+3D808034 618CBA14
+7D8803A6 4E800021
+4BFFFFD4 38600000
+60000000 00000000
+
+------------- 0x801A4BEC ---- 38800000 -> Branch
+
+4800007D 7C0802A6 # ScenePrep_Common
+90010004 9421FFF8
+386DBD88 8082A6F0
+38840001 9082A6F0
+2C040001 40820014
+3D808001 618C95FC
+7D8803A6 4E800021
+8082A6F0 2C040002
+40820014 3D808034
+618CBB00 7D8803A6
+4E800021 38600001
+9062A6F4 38604000
+38635624 3C808043
+B0642A42 8001000C
+38210008 7C0803A6
+4E800020 7C6802A6
+3D808034 618CE894
+7D8803A6 4E800021
+3C608048 3C80801A
+380446F4 38800000
+60000000 00000000
+
+------------- 0x80158268 ---- C822A6F0 -> C82280A0
+------------- 0x8034EB60 ---- 386DBD88 -> Branch
+
+8062A6F0 2C030001 #__VIRetraceHandler
+4080001C 38600000
+9062A6F4 3C608043
+38804000 388455FC
+B0832A42 38600000
+9062A6F0 386DBD88
+60000000 00000000
+
+------------- 0x80397878 ---- 801E0000 -> 4800020C # ErrorHandler

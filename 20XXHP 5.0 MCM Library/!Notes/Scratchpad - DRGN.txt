@@ -1,0 +1,1284 @@
+Created by DRGN of Smashboards
+My own R&D combined with random notes of interest from others.
+
+
+	TOC:
+
+		General / Dolphin
+		DOL 20XX Differences
+		On the CSS (MnSlChr)
+		Unique Closed Ports (UCP_14_9 Notes)
+		Special Game Modes
+		Special Game Modes Text (SdMenu.usd)
+		Stage Modifications
+		DOL Data Tables
+		Color Modifications
+		On the Debug Menu
+
+
+             /-------------------\
+=============  General / Dolphin  =====================================
+             \-------------------/
+
+20XX version number changes need to be updated in 3 places:
+	0x3A4CDD in MnSlChr (for Debug Menu display)
+	Texture on CSS upper-right (in MnSlChr @0x12760)
+	In DOL at 803FA154|0x3F7154; checked by OnBoot code
+		- this last one is the main one and the most detailed (referenced by internal code)
+		- Includes "20XX" string, followed by bytes for project#/major/minor/patch
+		- cannot do major/minor/patch numbers >9 without updating "Enable OSReport Print on Crash"
+
+There's a flag for playing audio files @804D6B94; handled by the Every Frame Function (in Scratchpad). Processes any non-0 ID set there. Should be linked to the SFX player code in the 20XXHP MCM Library. From Achilles:
+
+"I have a custom function that is executed every frame of the game to monitor a flag value, and if not 0, take the value as a SFX ID and play the SFX, then null the flag value. So if I ever need to play a SFX for a code, I just write the SFX ID to this RAM address and I know my every-frame code will take care of it next frame (ex. the SFX when hitting L/R for alternate costumes)."
+
+
+IfAll.usd is loaded into a persistent heap after advancing from the title screen, and is present for the entire time the game is running.
+
+
+Dolphin FYI:
+
+Highlighted line (when stepping through code) has NOT been executed yet; it is about to be on next step.
+When branching, the distance value includes the length of the branch itself; i.e. the branch is from the address of the branch, not the address immediately following the branch.
+
+
+Stages upgrades:
+
+https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.351221/page-178#post-21761748
+
+
+	Memory card stuff
+
+	- OnBoot code copies flag data from memory card to DOL space
+	- Every Frame Code copies flag data from DOL space to memory card RAM space
+	- Default 20XX flags are stored in MnSlChr at 0x3E2010
+	- The DOL space is broken into two sections:		Ranges restored by 'Reset 20XX' code:
+		803FA154|0x3F7154	0x378 bytes		803FA174-803FA4E4
+		803FA848|0x3F7848	0x11DC bytes		803FA840-803FBC68
+	- Debug menu data is between the two, at 803FA4CC to 803FA848 (0x37C bytes long)
+	- It seems not all of this space is actually used
+
+# Initial copy in RAM; one contiguous region
+8045D850   Start of nametag data (Vulnerable name on memory card);
+					^ I think he means the version string may be overwritten on save
+80469B94   End of last nametag (start of 20XX debug menu flag saves)
+8046B0EC   End of memcard data (61892/F1C4 total); last byte saved/restored is at B0E8
+	   B0EC-9B94= 0x1558 bytes
+
+# In DOL space; broken into two sections
+803FA154   Start of 20XX flags, section 1; 0x378 bytes
+	   A154+1558=B6AC
+803FA4CC   End of section 1
+803FA848   Start of section 2; 0x11DC bytes
+	   A848+11DC=BA24
+803FBA24   End of memcard data/20XX flags space (inclusive; the word here is the last saved)
+
+
+	From Achilles (on the GAMEID and memory card saves):
+
+"The memory card filename ID is located in the DOL. For the 20XX Hack Pack, I modified it as seen below:
+
+[ASCII "XXperSmashBros0110290334" at 0x3B7C5C]
+
+Obviously, I changed it from "Super..." to "XXper...".
+
+So a game save on a memory has two "parsed" IDs. First, is the Game ID it is saved for (e.g. GALE01). Second, is the memory card filename ID.
+
+Since the above change is implemented to the DOL, it will look on the memory card for a save with "GALE01" and "XXperSmashBros..."
+
+A vanilla Melee save is "GALE01", "SuperSmashBros..." so they don't conflict and can both be on a memory card simultaneously.
+
+(I initially used "XuperSmashBros..." but then found out that 20XX TE's "settings" save is using that filename ID)
+
+With the save files in the new Memory Card Management Debug Menu, it saves them under the "GALE01", "SuperSmashBros..." filename (so it overwrites/creates a new default Melee save file). You can just change that ASCII in the picture above right before the game executes a memory card save, and it will use the new memory card filename.
+
+I have not figured out a way, if possible, to change the game ID of a save. This is the main reason why I haven't changed the Game ID of 20XX from GALE01, and don't plan to - so that I can create GALE01 saves from this Debug Menu.
+
+20XXTE exploit cannot be activated from the Hack Pack."
+
+
+code flags:							string offset:
+
+# New code flags in DOL (802288E0 - 
+0x2254C0		Display Time at Top Right of CSS
+0x2254C4		Disable Wobbling
+0x2254C8		All Floors Are Drop-Through
+0x2254CC		low-poly mode
+0x2254D0		big heads mode
+0x2254D4		2D characters
+0x2254D8    802288E8	Easier Wavedashes (ROA-Style)
+0x2254DC    802288FC	Missing L-Cancels Fall Through Floor
+0x2254E0    80228900	Disable Spot Dodges
+0x2254E4    80228904	Disable Air Dodges
+0x2254E8    80228908	Longer Moonwalks
+0x2254EC    8022890C	Air Grabs
+0x2254F0    80228910	Everyone Can Float
+- Reserving space for more general codes here
+
+0x225590		Kirby Taunt Gives Random Ability
+0x225594		G&W Modulo
+0x225598		Yoshi Eggs code
+0x22559C		Nana Respawns After 20 Seconds		80FAEEAA
+0x2255A0		Buffed Hylian Sheild			80FAEEDA
+0x2255A4    802289C4	Instant Zelda/Shiek Transform		80FAEEF8
+0x2255A8    802289C8	Samus - Shoots Random Items		80FAEF20
+- Reserving space for more character codes here
+
+
+DOL Section 1 (803FA154|0x3F7154 to 803FA4CC|0x3F74CC)
+0x3F7210		UCF
+0x3F72D0		DK Always Full Giant Punch
+0x3F72D4		Luigi Always Misfire
+0x3F72D8		Fire Emblem Sword Swing Colors
+0x3F72DC		Samus Always Full Charge Shot
+0x3F7310		Battlefield Rainbow Water BG
+0x3F7360    803FA360	Greece Stage Variations
+0x3F73B4		Rainbow FD
+0x3F7F60		Sheik Always Full Needles
+0x3F7F64		Mewtwo Always Full Shadow Ball
+0x3F7F68		Peach Down-B Pull
+
+
+
+             /----------------------\
+=============  DOL 20XX Differences  ==================================
+             \----------------------/
+
+
+Diffs between a vanilla 1.02 DOL and the 20XXHP 5.0 base DOL (which has MCM library codes removed);
+i.e. custom code regions and areas used for flag storage.
+
+0x18DCC0 - 0x197B30 (0x9E70 bytes) zeroed out for custom code space
+0x2254C0 - 0x225644 (0x184 bytes) zeroed out for custom code space
+0x329584 - 0x329640 (0xBC bytes) zeroed out
+0x32A8E8 - 0x32A9A0 (0xB8 bytes) zeroed out
+0x32B96C - 0x32C208 (0x89C bytes) zeroed out for custom code space
+0x32C998 - 0x332834 (0x5E9c bytes) zeroed out for PAL FSM List (currently not used) # Extra USB/MCC Region
+0x39063C - 0x3907F4 (0x1B8 bytes) zeroed out for custom code space # Area 5 of USB/MCC
+
+After the normal end of the DOL (compared to vanilla, at 0x438600), Achilles added an
+extra 0x200 bytes, ending with the value 0x438800 (which is the file size). My guess is
+this was a test he was doing to see if it would load into the game, and he just didn't
+end up removing this afterwards. However since I'm not 100% sure, I'm leaving it for now.
+
+
+New code-region overwrite settings for MCM/MMW;
+see MCM's "settings.py" or MMW's codeRegionSettings.py for details.
+
+
+             /----------------------\
+=============  On the CSS (MnSlChr)  ==================================
+             \----------------------/
+
+loads into RAM at 0x80BEC720
+				heap is normally ->				80bd6440 -> 817f8ac0 	C22680	12,723,840
+				but on the CSS its (for char preloading) 	80bd6440 -> 811ad6c0 	5D7280	6,124,160
+
+Standalone CSS Color Modifications:	
+	https://smashboards.com/threads/standalone-css-color-modification.450087/
+
+
+Area to copy from .0sd to update .1sd/.2sd/.3sd: 
+	1) 0x3A2848 to 0x3C8FFF		<- Debug Menu changes
+	2) 0x3E3B10 to 0x3EB1FF		<- Every Frame Code and CSS Icon data
+
+
+	Diffs from vanilla to 20XX 4.07++
+	---------------------------------
+							len:
+
+Texture at 0x12760	Back button / version ID	0x9A0
+
+Texture at 0x2F760	Closed Port Door		0xC800
+
+Texture at 0x42620	"Stocks" (text) texture		0x2C0
+
+Texture at 0x4baa0	NTSC text in upper-left		0xEA0
+
+Special Melee Mode textures:		(All are 0x420 in length)
+	0x343A80	"Single-Button"
+	0x343EC0	"Giant"
+	0x344700	"Fixed-Camera"
+	0x344F40	"Invisible"
+	0x344F40	"Lightning"
+	0x345780	"Super Sudden Death"
+	0x345BA0	"Slo-Mo"
+	0x345FC0	"Tiny"
+
+
+Image data headers	(outlined in my main notes file)
+
+Closed Port Door alignment fix:
+	Two 4-byte ints changed (0 -> BE000000), starting at these offsets:
+	0x35A3F4
+	0x35A5F4
+	0x35A7F4
+	0x35A9F4	Probably Joint for P1
+
+
+
+	Diffs from 20XX 4.07++ to 20XX 5.0	(these are actual offsets changed; not struct starts)
+	----------------------------------
+
+0x7 		RT Start Offset (aka data section size) in header changed.
+		Needed to add RT entries, but couldn't add them to the end of
+		the table due to 20XX's data following the end of the file. 
+
+0xA		RT Entry Count in header changed
+
+0x2F760		Image Data for Closed Port Doors (CPDs) for P1 & P2
+   to
+0x3BF60
+
+0x348E8C	CSS bottom bar color changed:
+   to		    TEV struct 'color 1' changed to 818FAB00
+0x348E90	    TEV struct 'color 2' changed to 818FAB00
+
+0x34900C	CSS top bar color changed:
+   to		    TEV struct 'color 1' changed to 818FAB00
+0x349010	    TEV struct 'color 2' changed to 818FAB00
+
+0x349755	P4 CPD Image Data Header (pointer and image type changed)
+0x349815	P4 CPD Image Data Header (pointer and image type changed)
+0x34983F	00 -> FF	Reverse	P4? CPD left-bottom transparency mask in TEV Object
+0x349843	FF -> 00	Reverse	P4? CPD left-bottom transparency mask in TEV Object
+0x349A5F	P3 CPD Image Data Header (image type changed)
+0x349ADD	P3 Texture Object 1 (palette data header pointer added)
+0x349B16	P3 CPD Image Data Header (pointer and image type changed)
+0x349B3F	00 -> FF	Reverse	P3 CPD left-bottom transparency mask in TEV Object
+0x349B43	FF -> 00	Reverse	P3 CPD left-bottom transparency mask in TEV Object
+0x349B9D	P3 Texture Object 2 (palette data header pointer added)
+0x349D55	P2 CPD Image Data Header (pointer and image type changed)
+0x349E15	P2 CPD Image Data Header (pointer and image type changed)
+0x349E3F	00 -> FF	Reverse	P2? CPD left-bottom transparency mask in TEV Object
+0x349E43	FF -> 00	Reverse	P2? CPD left-bottom transparency mask in TEV Object
+0x34A055	P1 CPD Image Data Header (pointer and image type changed)
+0x34A115	P1 CPD Image Data Header (pointer and image type changed)
+0x34A13F	00 -> FF	Reverse	P1? CPD left-bottom transparency mask in TEV Object
+0x34A143	FF -> 00	Reverse	P1? CPD left-bottom transparency mask in TEV Object
+
+0x358CA8	P1 CSP alignment improvement; x-scale adjusted
+0x358CB4	P1 CSP alignment improvement; x-coord shifted
+0x358CE8	P2 CSP alignment improvement; x-scale adjusted
+0x358CF4	P2 CSP alignment improvement; x-coord shifted
+0x358D28	P3 CSP alignment improvement; x-scale adjusted
+0x358D34	P3 CSP alignment improvement; x-coord shifted
+0x358D68	P4 CSP alignment improvement; x-scale adjusted
+0x358D74	P4 CSP alignment improvement; x-coord shifted
+
+		CPDs alignment improvement; P1-P3 port doors moved approx. 1-2px to the right:
+0x35A2B4		x-coord for P1 door (shifted slightly right)
+0x35A4B4		x-coord for P2 door (shifted slightly right)
+0x35A6B4		x-coord for P3 door (shifted slightly right)
+
+0x35F5E5	P4 N/A button red color channel adjusted
+0x35F5F1	P4 N/A button green color channel adjusted
+0x35F600	P4 N/A button blue color channel adjusted
+
+0x35F68D	P3 N/A button red color channel adjusted
+0x35F699	P3 N/A button green color channel adjusted
+0x35F6A8	P3 N/A button blue color channel adjusted
+
+0x35F735	P2 N/A button red color channel adjusted
+0x35F741	P2 N/A button green color channel adjusted
+0x35F750	P2 N/A button blue color channel adjusted
+
+0x35F7DD	P1 N/A button red color channel adjusted
+0x35F7E9	P1 N/A button green color channel adjusted
+0x35F7F8	P1 N/A button blue color channel adjusted
+
+0x397BF1	2 structure pointers changed to point to relocated structs below.
+
+0x397BFC	Vanilla file structures from this point on (to the start of the RT) were
+   to		moved into the file's "tail data", after the normal end of the file. 
+0x397C24	This was done to free up space for new RT entries used by the CPD edits.
+
+0x397C2C	6 new RT Entries (0x18 bytes)
+
+0x3A280C	8 existing RT entries adjusted for relocated structure offsets (0x20 bytes)
+
+0x3A4CDD	Debug Menu version string updated to "VERSION 5.0"
+
+0x3AB078	Menu Item for CSS screens option count increased to 4
+
+0x3BD3A8	"DODGEBALL INFO" text changed to "TURBOMODE INFO"
+
+	The following 3 functions removed from CSS file, and placed in 
+	the DOL with  "All Players Can Control the Debug Menu (Rewrite)":
+
+0x3A51A0 (RAM:0x80F918C0; 0x70 in length) 	Debug Menu SDR Dynamic Menu Switcher 
+0x3A5830 (RAM:0x80F91F50; 0x44 in length)	Debug Menu Player Flag Switcher 
+0x3BCE10 (RAM:0x80FA9530; 0x88 in length)	Debug Menu Line Item Tracking
+
+0x3BCEA0	vestigial; old "Coming Soon Load Logic", which is now in the main library (and added upon)
+   to		(0x4C freed)
+0x3BCEEC
+
+0x3C10C0	Custom Stage name strings table updated with new stage names
+   to
+0x3C1F10
+
+0x3C1FE8	Pointer to "<MECHANICS CODES>" changed (reduced by 8 bytes)
+
+0x3C2048	Pointer to 'UCF' string below changed (reduced by 8 bytes)
+
+0x3C22B2	String for "SMASH TURN - 2 FRAME WINDOW :" changed to "Universal Controller Fix (UCF V.8) :"
+		(Mechanic itself replaced in DOL.)
+
+0x3C24A0	CSS names changed (from "DEFAULT", "TRI-CSP")
+
+0x3C9000	Previously the CPD (Closed Port Door) texture for all players. This space 
+   to		is now instead occupied by the image data for P3 & P4, and the palette 
+0x3DC040	data and palette headers/data for P3.
+
+0x3E1FAC	Vanilla structures relocated to here to make space for additional 
+   to		RT entries (required for CPD edits).
+0x3E2000
+
+0x3E3B00	Every Frame Code updated (v1.1)
+
+0x3E5E00	New CSS Icon Data (Image data only)
+  to
+0x3EB1FF
+
+'EFC' end		No further differences.
+   to
+  EOF
+
+
+Changes for the Closed Port Doors (CPDs) mentioned above are given 
+in greater detail in the "UCP_14_9 Notes.txt" file.
+
+
+All data/changes to MnSlChr after 0x3A2849 should be identical between the .0sd and .1sd files.
+
+
+CSP texture size: 0x63E0
+total CSPs: 118
+total space taken by CSPs: 0x2E0940 (3,017,024 bytes)
+
+stock icon size (used just for 1P mode CSS screens): 0x120
+total regular stock icons: 127	(non-character icons are: target, empty target, smash insignia)
+oversized stock icons (32x32): 2	<- for MH/CH
+124 * 0x120 = 0x8B80 (35,712) bytes
+
+
+
+	MnSlChr sizes (in bytes):
+
+			dec		hex		amount added
+
+vanilla			3,811,401	0x3A2849	n/a
+
+20XX 4.07++: 		4,128,785 	0x3F0011	+0x4D7C8 (317384) bytes
+
+~Max [known] possible:	4,325,376	0x420000	+0x2FFEF
+
+
+	other files needed on the CSS scene:
+
+		size in bytes:	hex:
+LbMcGame.usd	20,158		4EBE
+NtMemAc.usd	4,351		10FF
+MnExtAll.usd	1,315,321	1411F9
+SdSlChr.usd	14,996		3A94
+
+	total:	1,354,826	14AC4A		+3F0011 = 53AC5B
+
+
+	Custom Debug Menus thread:
+
+		https://smashboards.com/threads/custom-debug-submenu-engine-for-devs-only.398050/
+
+
+	Changing icon clickable area positions:
+
+		https://smashboards.com/threads/melee-hacks-and-you-new-hackers-start-here-in-the-op.247119/post-18250184
+
+
+CSS Icon Notes
+-CSS data exists in dol @ 803f0a48
+-CSS Icon struct exists in dol @ 803f0b24
+-Each entry is 0x1C long
+-Indexed by CSS order ID
+    0x00 = Char Unk ID, used for getting combo count @ 8025c0c4
+    0x01 = Char Ext ID
+    0x02 = Status ID. Dictates whether icon can be chosen. 0x0 = Not Unlocked, 0x1 = Unlocked (temp value), 0x2 = Unlocked and Displayed
+    0x03 = isAnimated ID? is made to be 0xC when the character is chosen.
+    0x04 = Unk ID, looks to be the same as the Joint ID?
+    0x05 = Joint ID, used to get JObj pointer from -0x49E0 (r13) (see 80264820 to get the JObj)
+    0x08 = SFX ID to play on selection
+    0x0C = Left Onscreen Boundary Position
+    0x10 = Right Onscreen Boundary Position
+    0x14 = Top Onscreen Boundary Position
+    0x18 = Bottom Onscreen Boundary Position
+
+
+
+	normal MnSlChr
+					length:
+
+header		    0x0 - 0x20		0x20
+
+unknown 	   0x20 -
+
+textures	 0x51c0 -
+
+CSS structs	0x395440 -
+
+rt table	0x397C44 - 0x3A2848	AC04
+& root nodes
+
+
+
+	20XX MnSlChr
+					length:
+
+header		    0x0 - 0x20		0x20
+
+unknown 	   0x20 -
+
+textures	 0x51c0 -
+
+CSS structs	0x395440 -
+
+rt table	0x397C44 - 0x3A2848	AC04
+& root nodes
+
+
+Debug Menu	0x3A2848 - 0x3A45F0	1DA8
+
+CSP Color	0x3A45F0 - 0x3A4720	130
+Pointers - External ID
+
+		   |	0x10
+
+Debug Menu	0x3A4730 - 0x3A4AA0	370
+(for stages?)
+		   |	0x10
+
+Debug Menu	0x3A4AB0 - 0x3A538C	8DC
+
+		   |	0x34
+
+Line Item	0x3A53C0 - 0x3A53D4	20	FUNCTION; 0x14 long
+Counter
+		   |	0xC
+
+VS Style Menu	0x3A53E0 - 0x3A5414	40	FUNCTION; 0x34 long
+Loader
+		   |	0x4A
+
+PLAYER FLAG	0x3A545E - 0x3A5820	3C2
+ACTIVE
+		   |	0x60
+
+Debug Menu	0x3A5880 - 0x3A5BD0?	350
+(custom shield colors)
+
+		   |	0x40
+
+"REG SUB	0x3A5C10 - 0x3A5C50	40	FUNCTION; 0x30 long
+Loader"
+
+"RET MAIN	0x3A5C50 - 0x3A5C70	30	FUNCTION; 0x20 long
+MENU"
+		   |	0x10
+
+character	0x3A5C80 - 0x3A5CEC	6C
+names pointer table
+		   | 	0x24
+
+character	0x3A5D10 - 0x3A5DC0	C0
+names string table
+
+		   |	?
+
+Character	0x3A61D0 - 0x3A64F0	320	(assuming full menu)
+Codes Menu
+		   |
+
+[Empty]		0x3A64F0
+
+		   |	0x90
+
+		0x3A6580
+
+[SDR stuff]
+
+TRACK PREVIEW	0x3B9060			Function for song previews in Debug Menu
+						Executed on Left/Right or A press
+		   |	0x90
+
+		0x3B90F0
+
+			0x3DB0
+
+COMING SOON	0x3BCEA0			Old function no longer used;
+CODE						should be safe to remove.
+		   |	0x4C
+
+		0x3BCEE0
+
+PAL MODE	0x3BDB80 - 0x3BEA40?
+TEX
+		   |	?
+
+Stage Texture 	0x3C10C0 - 0x3C1F10	E50	pointer table followed
+Name Definitions				by strings for each stage
+		   |	?
+
+[empty]		0x3C25A0 - 0x3C2700
+
+		   |
+
+Character	0x3C2700		Reserving block of 0x200 bytes for these strings
+Codes Menu
+Strings		   |	0x200
+
+Mechanics	0x3C2900		Reserving block of 0x160 bytes for these strings
+Codes Strings
+		   |	0x65A0
+
+Port Door	0x3C9000				In 4.07: 1 texture (0x19000 in length)
+Texture(s)						In 5.0:  2 textures (0x6400), 2 palettes, 
+		   |	0x13040					 and 2 palette headers
+							Refer to "Unique Closed Ports" section for details
+free space	0x3DC040
+
+		   |	0x5F6C		free space freed from switch from type _6 CSS CPD
+
+Relocated	0x3E1FAC		Original file structures, relocated here for CPD edits
+structs
+		   |			0x54
+
+Flags/		0x3E2000	<- "20XX RESET DEFAUL" label; these are default flags for
+Music Code					resetting 20XX data (X+A at CSS to Reset 20XX)
+		   |			192C
+
+CPU		0x3E392C
+Clone Flags
+		   |			1E4
+
+Every Frame	0x3E3B00		FUNCTION; 0x11C4 long		in RAM at 80FD0220
+   Code
+	(branched to by "All Players Can Control the Debug Menu")
+	(actual code start is 0x3E3B10)
+
+		   |			11D4
+
+[empty?]	0x3E4CD4
+
+		   |	76EC
+
+Song titles	0x3EC3C0 - 0x3EDDA4	19E4	strings for hex tracks 0x31 to 0xFF
+table 2						(bottom-up order; ends with string for 0x00)
+		   |	4
+
+Song title	0x3EDDA8 - 0x3EE1A4	3FC	space for 0xFF pointers
+pointer table
+		   |	2C
+
+Song titles	0x3EE1D0 - 0x3EE485	2B5	strings for hex tracks 0x01 to 0x30
+table 1						(top-down order)
+		   |	0x27
+
+Action state	0x3EE4AC - 0x3EEAAC	600
+name pointer table
+		   |	0xC
+
+Action state	0x3EEAB8 - ?
+names
+		   |	1559
+
+EOF		0x3F0011
+
+
+             /-----------------------\
+=============  On Unique Closed Ports ==================================
+             \-----------------------/
+
+These are old notes regarding the Closed Port Door (CPD) modifications on the CSS for 20XX HP v5.0. Typically, in vanilla Melee and prior 20XX versions, a single texture is shared across all port doors. It's fairly simple to instead use different textures for each, by adding space to the file (assuming you use the same texture properties). However, in 20XX (starting with v5.0), this is achieved through a much trickier way, due to limitations on file space, and the existance of data at the end of the file whos offsets needed to be preserved.
+
+
+v1.0 - complete CPD_9 project file. framework only; no textures imported
+v3.x - CPD_14 project files. 3.3 has complete framework, with textures
+v4.0 - hybrid CPD_14_9 project file. All players textures added as _14, except P2, which is _9
+v4.2 - Framework changed to represent image order explained below (P1, P4, P2, P3)
+v4.2.1 - Textures added
+v4.3 - Framework changed so all textures are _14, except P3, which is _9
+v4.4 - Final image order/type changed to P1/E, P2/E, P3/9, P4/E
+
+
+RT start: 397C2C
+String table start: 3A2834
+
+						as type 3	as type 6	as type 9	as type 14
+						(original)
+
+original closed door panel texture size: 	0xc800		0x19000		0x6400		0x3200
+										+2x 0x220 palettes/headers
+
+for same bit depth (double image data):						0xc800		0x6400
+										+2x 0x220
+
+=============  New File Struct Allocation  ==================================
+
+	Data/Header 1 = Upper-Right side
+	Data/Header 2 = Lower-Left side
+
+				     type:   length:   _
+0x2F760		P1 Image Data 1		9	0x3200	\
+0x32960		P1 Image Data 2		9		 \______/ 0xC800 total space, contained
+0x35B60		P2 Image Data 1		9		 /	\ in original texture location
+0x38D60		P2 Image Data 2		9	       _/
+-
+0x3C9000	P3 Image Data 1		14	0x6400
+0x3CF400	P3 Image Data 2		14
+0x3D5800	P4 Image Data 1		9	0x3200
+0x3D8A00	P4 Image Data 2		9
+0x3DBC00	P3 Palette Data 1	2	0x200
+0x3DBE00	P3 Palette Header 1		0x20
+0x3DBE20	P3 Palette Data 2	2
+0x3DC020	P3 Palette Header 2
+
+					Total image/palette/pHeader space for P2: 0xCC40
+
+Next usable space, following last header: 
+0x3DC040
+
+  0x5F6C free space between these
+
+0x3E1FAC	Relocated Structs	0x48		(The 0xC bytes following this are not used.)
+
+Start of usable space after this is @ 0x
+
+End of space available here:
+0x3E2000	Flags for music code (?) start immediately after this
+
+Space remaining: 0x3E1FAC - 0x3DC040 = 0x5F6C
+
+
+=============  File Structure Tree  ==================================
+
+			Data Headers:		Data Blocks:
+    Texture Object:
+
+====o	[ Upper-Right ]
+ P1 |	  34A08C	->	34A054  ->	2F760 (original)
+====o
+	[ Lower-Left ]
+	  34A14C	->	34A114  ->	32960
+
+
+====o	[ Upper-Right ]
+ P2 |	  349D8C	->	349D54  ->	35B60
+====o
+	[ Lower-Left ]
+	  349E4C	->	349E14  ->	38D60
+
+
+====o	[ Upper-Right ]
+ P3 |	  349A8C	-->	 349A54  ->	3C9000		Image Data 1
+====o			 \->	   3DBE00  ->	  3DBE00	Palette Data 1
+	[ Lower-Left ]
+	  349B4C	-->	349B14  ->	3CF400		Image Data 2
+			 \->	   3DC020  ->	  3DC020	Palette Data 2
+
+====o	[ Upper-Right ]
+ P4 |	  34978C	->	349754  ->	3D5800
+====o
+	[ Lower-Left ]
+	  34984C	->	349814  ->	3D8A00
+
+
+=============  Relocation Table Additions and Struct Relocations  ==================================
+
+New RT entries were required, for pointers in the texture structs and the new palette data headers.
+However, without more changes, I wasn't able to add to the end of the RT table (can't move 20XX data below it), 
+so I added to the RT's start. Thus, 6 structures at the end of the data section have been relocated, to make space above the RT.
+
+
+	Struct 0x397BFC (len 0xC) moved to 0x3E1FAC		<- Each struct moved 0x4A3B0 forward
+	Struct 0x397C08 (len 0xC) moved to 0x3E1FB8
+	Struct 0x397C14 (len 0xC) moved to 0x3E1FC4
+	Struct 0x397C20 (len 0xC) moved to 0x3E1FD0
+	Struct 0x397C2C (len 0xC) moved to 0x3E1FDC
+	Struct 0x397C38 (len 0xC) moved to 0x3E1FE8
+
+Pointers (in other structs, as well as in the RT) to these have been adjusted.
+
+
+New pointers for the RT, in order of tex struct pointer offsets first, 
+then header pointer offsets, all in file offset order:
+
+(Already modified for relativity to data section (-0x20))
+
+		pointer to:
+
+00349DBC	palette data header
+00349E7C	palette data header
+003DBDE0	palette data
+003DC000	palette data
+
+003E1FD8	fake struct 1
+003E1FDC	fake struct 2
+
+		The fake struct pointers are pointers to structures that aren't really in the file.
+		They essentially imply a struct starts there, so that DTW can calculate the length
+		of the last structure before it. These are needed because those structs fall in the
+		tail section of the file (appearing after the string table; i.e. outside of the
+		normal data section, of where they should appear in the file).
+
+
+File header changes:
+
+	-24 bytes from RT Start Offset (aka data section size):
+		From 0x397C24 (original) to 0x397C0C
+	+6 to RT Entry Count: From 2AFA (original; 11002) to 2B00 (11008)
+
+
+=============  TEV Struct Changes  ==================================
+
+The way that the game normally stores the Closed Port Doors includes using the alpha channel as a mask. Pixels for the top-right panel are opaque in the original image, while pixels for the bottom-left panel are transparent. When the texure is used in the game, a blending is used with the alpha channel; only the opaque pixels are shown for the top-right panel, while the blending is reversed for the bottom-left panel so that only transparent pixels are shown. (In both cases, the effect is actually proportional to the alpha channel, meaning that an alpha of 50% would result in that panel appearing partially transparent.)
+
+This is normally fine for _3 or _6 type textures, as the bit depth for colors is the same, regardless of whether the pixel has transparency. However, for _5, _9 or _14 type textures, a color shift naturally occurs during encoding/decoding, which varies partially due to whether or not the color is stored with transparency (in _9, this is due to a different bit depth between pixels with and without an alpha channel, while in _14 this is due to a difference in interpolation of the encoded colors).
+
+Therefore, in order to have same-colors appear the same on both sides of the port doors in-game (after encode/decode), the existance of an alpha channel must be the same for pixels on both panels of the door. To do this, instead of one image for each door, where the application method of the mask is reversed for both sides, I created two images per CPD (one for each panel), changing the mask application method to be the same for both sides. This is done by reversing mask transparency rules in the texture's TEV (Texture Environment) structures. (Specific offsets of these are available in the "On the CSS (MnSlChr)" section.)
+
+
+             /-----------------------\
+=============  On Special Game Modes  ==================================
+             \-----------------------/
+
+special modes:
+				4.07		5.0
+
+ID:
+	camera
+	stamina
+	super sudden death	chess
+	giant			dual 1v1
+	tiny			beam sword
+0x11	invisible		hot mr. S	Super Shine Bros.
+	fixed-camera		RHE
+0x2C	single-button		dodgeball	Turbo Mode
+0x13	lightning		NBA Jam
+	slo-mo melee		Tag Team
+
+
+#Scene Struct
+.set SceneController,0x80479D30
+  .set Scene.CurrentMajor,0x0
+  .set Scene.PendingMajor,0x1
+  .set Scene.PreviousMajor,0x2
+  .set Scene.CurrentMinor,0x3
+  .set Scene.PendingMinor,0x4
+  .set Scene.PreviousMinor,0x5
+
+
+Menu IDs (menu major)
+------------------
+00 - Title Screen (Press Start)
+01 - Reloads menu from language change? (brings to language change selection and saves)
+02 - VS mode character select
+03 - Classic Mode
+04 - Adventure Mode
+05 - All-Star Mode
+06 - Debug Menu
+07 - Master Sound Test
+08 - Looks like regular VS mode, but actually cycles through many different character select screens
+09 - Black Screen...?
+0A (10) - Camera Mode
+0B (11) - Trophy Gallery
+0C (12) - Trophy Lottery
+0D (13) - Trophy Collection
+0E (14) - Starts a match (with the debug menu configurations?)
+0F (15) - Target Test
+10 (16) - Super Sudden Death
+11 (17) - Invisible Melee
+12 (18) - Slo-Mo Melee
+13 (19) - Lightning Melee
+14 (20) - "A new foe has appeared!" (Ganon with sword, freezes if you try to progress, ID from debug?)
+15 (21) - Classic Mode trophy acquisition & credits (C.Falcon, ID from debug?)
+16 (22) - Adventure Mode trophy acquisition & credits (C.Falcon, ID from debug?)
+17 (23) - All-Star Mode trophy acquisition & credits (C.Falcon, ID from debug?)
+18 (24) - Intro video
+19 (25) - Cycles through Adventure Mode cinematics
+1A (26) - Character trophy acquisition (no credits) (uses All-Star trophy) (C.Falcon, ID from debug?)
+1B (27) - Tournament Menu
+1C (28) - Training Mode
+1D (29) - Tiny Melee
+1E (30) - Giant Melee
+1F (31) - Stamina Mode
+20 (32) - Home-Run Contest
+21 (33) - 10-Man Melee
+22 (34) - 100-Man Melee
+23 (35) - 3-Minute Melee
+24 (36) - 15-Minute Melee
+25 (37) - Endless Melee
+26 (38) - Cruel Melee
+27 (39) - "Enable Progressive Scan Display?"
+28 (40) - Plays Intro Video
+29 (41) - Memory Card Overwrite Confirmation
+2A (42) - Fixed-Camera Mode
+2B (43) - Loads Event Match 1 (Match ID from the debug menu?)
+2C (44) - Single-Button Mode
+
+
+             /---------------------------------------------------\
+=============  On modifying Special Game Modes Text (SdMenu.usd)  ==================================
+             \---------------------------------------------------/
+
+Original text
+suggested replacement for 20XX
+SdMenu offset
+text hex
+hex immediately following the text hex
+
+
+	Chess Melee to replace Super Sudden Death:
+All players start with 300% damage.
+Fight like every stock is the last.
+4DD9
+18200A202F202F1A2033202F2024203C2028203520361A203620372024203520371A203A202C2037202B1A20032000200021031A2027202420302024202A202820E7
+19 0F 0D 00 16 10 0C AA AA AA 0E 00 B3 00 B3 06 00 00 00 00
+
+
+	Dual 1v1 to replace Giant Melee:
+All players are giant-sized.
+A 1v1 plus a 1v1, for a 1v1.
+4E2F
+18200A202F202F1A2033202F2024203C2028203520361A2024203520281A202A202C20242031203720FC2036202C203D2028202720E7
+19 0F 0D 00 16 10 0C AA AA AA 0E 00 B3 00 B3 06
+
+
+	Beam Sword Battle to replace Tiny Melee:
+All players are tiny.
+*Lightsaber noises*
+Swords for everyone.
+Everyone has a sword.
+4E79
+18200A202F202F1A2033202F2024203C2028203520361A2024203520281A2037202C2031203C20E7
+19 0F 0D 00 16 10 0C AA AA AA 0E 00 B3 00 B3 06 00 00 00 00
+
+
+	Hot Mr. Saturn to replace Invisible Melee:
+All players are invisible.
+HOT, HOT, HOT!
+Beware the Saturns!
+All characters have a shine.
+Everyone has a shine.	200e203920282035203c2032203120281a202b202420361a20241a2036202b202c2031202820e7
+Gives everyone a shine.
+All players have a shine.	200a202f202f1a2033202f2024203c2028203520361a202b2024203920281a20241a2036202b202c2031202820e7
+4EB4+
+200a202f202f1a2033202f2024203c2028203520361a2024203520281a202c20312039202c2036202c2025202f202820e7
+19 0F 0D 00 16 10 0C AA AA AA 0E 00 B3 00 B3 06 00 00 00 00
+
+
+	Super Shine Bros. to replace Invisible Melee:
+All characters have a shine.
+Everyone has a shine.	200e203920282035203c2032203120281a202b202420361a20241a2036202b202c2031202820e7
+Gives everyone a shine.
+All players have a shine.	200a202f202f1a2033202f2024203c2028203520361a202b2024203920281a20241a2036202b202c2031202820e7
+4EB5
+
+	Random Hit Elements to replace Fixed-Camera Mode:
+The camera does not zoom or scroll. 
+    Hit effects are randomized.    
+4EFB
+18201D202B20281A2026202420302028203520241A20272032202820361A2031203220371A203D2032203220301A203220351A2036202620352032202F202F20E7
+19 0F 0D 00 10 0C AA AA AA 0E 00 B3 00 80 07 00 00 FF EC 03 16 06 00 00 00 00
+
+
+	Super Shine Bros. to replace Single-Button Mode:
+The player uses only the A Button
+Gives every character a shine.
+All characters have a shine.
+    Adds some game balancing,    
+4F56
+18201D202B20281A2033202F2024203C202820351A20382036202820361A20322031202F203C1A2037202B20281A200A1A200B20382037203720322031
+19 03 06 00 00 00 00
+
+ and the Control Stick. Great for beginners.
+   by giving every character a shine.
+4F99+
+181A2024203120271A2037202B20281A200C20322031203720352032202F1A201C2037202C2026202E20E71A201020352028202420371A2029203220351A20252028202A202C2031203120282035203620E7
+19 0F 0D 00 16 10 0C AA AA AA 0E 00 B3 00 B3 06 00 00 00 00
+
+
+	Turbo Mode to replace Single-Button Mode:
+The player uses only the A Button
+Landing an attack allows you to
+4F56
+2015202420312027202c2031202a1a202420311a20242037203720242026202e1a2024202f202f2032203a20361a203c203220381a20372032
+
+ and the Control Stick. Great for beginners.
+cancel instantly with a different move!
+4F9A
+20262024203120262028202f1a202c203120362037202420312037202f203c1a203a202c2037202b1a20241a2027202c20292029202820352028203120371a203020322039202820ec
+
+
+	NBA Jam to replace Lightning Melee:
+All players move at high speeds.
+   Gain power by getting KOs.   
+5000
+18200A202F202F1A2033202F2024203C2028203520361A20302032203920281A202420371A202B202C202A202B1A20362033202820282027203620E7
+19 0F 0D 00 16 10 0C AA AA AA 0E 00 B3 00 B3 06 00 00 00 00
+
+
+	Tag Team to replace Slo-Mo Melee:
+All players move in slow motion.
+Tag-in or tag-out your teammate.
+Tag-in teammates for battle.
+5050
+18200A202F202F1A2033202F2024203C2028203520361A20302032203920281A202C20311A2036202F2032203A1A203020322037202C2032203120E7
+19 0F 0D 00 10 0C AA AA AA 0E 00 B3 00 B3 16 06 00 00 00 00
+
+
+             /------------------------\
+=============  On Stage Modifications  ==================================
+             \------------------------/
+
+For stages, the stage names that appear in the Debug Menu for random 
+default stages are defined in MnSlChr, starting at 0x3C10C0.
+
+20XX's Stage Swap Modification flags & data starts in the DOL at offset 0x3F8C70
+
+	Details: 
+https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.351221/page-129#post-20702420
+
+
+DOL Stage File Name Offsets:		v offset for start of the name
+							v offset for byte to replace
+		Nuetrals:						v RAM address for byte to replace
+	Battlefield 	GrNBa.dat	0x3E4E2D	0x3E4E33	803E7E33
+	Dreamland 64	GrOp.dat	0x3E373D	0x3E3742	803E6742
+	FD		GrNLa.dat	0x3E4F85	0x3E4F8B	803E7F8B
+	FoD		GrIz.dat	0x3DDE51	0x3DDE56	803E0E56
+	Stadium		GrPs		0x42F609	0x42F60C	804D45EC	(offset to "s")
+	Yoshi's Story	GrSt.dat	0x3DF741	0x3DF746	803E2746
+
+		Other:
+	Corneria	GrCn		0x42F671	0x42F674	804D4654	(offset to "n")
+	Fourside	GrFs.dat	0x3E0D89	0x3E0D8E	803E3D8E
+	Great Bay	GrGb.dat	0x3E0F61	0x3E0F66	803E3F66
+	Kongo Jungle 64	GrOk.dat	0x3E35DD	0x3E35E0	803E65E2
+	Onett		GrOt		0x42F6A9	0x42F6AC	804D468C	(offset to "t")
+	PokeFloats	GrPu.usd	0x3E3A31	0x3E3A36	803E6A34
+	MKII		GrI2.dat	0x3E1BF5
+	MKI		GrI1.dat	0x3E1945	0x3E194A	803E494A
+	Mute City	GrMc.dat	0x3E03D1	0x3E03D6	803E33D6
+	Peach's Castle	GrCs.dat	0x3DE199	0x3DE19E	803E119E
+	Temple		GrSh.dat	0x3E2125	0x3E212A	803E512A
+	Yoshi's Island	GrYt.dat	0x3E21C1	0x3E21C6	803E51C6
+
+		1P:
+	Heal		GrHe.dat	0x3E54B9	0x3E54BE	803E84BE
+
+		BTT Stages:
+	DK's		GrTDk.dat	0x3E57E1	0x3E57E7	803E87E7
+	Dr. Mario	GrTDr.dat	0x3E58A1	0x3E58A7	803E88A7
+	Falcon's	GrTCa.dat	0x3E5658	0x3E565F	803E865F
+	Fox's		GrTFx.dat	0x3E5A29	0x3E5A2F	803E8A2F
+	Roy's		GrTFe.dat	0x3E6811	0x3E6817	803E9817
+	Link's		GrTLk.dat	0x3E5D81	0x3E5D87	803E8D87
+	Luigi's		GrTLg.dat	0x3E5E41	0x3E5E47	803E8E47
+	Marth's		GrTMs.dat	0x3E5F01	0x3E5F07	803E8F07
+	Ness's		GrTNs.dat	0x3E6081	0x3E6087	803E9087
+	Ganon's		GrTGn.dat	0x3E68D1	0x3E68D7	803E98D7
+	Sheik's		GrTSk.dat	0x3E6509	0x3E650F	803E950F
+	YL's 		GrTCl.dat	0x3E5721	0x3E5727	803E8727
+
+SSS Stage text properties:
+
+	Top text: Palatino Linotype Bold, size 17
+	Bottom text: A-OTF Folk Pro Heavy, Italic, size 24, -.5 kerning
+		Assuming the height of the Bottom text layer is 75, 
+		scale its height up to 122, then add a -5 shear.
+
+
+
+Stage IDs (external): 	https://docs.google.com/spreadsheets/d/1JX2w-r2fuvWuNgGb6D3Cs4wHQKLFegZe2jhbBuIhCG8/edit#gid=20
+   		or	https://code.google.com/archive/p/vgce/wikis/ssbmStageID.wiki
+
+
+Stage File Name and Special Function Table?
+
+	There is a pointer table in the DOL at 803dfedc / 0x3DCEDC 
+	each entry points to the structure defined below.
+
+	- indexed by internal stage ID
+	- each entry is a 4 byte pointer, pointing to a 0x34 byte struct described below
+	- 0x6F (111) entries; however, only 0x47 (71) practical entries*
+	- 0x1BC total length
+
+* Entries at index 0x47 and after are the same as entry 0x01 (and 0x23), 
+	which is the placeholder "TEST" stage.
+
+
+	- Structure (0x34 bytes in length):
+
+0x0 = stage info
+    0x00 = Stage Internal ID, Int32
+    0x04 = Pointer to map_gobj Creation Functions
+            -Each Entry on this table is a group of functions. 
+	     Groups are 0x14 long and are all pointers to functions used to init various map_gobjs
+            -0x00 = Run On Element Creation
+            -0x04 = Run On Unk (Element Deletion?)
+            -0x08 = Run Per Frame
+            -0x0C = Run on Unk
+            -0x10 = Bitflags
+    0x08 = Pointer to Stage File Name string
+    0x0C = Pointer to StageInitialization Function
+    0x10 = Pointer to Unk Function
+    0x14 = Pointer to Stage's OnLoad Function
+    0x18 = Pointer to Stage's OnGo Function
+    0x1C = Pointer to Unk Function
+    0x20 = Pointer to Unk Function
+    0x24 = Pointer to Unk Function
+    0x28 = Unk, Int32
+    0x2C = Pointer to MovingCollisionPointsInitialize value sets
+        -Each set is 0x6 long
+        0x0 = half, line ID?
+        0x2 = half, map_gobj these lines are associated with
+        0x4 = 
+    0x30 = Amount of MovingCollisionPointsInitialize value sets?
+
+
+
+First entry: 803DFEA8 / 0x3DCEA8
+
+00 00 00 00 00 00 00 00 00 00 00 00 80 1B FF A8 80 1B FF AC 80 1B FF A8 80 1B FF A8 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+second entry: 803E5764 / 0x3E2764
+
+
+00 00 00 01 80 3E 57 08 80 3E 57 58 80 20 6E 30 80 20 6E 2C 80 20 70 14 80 20 70 18 80 20 70 3C 80 20 74 0C 80 20 74 14 00 00 00 01 80 3E 56 B8 00 00 00 0D
+
+third: 803E11A4 / 0x3DE1A4
+
+00 00 00 02 80 3E 0F F4 80 3E 11 98 80 1C D3 7C 80 1C D3 38 80 1C D4 A0 80 1C D4 A4 80 1C D4 C8 80 1D 0B 04 80 1D 0B 0C 00 00 00 01 80 3E 0F E8 00 00 00 02
+
+
+	Internal stage IDs:
+
+0 = DUMMY (classic mode VS splash screen)
+1 = TEST (test level)
+2-30 = normal VS mode stages
+31-35 = adventure mode stages
+  31 = mushroom kingdom 1p
+  32 = underground maze
+  33 = escape
+  34 = fzero race
+  35 = unk
+36 = battlefield
+37 = final destination
+38 = snag trophies
+39 = race to the finish
+40-65 = target tests
+66 = all star rest
+67 = homerun contest
+68-70 = unk
+70-109 = unk, all share same pointer to the TEST stage struct. possibly placeholders
+
+
+0x00: 'DUMMY'
+0x01: 'TEST' # Cafe test level
+0x02: Princess Peach's Castle
+0x03: Rainbow Cruise
+0x04: Kongo Jungle
+0x05: Jungle Japes
+0x06: Great Bay				pointer at 0x3DCEDC + (4*6) = 3DCEF4 - pointer = 803E3F6C / 0x3E0F6C
+0x07: Hyrule Temple
+0x08: Brinstar
+0x09: Brinstar Depths
+0x0A: Yoshi's Story
+0x0B: Yoshi's Island
+0x0C: Fountain of Dreams
+0x0D: Green Greens
+0x0E: Corneria
+0x0F: Venom
+0x10: Pokemon Stadium
+0x11: Poke Floats
+0x12: Mute City
+0x13: Big Blue
+0x14: Onett
+0x15: Fourside
+0x16: Icicle Mountain
+0x18: Mushroom Kingdom
+0x19: Mushroom Kingdom II
+0x1B: Flat Zone
+0x1C: Dream Land
+0x1D: 'Yoshi's Island (64)'
+0x1E: 'Kongo Jungle (64)'			# 30
+0x1F: 'Mushroom Kingdom Adventure'
+0x20: 'Underground Maze',
+
+
+target test stages seem to be in same order as those for external ids
+				pointer table index
+
+0x28: 'Mario's BTT'		A0
+0x29: 'Captain Falcon's BTT'
+
+0x2B: 'Donkey Kong's BTT'	AC		80 3E 87 EC
+
+00 00 00 2B 
+80 3E 87 90 
+80 3E 87 E0 		Stage File Name string
+80 22 02 2C / 0x21CE0C	StageInitialization Function
+80 22 02 28 
+80 22 02 9C 
+80 22 02 A0 
+80 22 02 C4 
+80 22 04 FC 
+80 22 05 04 
+00 00 00 01 
+00 00 00 00
+
+
+             /-----------------\
+=============  DOL Data Tables  ==================================
+             \-----------------/
+
+Some of the vanilla data look-up tables residing in the DOL:
+
+
+Heap Setup Table exists @ 803ba380
+-Structure is:
+    -0x0 = Int32, Main Heap ID
+    -0x4 = Int32, Heap Lo Boundary Behavior
+    -0x8 = Int32, Heap ID to Start After
+    -0xC = Int32, persistent heap size.
+
+Persistent IDs
+0 = unk
+1 = IfAll
+2 = Fighter file cache
+3 = AJ file cache (ARAM)
+
+preload table struct (80432078):
+        0x00 = 
+        0x04 = unk
+        0x08 = unk
+        0x10 = stage ID 
+        0x14 = first character ID (external) (0x21 = unloaded) (word)
+        0x18 = first character costume ID (byte)
+        0x1C = second character ID (external) (0x21 = unloaded)
+        0x20 = second character costume ID (byte)
+        0x24 = third character ID (external) (0x21 = unloaded)
+        0x28 = third character costume ID (byte)
+        .... goes up to 8 slots i think
+        0x54 = # of times preload table has been reset
+        .... copy of 0x00 -> 0x54
+
+
+Stage Info table at 803dfedc|0x3DCEDC, detailed in the "On Stage Modifications" section above.
+	(table of pointers; each pointer leads to a struct of multiple stage properties)
+
+Music ID/filename table at 0x3B9314:
+	- indexed by music ID
+	- each entry is a 4 byte pointer, which leads to a disc file name string
+	- 0x63 entries
+
+GrInstance table at 803e9960|0x3E6960:
+	- Indexed by external stage ID
+	- Stride (entry length) is 0xC
+	- Struct values:
+		0x0 = internal stage ID
+		0x04 = 0
+		0x08 = 0 
+
+Pointer Table based on Char ID; 803c11d8|0x3BE1D8
+
+
+
+Pointer table to character 'Pl__.dat' files and their symbols: 803C1F40|0x3BEF40
+needs verification, but seems to be:
+  - 0x21 entries
+  - indexed by internal character ID
+  - each entry is two pointers:
+	0x0: 'Pl__.dat' string
+	0x4: 'ftData[char]' symbol string
+
+
+	Pl__.dat string offsets (in table order):
+		803C57D5  00	Mario
+		803C7BED  01	Fox
+		803C759D  02	Falcon
+		803CBDFD  03	DK
+		803CA30D  04	Kirby
+			  05	Bowser
+
+		803CC365	Sheik
+	
+		803CD615	Popo
+		803CFC9D	Zelda
+
+             /------------------------\
+=============  On Color Modifications  ==================================
+             \------------------------/
+
+
+CSS border element color shifts (tev struct color 1 and color 2): 818FAB00
+
+	SSS Grayscale texture color changes:
+
+	 - TEV struct 0x95FAC (outer rectangular-structures)
+	color 1 and color 2: 66666600 -> 5A647800
+
+new color based on the CSS color 818FAB00
+
+new value calculations
+h	d	*.6	*.7
+81	129	77	90
+8F	143	86	100
+AB	171	103	120
+
+*.6: 4D5667
+*.7: 5A647800
+
+	 - Material colors for 0x95F5C struct (stage select circles)
+	RGBA Diffusion: 808080FF -> 606b80FF
+	RGBA Ambience:  CCCCCCFF -> 99aaccFF
+		(^ made by matching HSV value of these to the 5A647800 color)
+
+
+             /-------------------\
+=============  On the Debug Menu  ==================================
+             \-------------------/
+
+Debug Menu line items have a 'target function' pointer at 0x
+
+
+3a4a00		all floors code, menu item offset
+target function: 80F91160 for temp test
+	target function executes AFTER item's current value is updated
+	seems that r15-r19 are safe to use, as Achilles uses these
+
+
+hold X+A to reset 20XX
+
+Debug Menu 'Target Function' addresses and functions:
+
+
+REG SUB LOADER		common target function for type 2 menu items
+80F92340|3A5C20 (CSS)
+4B 36 DA 3D	branch back from REG SUB LOADER, at 3a5c38, to 802FFD94/DebugMenu_OnSelect
+		then returns to this function
+		uses a blr to get back, returning to DebugMenu_ButtonPressCheck
+
+
+
+80301C80 = Debug Menu OnLeave/Enter function?
+
+
+2FE9E8 | 80301E08	Goes to DebugMenu_CreditsGameStart
+
+
+Song Preview target function
+80FA5780 | 3B9060 (CSS)		branches to DebugMenu_ButtonPressCheck
+				loads hex track ID, branches to Music_HandleLoading if A is pressed
+				uses a blr to get back
+
