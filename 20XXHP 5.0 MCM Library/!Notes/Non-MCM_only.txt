@@ -1,0 +1,456 @@
+7/16/16
+0x32ba70 to 0x32c20c is now free, due to putting Magus physics main code into DOL Manager. Could add this to DOL Manager free space if needed.
+
+
+General:
+
+Memory Card Names
+0x3b7c5c --- 53 --> 58 (SuperSmashBros... to XXperSmashBros..)
+0x3b7c3c --- 47616d65 --> 32305858 (Game --> 20XX)
+
+Bowser Flame Cancel - on by default
+0x132264 (135686 in RAM) ---- 38800155 --> 38800156
+
+
+Debug Menu Replaces Tournament Mode
+-Selecting Tournament Melee in the main menu takes you to the Debug Menu instead
+-Selecting Fixed Camera takes you to the Tournament Melee mode instead
+0x22A218 (22d638 in RAM) ---- 3800001B -> 38000006
+0x229208 (22c628 in RAM) ---- 3800002A -> 3800001B
+
+
+Unlock All Characters & Stages & Random Stage Select
+0x1614A8 ---- A0BF0000 -> 38A007FF
+0x16109C ---- A0BF0000 -> 38A007FF
+0x170160 ---- A0BF0000 -> 38A007FF
+
+
+Modified Default Settings
+- infinite time
+- 4 stock
+- 8 minute stock timer
+- No items
+- Friendly Fire ON
+- Rumble OFF for all players
+- Deflicker OFF
+- Only legal Singles stages on random stage toggle
+
+
+Disable Name Tag and KO Star Reset After Closing Character Port [Ato]
+0x25E6FC ---- 98A4007A -> 60000000
+0x25E710 ---- 98A4001B -> 60000000 
+
+
+Disable KO Star Reset Upon Exiting CSS [Todd Benney]
+
+
+Unlock Stage Select Upon Boot										< not added, in lue of other codes that should do this
+0x15ba28 ---- 8803186c -> 3800000e
+
+"Random" is default selected on SSS
+byte@
+0x2575f0 (25AA10 in RAM) --- 38e0001e --> 38e0001d
+0x1a21cc ---- 7c0802a6 -> 4e800020
+0x3D1A48
+
+
+--------------------------------------------------
+
+Default Character Nametags
+Male Wireframe:
+ZAKA otoko -> M Wireframe
+0x003d1f7c ----
+
+Female Wireframe:
+ZAKA onna -> F Wireframe
+0x003d1f90 ----
+
+Popo:
+003d205c - added pointer here to 0x803d4f89
+
+---------------------------------------------------
+
+
+
+
+Debug Menu Hacks
+
+All players can control: See the document Hack folder					< used the standard "All Players Can Control the Debug Menu"
+
+
+--------------------------------------------
+---------- All Added to Aux Stuff ---------v
+Colors:
+430a28 (BG) --- 40508080 -> 66666650							< this is actually 00000000 in the 20XX DOL?
+	- new BG color for 3.03 is 444444ff (ff = opague)
+430a34 (NonSelect Text) --- a0a0ffff -> ffcc00ff
+
+DBLevel Text at Start Screen: 0x3e76c8
+
+*Disabled
+Return Main Menu no Freeze
+0x300a60 (303e80 RAM) ---- 7d8803a6 -> 48C8E500						< only placing a branch at 0x300a60
+START (MnSlChr)- 80f92380 RAM
+
+**Debug Menu Player Flag Switcher
+0x300584 (803039a4 RAM) --- 39400000 -> 48C8E5AC					< hex shown here is not vanilla (replaced by custom func)
+**New, injected into MnSlChr @ 3a5830 (F91F50 RAM)
+
+
+	-	-
+
+Other L Cancel Stuff				
+
+Change compare byte!
+0x8a274 (8d694 in RAM)
+
+Changed ASM from
+lwz r0,0x00E4(r6) - 800600e4
+to
+li r0,7 - 38000007
+(it always loaded 7 anyway from DOL).
+Do this to change L cancel timing
+
+	-	-
+
+Frame Counter
+- the code that actually makes the percents change
+
+0x16997c (16cd9c in RAM) ---- 90010004 --> 4be97674
+START- 1410
+END- 1490
+
+
+16cd9c to 0004410 = branch distance of -0x16898C
+
+-------------------------------------------^
+--------------------------------------------
+
+
+Prevent Button Press Function from Running When Entering a Menu
+0x2ff9e0 ---- 7c0802a6 -> 4e800020
+
+Prevent Button Press Function from Running When Pressing B no Line Item
+0x300a50 ---- 41820048 -> 48000048
+
+Debug Menu Exits to CSS
+0x1ad5f4 --- 38600000 -> 38600002
+
+Modified Submenu Load Routine								< any change in DOL to point to this function?
+START (MnSlChr)- 80F92340 RAM
+
+Submenus Resemble Normal Menus
+0x300e34 (304254 RAM) ---- 887f0000 -> 38600000
+0x300e3c (30425c RAM) ---- 88a90004 -> 38a00006
+0x2ffcbc (3030dc RAM) ---- 80010058 -> 3c000000
+0x2ffd38 (303158 RAM) ---- 80010050 -> 3c000000
+0x2ffdb4 (3031d4 RAM) ---- 80010048 -> 3c000000
+0x2ffe24 (303244 RAM) ---- 80010040 -> 3c000000
+
+
+----------------------------------------------
+Name Tag Blank Space Additions
+0x1a21d0 --> 81940000 = #
+0x1a21d4 --> 81620000 = |
+0x1a21d8 --> 81510000 = _
+(the 1a21d0 function was disabled with the "Disable KO star reset after leaving CSS" code)			< Added to Aux Stuff
+
+offset		orig	new (early?)		new (actual)
+0x3eac60 ---- 804d4cac --> 80003468		801A55F8
+0x3eac4c ---- 804d4cac --> 80003464		801A55F4
+0x3eac38 ---- 804d4cac --> 80003460		801A55F0			
+
+# above new values apparently changed to below values
+0x3eac60 ---- 804d4cac --> 801a55f8							< these changes added with Name Tag Blank Space Additions above
+0x3eac4c ---- 804d4cac --> 801a55f4							  (in CSS library file)
+0x3eac38 ---- 804d4cac --> 801a55f0
+
+
+
+--------------------------------------------------------------------
+---------- All Added under "Default File Name Changes" -------------				< in "Stages.txt"
+
+IfAll - changing for easy PAL Stock Icon switching
+0x42e810 (4d37f0) ---- 6c -> 30 (IfAll -> IfAl0)
+0x4307a4 (4d5784) ---- 6c -> 30
+--------------------------
+MnSlMap.usd
+0x3eda20 (3f0a20) ---- 75 -> 31 (.usd -> .1sd)
+---------------------------
+Battlefield (GrNBa.dat)
+0x3e4e33 (3e7e33) ---- 64 -> 30 (GrNBa.0at)
+-------------------------
+Pokemon Stadium
+
+Main Stage 0x42f60C (4d45eC)
+Transformations start around 0x3de5f0 (3e15f0)
+----------------------------
+Dreamland (GrOp.dat)
+0x3e3742 (3e6742) ---- 64 ->
+
+-----------------
+Princess Peachs Castle(GrCs.dat)
+0x3de19e (3e119e) ---- 64 ->
+----------------
+Final Destination (GrNLa.dat)
+0x3e4f8b (3e7f8b) ---- 64 -> 30
+
+GrNLa.0at = Default
+GrNLa.2at = Smash Wii U Model Import
+----------------
+Yoshi's Story (GrSt.dat)
+0x3df746 (3e2746) ---- 64 ->
+------------------
+Fountain of Dreams (GrIz.dat) 
+0x3dde56 (3e0e56) ---- 64 ->
+-----------------
+Green Greens (GrGr.dat)
+0x3e46ca (3e76ca) ---- 64 -> 30 (GrGr.0at)
+GrGr.0at = default
+GrGr.1at = hacked
+GrGr.2at = hacked (smashville texture)
+-------------------
+Jungle Japes (GrGd.dat)
+0x3e22da --- (3e52da) --- 64 -> 30 (GrGd.0at)
+GrGd.0at = default
+GrGd.1at = hacked with platform
+GrGd.2at = omega
+------------------
+Yoshi's Island (GrYt.dat)
+0x3e21c6 (3e51c6) ---- 64 -> 30 (GrYt.0at)
+GrYt.0at = default
+GrYt.1at = hacked (omega)
+------------------
+Mushroom Kingdom Adventure
+0x3e2847 (3e5847) --- 64 --> 30 (GrNKr.0at)
+GrNKr.0at = default
+GrNKr.1at = hacked (2 plat)
+GrnKr.2at = hacked (omega)
+------------------
+Fourside (GrFs.dat)
+0x3e0d8e (3e3d8e) ---- 64 -> 30 (GrFs.0at)
+GrFs.0at = default
+GrFs.1at = hacked (smashville)
+------------------
+Hyrule Maze (GrNSr.dat)
+0x3e2983 (3e5983) ---- 64 -> 30 (GrNSr.0at)
+GrNSr.0at = default
+GrNSr.1at = hacked
+------------------
+Target Test - Luigi (GrTLg.dat)
+0x3e5e47 (3e8e47) ---- 64 -> 30 (GrTLg.0at)
+GrTLg.0at = default
+GrTLg.1at = hacked (gamecube)
+------------------
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+-------------------------
+CSS/Debug Menu Big Code Function				<- a call to this is made by 
+0x25ff30 (263350) ---- 4e800020 -> 48______				'All Players Can Control the Debug Menu'
+
+code in ram at 80FD0230; in CSS at 0x3E3B10 (rel. file offset)
+
+
+
+Debug Menu:
+0x300628 (303a48) ---- 4e800020 -> 48CCACD8
+
+					^ in vanilla 20XX 4.07++, this is actually 48CCC7E8
+					  which points to MnSlChr @ 0x3E3B10 (Big Code Function above)
+					  (80303A48 + CCC7E8) - 80BEC720 = 3E3B10)
+
+
+START- 
+
+
+
+Battlefield Custom Platform Controller
+0x216930 (219d50) ---- 4e800020 -> 4BDE9E7C
+START- bcc
+END- d20
+regular branch to custom and end custom with blr!
+
+
+------------------
+
+
+Stage Spawns
+Pointers Start @ 00001230
+000000XX YYYYYYYY
+xx = stage ID, Y = location of p1 spawn offset
+
+Hyrule Spawns Start @ 5d0
+Trophy Spawns Start @ 570
+Mush King Adv @ 1350
+
+Stage ID	RAM Address	DOL Offset	Stage name
+
+2		80 3F DA B0 	0x3FAAB0
+8		80 3F DA F0	0x3FAAF0
+1F		80 3F DA 70	0x3FAA70
+1C		80 3F DA 30	0x3FAA30
+20 		80 3F DB 10 	0x3FAB10
+1E 		80 3F DA 10 	0x3FAA10
+3F 		80 00 35 D0 	0x5D0		Hyrule?
+53 		80 3F D9 F0 	0x3FA9F0
+3B 		80 3F D9 D0 	0x3FA9D0
+2C 		80 3F DB 10	0x3FAB10 (used twice)
+
+80 3F DA B0 00 00 00 08 80 3F DA F0 00 00 00 1F 80 3F DA 70 00 00 00 1C 80 3F DA 30 00 00 00 20 80 3F DB 10 00 00 00 1E 80 3F DA 10 00 00 00 3F 80 00 35 D0 00 00 00 53 80 3F D9 F0 00 00 00 3B 80 3F D9 D0 00 00 00 2C 80 3F DB 10
+
+---------------------------
+
+SDR active Menu switch
+0x300588 (3039a8 RAM) --- 39000000 -> 						< included in "Custom All Players Can Control the Debug Menu (static)"
+Branch to MnSlChr
+
+Main Menu Line Item Returner			
+0x300588 (3039a8) --- 39000000 -> 48CA5B88					< resides in MnSlChr; no longer used! Merged with above?(static)"
+
+SDR Dynamic Menu Switcher
+- code is in MnSlChr
+0x30058c (3039ac) --- 38e00008 -> 48C8DF14					< included in "Custom All Players Can Control the Debug Menu (static)"
+	target function in MnSlChr @3A51A0					  The end of this function then branches back to 0x300590 (DOL)
+
+
+wParam  function in RAM at 0x803039A4	- C8E5AC =
+
+------------------------------
+
+Song Preview Debug Line Item
+0x20b30 (80023f50) ---- 2c030062 -> 2c030063
+0x20b50 (80023f70) ---- 2c030062 -> 2c030063
+
+-------------------------
+Debug Menu Controllers
+- code is in MnSlChr
+
+Line Item Counter
+0x2fcdbc (3001DC) ---- 7c0802a6 -> 48C91904
+
+VS Style Menu Loader
+0x300bd8 (303FF8) --- 90a40008 -> 48c8db08
+
+"Coming Soon" Screen Change and ASCII Controller		< already exists in original 20XX MCM codelist: "Debug Menu - Coming Soon Load Logic"
+0x2fea04 (301e24) --- 3860000e -> 48CA77AC			< actual code change was originally 3860000e -> 48C91904
+3bceb0 in MnSlChr
+
+
+
+SDR FSM Table at 0x19D0
+
+
+-----------------
+
+
+Magus Physics Hack w/ Additions
+
+Increment Player ID/CPU stat view toggle
+0x1a1610 (1a4a30) ---- 4bfc0999 -> 
+START- 32b978
+END- 32b9b4
+
+
+Move Pokemon Setting Down
+0x222c60 (226080 ) ---- 90040000 -> 48108D58
+START- 32b9b8
+END- 32b9e0
+
+
+Move Pokemon Setting Up (keep from going past 4)
+0x222c98 (2260b8) ---- 90040000 -> 48108D4C
+START- 32b9e4
+END- 32ba08
+
+Max Item Setting Value
+0x222ba0 (225fc0) ---- 90030000 -> 48108E6C
+START- 32ba0c
+END- 32ba18
+!! modify byte @ 32ba0f as the max item value !!
+
+
+Different Text Type (& red text, black bg)
+0x222cdc (802260FC) ---- 28000002 -> 
+START- 32ba1c
+END- 32ba5c
+
+---------------------
+
+SpawnItemEntity custom spawnitem_t
+- defaulted to spawn a beam sword (for beam sword battle)
+0x225460 (228880)
+
+0x2254C0 - 0x225644 zeroed out ([latter majority half of] first area of the USB Screenshot regions)
+
+
+--------------------
+
+Color Overlays										< what code refers to this?
+
+RRGGBB color table
+START- 32a890 (32dcb0)
+END- 32a8e4
+
+
+-----------------------
+
+
+Rebirth All Active Players - Custom Function						< this mod added as SO in Aux Stuff. where's the branch to this; what uses it?
+START- d40
+END- e0c
+
+
+	-	=	-	=	-
+
+
+Stage Swap Table									< this area is just blanked. how big should it be?
+0x3fa680 (3fd680)
+
+
+-----------------------------
+
+
+
+
+
+Stopwatch Flags
+32ba68 (32EE88) = frames count on last "zero-out"
+32ba6c (32EE8c) = last stopwatch value
+
+
+
+
+unknown word change at 0x300C68 (387C0078 -> 3BC00000)
+
+
+
+
+
+remaining diffs between vanilla 1.02 (with zeroed free space regions) and 20XX 1.02 with codes removed:
+	(excluding some extra free space regions zeroed out in 20XX)
+
+	word at 0x1A1B64		this is fine; it's a nop to use the Screenshot Region
+	word at 0x1A1C50		this is fine; it's a nop to use the Screenshot Region
+	0x32B96C to 0x32BA60		part of Magus Display;ends with branch 4B EF7284; points to 0x222CE0[d]/0x80226100;
+	0x3C472A	audio flag;00 changed to 01
+	0x3D1A4A to 0x3D1A7C		this is fine; these are default game settings
+	0x3E794C	table of pointers; all entries beyond the first have been modified
+	word at 0x3D205C
+
+	----- ^ resolved -----
+
+	0x3D25A5	35 changed to 37		added to aux stuff
+	0x3D2617	44 changed to 28		added to aux stuff
+	0x3D261B	44 changed to 28		added to aux stuff
+	0x3F7125	lots of stuff starting from here
+
+
+Mods not detected in original 20XXHP:
+
+	[Custom] All Players Can Control the Debug Menu (static)
+		second branch points to 0x1901E4[dol] 
+	Debug Menu - Increased Joystick Deadzone (static)		<- called in above function
+	Magus Physics Display
+	Debug Menu - Line Tracking (static)
+

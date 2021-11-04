@@ -1,0 +1,1980 @@
+!
+
+This file exists to provide convenient tools to temporarily install in your game, mostly for helping with edits.
+
+This file can be enabled (i.e. picked up by MCM to appear in your library) by removing the '!' in the start of the file name.
+
+
+	-==-
+
+
+Force Crash
+Forces the game to crash, 3 seconds after scene start; for testing OSReport Printout.
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801a507c ---- 8019000C -> Branch
+
+# Injects into "updateFunction", near the start of its loop.
+# Crash code should execute every frame, once the scene reaches the specified frame.
+
+# Check the scene's current frame to see if we should execute
+lis r15, 0x80479D30@h		# Load address of scene controller
+ori r15, r15, 0x80479D30@l
+lwz r14, 0x2C(r15)		# Load GX frame count
+cmpwi r14, 180
+blt+ OrigLine
+
+# Cause a crash
+lwz r0, 0x000C(r0)
+b END
+
+OrigLine:
+lwz r0, 0x000C(r25)
+END:
+b 0
+
+
+	-==-
+
+
+Disable Character Rendering
+Useful for grabbing stage screenshots for SSS icons.
+[Achilles]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8006A360 ---- 7C0802A6 -> 4E800020
+
+
+	-==-
+
+
+Additional Debug Background Colors
+Adds 3 more colors to the background debug option, magenta, green, and blue.
+<https://smashboards.com/threads/additional-debug-background-colors.464311/>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x80227784 ---- 2C000003 -> Branch
+
+2C000003 4081005C
+2C000004 41810014
+386000FF 38800000
+38A000FF 48000034
+2C000005 41810014
+38600000 388000FF
+38A00000 4800001C
+2C000006 41810024
+38600000 38800000
+38A000FF 48000004
+3D808022 618C77BC
+7D8903A6 4E800420
+60000000 00000000
+
+------------- 0x8022877C ---- 2C000003 -> 2C000006
+
+
+	-==-
+
+
+Heap Logger
+Installs injections that help log extra information about heap allocations
+Includes "Core Utilities" and "Standalone Functions" modules, enabling default loggers
+
+# See "Core Utilities" module for a list of features installed by this Core
+# See "Standalone Functions" module for a list of features that can be used with or without Core
+
+# --- MEMORY EDITOR QUERY:
+
+804DAA84 = INPUT FIELD -- write a query address here to trigger the output next frame
+
+Inputs will be read once per VIRetrace frame.
+Use pointer at -0x4F60(rtoc) (804DAA80) to reach Memory Editor Query output data:
+OUTPUT TABLE :
+  0x00 = (copy of last input)
+  0x04 = offset of input from allocation start
+  0x08 = POINT to fragment metadata header
+  0x0C = POINT to data start
+  0x10 = POINT to alloc caller  -- the instruction responsible for making this
+  0x14 = POINT to heap descriptor
+  0x1A = Byte: Heap ID
+  0x1B = Byte: Fragment type : 0=free, 1=allocated, 2=not dynamic
+  0x1C = Word: Size of allocation
+[Punkline]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801A891C ---- C882B0A0 -> C88280A0
+------------- 0x801A87AC ---- C862B0A0 -> C86280A0
+------------- 0x801A863C ---- C842B0A0 -> C84280A0
+------------- 0x804DAA80 ---- 43300000 -> .long <<isFromHeap.output.data>>
+------------- 0x804DAA84 ---- 80000000 -> 00000000
+# Mytoc Block_177
+# -0x4F60(rtoc)  - use this to reference in codes
+# 804DAA80       - use this to reference when memory editing
+# 0x0 = point to output data
+# 0x4 = input field
+------------- 0x801A41D0 ---- 987F0003 -> Branch
+
+987F0003
+bl <timestamp.scene>
+394A0001 B14C0044 90AC0040 992C0046 990C0047
+lis r3, <<isFromHeap.loggerSettings>>@h
+ori r3, r3, <<isFromHeap.loggerSettings>>@l
+88630002 2C030000 4182008C 48000009 48000060 4E800021 202D2D20 5343454E 45205452 414E5349 54494F4E 20255820 3A205649 4672616D 65202523 20782E25 30347820 3A204D61 6A6F7220 25303278 202D3E20 25303278 2C204D69 6E6F7220 25303278 202D3E20 25303278 00000000 7C6802A6 7C862378 7D445378 88EB0000 890B0001 892B0004 894B0003
+bl <printf>
+bl <printf.newline>
+00000000
+
+------------- 0x80344118 ---- 7C072050 -> Branch
+
+7C0802A6 9421FFC0 90010044 39810010 7C6CA5AA
+lis r12, <<isFromHeap.globals>> + 0x10 @h
+ori r11, r12, <<isFromHeap.globals>> + 0x10 @l
+54601838 7CEB016E 810DBD80 910B0004
+lis r12, <<isFromHeap.loggerSettings>>@h
+ori r12, r12, <<isFromHeap.loggerSettings>>@l
+898C0001 2C0C0000 41820084 48000009 48000060 4E800021 202D2D20 4F534865 61705B25 785D203A 20686173 20626565 6E20414C 4C4F4341 54454420 6F6E2056 49467261 6D652025 2320783A 20252320 78206279 74657320 636C6169 6D656420 61742025 78202E2E 2E202578 00000000 7D054378 7CC72050 7C882378 7C641B78 7C6802A6
+bl <printf>
+bl <printf.newline>
+39810010 7C6CA4AA 80010044 38210040 7C0803A6 7C072050 00000000
+
+------------- 0x80344508 ---- 900DA570 -> Branch
+
+814DA570 900DA570 7C090378 39800001 39600000 7CC33378
+b <OSAnnounceArena.inj>
+00000000
+
+------------- 0x8034452C ---- 906DBCD0 -> Branch
+
+814DBCD0 7C691B78 39800001 39600001 906DBCD0
+b <OSAnnounceArena.inj>
+00000000
+
+------------- 0x803444E0 ---- 906DA570 -> Branch
+
+814DA570 7C691B78 39800001 39600000 906DA570
+b <OSAnnounceArena.inj>
+00000000
+
+------------- 0x803444D8 ---- 906DBCD0 -> Branch
+
+814DBCD0 7C691B78 39800001 39600001 906DBCD0
+b <OSAnnounceArena.inj>
+00000000
+
+------------- 0x803444D0 ---- 806DA570 -> Branch
+
+39800000 39600000 806DA570
+b <OSAnnounceArena.inj>
+00000000
+
+------------- 0x803444C8 ---- 806DBCD0 -> Branch
+
+39800000 39600001 806DBCD0
+b <OSAnnounceArena.inj>
+00000000
+
+<OSAnnounceArena.inj> NTSC 1.02
+7C0802A6 9421FFC0 90010044 2C0C0000 39010010 7C6885AA 91810020 7C681B78
+lis r7, <<isFromHeap.globals>>@h
+ori r7, r7, <<isFromHeap.globals>>@l
+2C8B0000 41820014 41860008 91270030 40860008 91270008 48000009 48000098 4E800021 202D2D20 4F534172 656E6125 73203A20 68617320 6265656E 20777269 7474656E 20746F20 62792063 616C6C65 72202578 20206D6F 76696E67 2066726F 6D202578 20746F20 25783B20 25232078 20627974 65730020 2D2D204F 53417265 6E612573 203A2068 61732062 65656E20 72656164 20287233 203D2025 78292062 79206361 6C6C6572 20257800 4869004C 6F000000 30A0FFFC 7C6802A6 38830088 7D465378 40820010 38630053 7CA62B78 7D054378 7D274B78 7D0A4850 40860008 38840003
+lis r12, <<isFromHeap.loggerSettings>>@h
+ori r12, r12, <<isFromHeap.loggerSettings>>@l
+898C0000 2C0C0000 41820018
+bl <printf>
+81810020 2C0C0000 40A10008
+bl <printf.newline>
+39010010 7C6884AA 80010044 38210040 7C0803A6 4E800020
+
+------------- 0x80344154 ---- 1C03000C -> Branch
+
+7C0802A6 9421FFC0 90010044 90610010
+lis r12, <<isFromHeap.loggerSettings>>@h
+ori r12, r12, <<isFromHeap.loggerSettings>>@l
+898C0001 2C0C0000 418200A4 48000009 48000060 4E800021 202D2D20 4F534865 61705B25 785D203A 20686173 20626565 6E204445 5354524F 59454420 61667465 72202523 20782056 49467261 6D65733A 20252320 78206279 74657320 66726565 64206174 20202578 202E2E2E 20257800
+lis r12, <<isFromHeap.globals>> + 0x10 @h
+ori r12, r12, <<isFromHeap.globals>> + 0x10 @l
+54601838 7CEC006E 1C03000C 80AC0004 7C641B78 806DBCC0 7CC3002E 7D073214 806DBD80 7CA51850 7C6802A6
+bl <printf>
+bl <printf.newline>
+81810044 7D8803A6 80610010 38210040 1C03000C 00000000
+
+------------- 0x80343F24 ---- 28060000 -> Branch
+
+7C0802A6 9421FFC0 90010044 39810010 7C6C05AA
+lis r0, <<isFromHeap.callerFilter>>@h
+ori r3, r0, <<isFromHeap.callerFilter>>@l
+bl <callerFilter>
+80C1001C 90660014
+bl <timestamp.scene>
+7CA62850 80C1001C 90A60018 9086001C 38000000 9006000C 90060010 39810010 7C6C04AA 80010044 38210040 7C0803A6 28060000 00000000
+
+------------- 0x8034EA28 ---- 38610018 -> Branch
+
+lis r12, <<isFromHeap.loggerSettings>>@h
+ori r12, r12, <<isFromHeap.loggerSettings>>@l
+898C0003 2C0C0000 4182000C 8062B0A4
+bl <isFromHeap.printf>
+38000000 9002B0A4
+bl <timestamp.scene>
+908C0048 7C6C42E6 906C004C 38610018 00000000
+
+
+    -==-
+
+
+Heap Logger - PathToEntrynum Logger
+Prints the argument string, the string location, and the caller of this function; every call
+- uses the HSD filename buffer function as a means of capuring static string arguments when possible
+Edit the <PathToEntrynum.callerFilter> table to skip over sampling callers from known functions
+Edit the <PathToEntrynum.loggerSettings> table to mute PathToEntrynum logger features
+[Punkline]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+<PathToEntrynum.loggerSettings> NTSC 1.02
+# '00' bytes are disabled;  else = enabled
+01  # --- PATHTOENTRYNUM LOGGER - prints a message every time a file name entrynumber is looked up
+01  # --- SAMPLE BUFFER ARGUMENTS - logger uses memory of 0x80432058 buffer arg for path string addr
+0000     # - padding
+00000000 # - (space reserved for buffer)
+
+<PathToEntrynum.callerFilter> NTSC 1.02
+800186d0
+800181b8 # unknown DAT index HSD heap funcs
+00000000
+
+NTSC 1.02 --- 0x80016220 ---- 3C80803C -> Branch
+
+lis r0, <<PathToEntrynum.loggerSettings>>@h
+ori r4, r0, <<PathToEntrynum.loggerSettings>>@l
+93440004 3C80803C 00000000
+
+------------- 0x80337C4C ---- BA810018 -> Branch
+
+lis r0, <<PathToEntrynum.loggerSettings>>@h
+ori r29, r0, <<PathToEntrynum.loggerSettings>>@l
+7C7E1B78
+lis r0, <<PathToEntrynum.callerFilter>>@h
+ori r3, r0, <<PathToEntrynum.callerFilter>>@l
+bl <timestamp.scene>
+7E862850 7C952378 7CF63B78
+bl <callerFilter>
+48000009 48000058 4E800021 20506174 68546F45 6E747279 6E756D3A 206F6E20 4672616D 65202523 20782E25 30347820 5363656E 65202530 3578203A 20257820 67657473 2072333D 20252320 30367820 3C2D2025 78202D20 25730000 881D0000 2C000000 41820048 7E84A378 7EA5AB78 7EC6B378 7C671B78 7C6802A6 7FC8F378 7F29CB78 3C008043 60002058 7F2ACB78 7C004800 40820014 881D0001 2C000000 41820008 813D0004
+bl <printf>
+7FC3F378 BA810018 00000000
+
+
+    -==-
+
+
+Heap Logger - Archive Object Logger
+Invokes <isFromHeap.printf> each time a DAT file is loaded
+Requires Heap Fragment Offset Finder
+Edit the <ArchiveObject.loggerSettings> table to mute PathToEntrynum logger features
+[Punkline]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+<ArchiveObject.loggerSettings> NTSC 1.02
+# Archive Logger flags can be edited below  using False=0,  True=1
+# flags are in nibbles on little end, to fit discretely in CR:
+0000 # padding
+1 # --- ARCHIVE OBJECT LOGGER    - logs information about archives (dat files) as they are loaded
+1 # --- VERBOSE HEADER LOG       - logs details extracted from the archive header and heap fragment
+1 # --- LOG COPIED ARCHIVES ONCE - logs copied archives (like action state animations) only once
+# - prevents archive copies from flooding the logger by only announcing it once per allocation
+#   - this will prevent the logger from seeing things like action state changes, beyond the first
+1 # --- VERBOSE HEADER ONCE      - prevents serial verbose header logs from the same allocation
+# - prevents verbose copies from flooding the logger with multiple lines every action state
+#   - if logging all archive copy parses, then each copy only shows verbose lines on the first use
+
+<ArchiveObject.callerFilter> NTSC 1.02
+80069d14
+80069cf4
+80085dec # these are related to action state changes
+00000000
+
+
+# --- Injection code:
+
+NTSC 1.02 --- 0x8038033C ---- 8001002C -> Branch
+
+7C000026 90610018 90010014
+lis r0, <<ArchiveObject.loggerSettings>>@h
+ori r12, r0, <<ArchiveObject.loggerSettings>>@l
+818C0000 7D80F120 4093037C 7FE3FB78
+bl <isFromHeap>
+7CFF3B78 2D040001 38000000 41890010 A01F000C 39200DA7 B13F000C 2D800DA7 4D8ED902 4FFF7202 4DB7FA02 815E0000 394A003F 39600000 41890008 817F0008 55400034 7E0B0000 4D8C9102
+lis r0, <<ArchiveObject.callerFilter>>@h
+ori r3, r0, <<ArchiveObject.callerFilter>>@l
+bl <callerFilter>
+38000000 90610010
+bl <timestamp.scene>
+4800000D 7FA802A6 480001C8 4E800021 20415243 48495645 2046494C 45202020 20203A20 25387820 3A202573 2C202523 20782062 79746573 20617420 2578203A 20467261 6D652025 2320782E 25303478 206F6620 5363656E 65202530 35780020 2D204152 43484956 45204441 54412020 203A2025 3878203A 20252320 78206279 74657300 202D2041 52434849 56452052 454C4F43 53203A20 25387820 3A202564 20706F69 6E746572 28732900 202D2041 52434849 5645204E 4F444553 20203A20 25387820 3A202564 2073796D 626F6C28 7329206E 6F646573 00202D20 41524348 49564520 45585445 524E203A 20253878 203A2025 64206578 7465726E 616C2073 796D626F 6C287329 00202D20 41524348 49564520 53594D53 5452203A 20253878 203A2025 23207820 62797465 20666F6F 74657200 20415243 48495645 20434F50 59202020 20203A20 25387820 3A202523 20782062 79746573 206F6620 25782028 616C6C6F 63202578 202B2025 7829203A 20467261 6D652025 2320782E 25303478 00202D20 50415253 45204341 4C4C4552 2020203A 20253878 203A2072 65636965 76657320 41726368 69766520 25782025 73002870 61727420 6F662074 68652072 756E7469 6D652073 7461636B 29000000 40B2002C 7D062850 7C892378 7CEA3B78 387D0000 3C008043 60052058 80FE0040 7FC4F378 80DE0000
+bl <printf>
+408C005C 7D262850 7C8A2378 387D0124 80DE0040 38FF0020 7FC4F378 80BE0000 40A90034 38E00000 39000008 3508FFFF 41800024 55001838 7C0C002E 7C060040 4180FFEC 7C063840 4180FFE4 7C070378 4BFFFFDC 7D073050
+bl <printf>
+418D00B4 387D004F 80BE0004 809E0020
+bl <printf>
+387D0074 80BE0008 2C050000 809E0024 40810008
+bl <printf>
+387D009C 80BE000C 2C050000 809E0028 40810008
+bl <printf>
+387D00C9 80BE0010 2C050000 809E002C 40810008
+bl <printf>
+387D00F9 801E0040 80BE0000 809E0030 7CA50214 7CA42850 2C050000 40810008
+bl <printf>
+387D0171 80810010 7FC5F378 3C00804F 38DD01BD 7C050000 40800010 7C050800 40810008 38DD01A2
+bl <printf>
+807E0040
+bl <isFromHeap.printf>
+80010014 80610018 7C0FF120 8001002C 00000000
+#
+
+
+	-==-
+
+
+Heap Logger - Standalone Functions
+Standalone utilities used by Heap Logger that do not require injections:
+
+
+# --- HEAP TOOLS:
+
+<alloc> creates a heap allocation in the topmost heap (while preserving volatile registers)
+Arguments:   rSize = 3
+Returns:     rAllocation = 3; # r4...r12 are restored -- for easy use inside of injections
+
+<alloc.r12> is a variation of alloc that uses r12 as its argument/return register
+# May be useful for creating allocations while r3 is in use by injection context
+
+<alloc.free> is a shortcut to HSD_Free
+Arguments:   rAlloc = 3
+
+<isFromHeap> checks if a given RAM address belongs to a any heap fragments defined by OS
+Arguments:   rQuery = 3
+Returns:     rQuery=3; rType=4; rOffset=5; rAlloc=6; rMeta=7; rDesc=8; rDescID=9
+# Type = memory type
+#  - 0 = Free;   1 = Allocated;   2 = (not currently in an active heap)
+# Offset = offset of given query from allocation start
+# Meta = 0x20 bytes of header metadata for all heap fragments
+#  - 0x8(rMeta) = alloc + meta size
+# Desc = 0xC bytes of header information about this heap (of IDs 0...3)
+#  - 0x0(rDesc) = heap size;   0x4 = Free Fragment;   0x8 = Allocated
+
+
+# --- TIME SAMPLER:
+
+<timestamp> returns a 64-bit timestamp for you to use for logging purposes
+Returns:     rTimeHi = 3; rTimeLo = 4
+# TimeLo increments every 20 nanoseconds
+# TimeHi increments every 85.8993 seconds
+
+
+# --- CALLSTACK SAMPLER:
+
+<callerFilter> is a leaf that samples the caller of the current stack frame
+Arguments:   rFilter = 3  # use a value of 0 to ignore filter
+Returns:     rCaller = 3  # the address of the instruction that called this frame
+# - filter is a null-terminated array of 4-byte address pointers
+#   - each instruction is of a call, like bl or blrl; and will be skipped in sample
+
+
+# --- PRINTF SHORTCUTS:
+
+<printf> is a shortcut for invoking the NTSC 1.02 printf function, for writing to logger
+Arguments: rFormat = 3; bUseFloatArgs = cr1.eq; # varargs = r4 ... r10, f0 ... f8
+# search for 'printf' online for details on syntax of format string
+# - format strings should start with a space, to properly print in dolphin
+# - format strings are null terminated, and are printed on individual lines
+
+<printf.newline> is a variation of printf that takes no args, and prints a blank string
+[Punkline]
+<alloc> NTSC 1.02
+# Allocate from top-most heap, and back up volatile registers
+
+# --- Arguments:
+# r3 = alloc size
+
+# --- Returns:
+# r3 = allocation;  all other registers are preserved
+7C0802A6 9421FF80 90010084 91810010 39810014 7C8C05AA 7C641B78 806DA760
+bl 0x80343ef0
+39810014 7C8C04AA 81810010 80010084 38210080 7C0803A6 4E800020
+
+<alloc.r12> NTSC 1.02
+# Variant of <alloc> uses r12 as argument/return instead of r3
+7C0802A6 9421FF80 90010084 90610010 38610014 7C8305AA 7D846378 806DA760
+bl 0x80343ef0
+38610014 7C8304AA 80610010 80010084 38210080 7C0803A6 4E800020
+
+<alloc.free> NTSC 1.02
+# --- Arguments:
+# r3 = allocation to free
+b 0x8037f1b0  # HSD_Free -- picks topmost heap and invokes OSFreeToHeap
+
+
+<isFromHeap> NTSC 1.02
+# check if query comes from any dynamic heap fragments
+
+# --- Arguments:
+# r3 = Query Address
+
+# --- Returns:
+# r3 = argument query
+# r4 = type    -- 0 = Free;  1 = Allocated;  2 = Not_Dynamic (not in heap sub-arenas)
+# r5 = offset  -- offset of argument query from start of fragment allocation
+# r6 = alloc   -- the base address of an allocated space for storing data
+# r7 = meta    -- the base address of a header for an allocation or free fragment
+# r8 = desc    -- the heap descriptor responsible for pointing to this heap
+# r9 = descID  -- the index of this heap descriptor
+810DBCC0 38000004 38800001 7C0903A6 39080030 8408FFF4 2C000000 41A00044 38A00001 80E80008 7C071800 80070008 7C070214 7C801800 4C450902 41820044 7CE03B78 80E70004 2C070000 4180FFDC 38800000 80E80004 34A5FFFF 4182FFCC 4200FFB4 38800002 38A00000 38C00000 38E00000 39000000 3920FFFF 4E800020 38C70020 7D2902A6 7CA61850 21290003 4E800020
+
+<timestamp> NTSC 1.02
+# leaf takes no args, and returns the following identifying timestamp data:
+# --- Retrns:
+# r3 = TBU: Upper 32-bits of timestamp
+# r4 = TBL: Lower 32-bits of timestamp
+7C6D42E6 7C8C42E6 7C0D42E6 7C001800 40A2FFF0 4E800020
+
+<callerFilter> NTSC 1.02
+# Fetches callers, optionally filtering out known caller instructions
+# --- Arguments:
+# r3 = filter list  -  null terminated list of exceptions to skip
+# - each exception must be the address of the CALLER, not the return address or the function start
+
+# --- Returns:
+# r3 = caller
+2C830000 3083FFFC 80A10000 7C862378 4800001C 84040004 2C000000 4C800020 7C001800 4082FFF0 80A50000 80650004 3863FFFC 7CC43378 4184FFDC 4E800020
+
+<printf.newline> NTSC 1.02
+# no args -- as though calling printf with r3 = point to null
+lis r3, <<printf.newline.data>>@h
+ori r3, r3, <<printf.newline.data>>@l
+b <printf>
+
+<printf.newline.data> NTSC 1.02
+00000000
+
+<printf> NTSC 1.02
+# Can be used to format a print string for stdout, and displaying in the Dolphin Logger
+# --- Arguments:
+# r3 = format string, r4...r10 = varargs
+# if cr1.eq is true, f0...f8 also = varargs
+# - format string must start with a space in order to display in Dolphin Logger properly
+b 0x80323eb4
+
+
+    -==-
+
+
+Heap Logger - Core Utilities
+Installs injections that help log extra information about heap allocations
+
+
+# --- METADATA:
+
+Injections write extra metadata to OSHeap fragment headers :
+  0xC  = 8 bytes are cleared for implementation by users
+  0x14 = address of allocation caller (filtered by callerFilter)
+  0x18 = VI Retrace frame that allocation was made
+  0x1C = tbl timestamp
+
+
+# --- LOGGERS:
+
+Enables the log announcer for:
+- on OSArenaHi/Lo reads/writes
+- on OSHeap[n] creation/destruction
+- on Scene Transitions
+- on Memory Editor Query Inputs
+
+Edit the <isFromHeap.loggerSettings> table to selectively mute core logger features
+
+
+# --- MEMORY EDITOR QUERY:
+
+Use 804DAA80 or -0x4F60(rtoc) to reach Memory Editor Query IO :
+804DAA80 = POINT TO OUTPUT TABLE -- this will display info about your query address
+804DAA84 = INPUT FIELD -- write a query address here to trigger the output next frame
+
+OUTPUT TABLE :
+  0x00 = (copy of last input)
+  0x04 = offset of input from allocation start
+  0x08 = POINT to fragment metadata header
+  0x0C = POINT to data start
+  0x10 = POINT to alloc caller  -- the instruction responsible for making this
+  0x14 = POINT to heap descriptor
+  0x1A = Byte: Heap ID
+  0x1B = Byte: Fragment type : 0=free, 1=allocated, 2=not dynamic
+  0x1C = Word: Size of allocation
+
+Edit the <isFromHeap.callerFilter> table to specify callers to ignore when sampling a callstack
+
+
+# --- HEAP OFFSET FINDER EXTENSIONS:
+
+<isFromHeap.output> is a version of <isFromHeap> that also samples extra metadata
+# samples are written to global output table <isFromHeap.output.data>
+
+<isFromHeap.printf> is a log announcer that calls and uses <isFromHeap.output> for logging
+
+
+# --- TIMESTAMP EXTENSIONS:
+
+<timestamp.scene> is a verbose timestamp that also samples Melee scene and VIRetrace frames
+Returns:   rTimeHi=3;rFrameFrac=4;rFrame=5;rSceneFrame=6;rCompID=7;rMinor=8;rMajor=9;rCTR=10;rScene=11;rGlob=12
+[Punkline]
+<isFromHeap.loggerSettings> NTSC 1.02
+# You can select which loggers you want to enable when the core module is installed:
+# '00' bytes are disabled;  else = enabled
+01  # --- ARENA LOGGER - triggered when the OS Arena functions are invoked
+01  # --- HEAP LOGGER  - triggered when an OS Heap is created or destroyed
+01  # --- SCENE LOGGER - triggered when the scene function writes a new minor ID
+01  # --- MEMORY EDITOR QUERY INTERFACE LOGGER - triggered when a user input is found at 804DAA84
+
+<isFromHeap.callerFilter> NTSC 1.02
+# You can filter out unwanted caller samples by adding them here
+# - when sampled on allocation, the callstack will reach one extra step when finding these
+8037f20c # HSD_MemAlloc call
+8037aa38 # HSD_ObjAllocAddFree
+8037acbc # HSD_ObjAlloc ... something with IDs
+
+80015c40 # HSD_ ... something with loading files
+
+# <- add additional instruction addresses here
+
+
+# - add the address of instructions that call OSAllocFromHeap (80343ef0)
+#   - you can also add instructions that call functions that call OSAllocFromHeap
+#   - each matching address will be skipped in the callstack parse, in favor of the next one
+00000000  # leave a null terminator, for the parser
+
+
+
+# --- Reserved Data:
+
+<isFromHeap.output.data> NTSC 1.02
+00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+<isFromHeap.globals> NTSC 1.02
+80000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000 81800000 00000000 00000000 00000000 00000000 00000000
+
+# --- Functions:``
+<isFromHeap.output> NTSC 1.02
+# invokes <isFromHeap> to record 0x20 bytes of output data in <isFromHeap.output>
+7C0802A6 9421FFE0 90010024 8182B0A0 816C0000 2C030000 40800048
+bl <isFromHeap>
+2C040001 39400000 39600000 41810010 81470014 81670008 396BFFE0 906C0000 992C001A 90AC0004 90EC0008 914C0010 90CC000C 910C0014 988C001B 916C001C 80010024 38210020 7C0803A6 4E800020
+<isFromHeap.printf> NTSC 1.02
+# invokes <isFromHeap.output> and prints out the resulting data into dolphin logger
+7C0802A6 9421FFC0 90010044 BF610010 2C030000 40A00090
+bl <isFromHeap.output>
+7C9C2378 7CFD3B78 2C1C0002 7D9F6378 4800008D 7F6802A6 7F63DB78 809F0000 40A2000C
+bl <printf>
+4800005C 387B0049 2C1C0001 40820034 3BDB009D 7CC73378 7D665B78 7D284B78
+bl <printf>
+bl <timestamp.scene>
+7FC3F378 80BD0018 809D0014 80DD001C
+bl <printf>
+48000020 387B00F5 2C1C0000 40820018 7FA5EB78 7D264B78 7D675B78
+bl <printf>
+bl <printf.newline>
+BB610010 80010044 38210040 7C0803A6 4E800020 4E800021 202D204E 4F545F44 594E414D 49432020 20203A20 2558203A 20697320 6E6F7420 61207061 7274206F 6620616E 79206163 74697665 204F5348 65617020 66726167 6D656E74 732E2E2E 00202D20 414C4C4F 43415445 44202020 2020203A 20255820 3A206F66 66736574 20252320 78206F66 20612025 2320782D 62797465 20616C6C 6F636174 696F6E20 61742025 7820696E 204F5348 6561705B 2531785D 00202020 20202020 20202020 2D20616C 6C6F6320 77617320 63616C6C 65642062 79207468 6520696E 73747275 6374696F 6E206174 20257820 6F6E2046 72616D65 20252320 782E2530 3478206F 66205363 656E6520 25303578 00202D20 46524545 20465241 474D454E 5420203A 20255820 3A206973 20696E20 66726167 6D656E74 20257820 696E204F 53486561 705B2564 5D2C2061 6E642068 61732025 23207820 72656D61 696E696E 67206279 74657300
+<timestamp.scene> NTSC 1.02
+# leaf takes no args, and returns the following identifying timestamp data:
+# --- returns:
+# r3 = TBU: Upper 32-bits of timestamp
+# r4 = 16-bit fractional scene frame -- measured from TBL
+# r5 = VIRetrace Frame
+# r6 = VIRetrace Frame of last Minor Scene Transition
+# r7 = 32-bit Scene ID (16-bit r10, 8-bit r8, 8-bit r9)
+# r8 = Minor Scene
+# r9 = Major Scene
+# r10 = Scene Reload Counter -- counts up each time a new minor scene of the same r9 is loaded
+# r11 = scene controller base address
+# r12 = isFromHeap.globals
+lis r0, <<isFromHeap.globals>>@h
+ori r12, r0, <<isFromHeap.globals>>@l
+3C008047 80ADBD80 600B9D30 80CC0040 88EB0000 890B0003 5107442E A14C0044 5147801E 7C6D42E6 7C8C42E6 7C0D42E6 7C001800 40A2FFF0 800C004C 7C802050 1C841421 5484843E 4E800020
+#
+
+
+	-==-
+
+
+Memory - Test 2
+Print log messages at the end of ever scene change announcing memory region information
+[Punkline]
+  
+NTSC 1.02 --- 801a409c ---- 819b0004 -> Branch
+# After minor scene memory wipe...
+# Before minor scene setup...
+  
+bl <point.inline>
+b 0f
+  .asciz "Before Initialization"
+  .align 2
+0:
+mr r4, r3
+li r3, 0xFF
+bl <log.printf_HSD_region_summary>
+
+_return:
+lwz r12, 0x0004 (r27)
+.long 0
+  
+
+
+NTSC 1.02 --- 801a40e8 ---- 807a0004 -> Branch
+# After minor scene setup...
+bl <point.inline>
+b 0f
+  .asciz "After Initialization"
+  .align 2
+0:
+mr r4, r3
+li r3, 0xFF
+bl <log.printf_HSD_region_summary>
+
+_return:
+lwz r3, 0x4(r26)
+.long 0
+  
+NTSC 1.02 --- 801a40f4 ---- 3c608047 -> Branch
+# After minor scene loop has completed...
+bl <point.inline>
+b 0f
+  .asciz "Old Scene memory"
+  .align 2
+0:
+mr r4, r3
+li r3, 0xFF
+bl <log.printf_HSD_region_summary>
+_return:
+lis r3, 0x8047
+.long 0
+  
+NTSC 1.02 --- 8037e390 ---- 80010014 -> Branch
+# Once per scene frame...
+# - print if pressing or holding DPad Down
+#   - if holding longer than 45 frames, another print is made every 8 frames that hold continues
+  
+
+# --- MPad structure
+MPad.address = 0x804C1FAC
+# This base address can be used to reach the vanilla MPad structures, without any codes
+# If you have the module installed, you can use <PPad.pad> or <PPad.mode> to get an indexed MPad
+# - Otherwise, you can use the MPad.size symbol to create your own index
+  
+
+# --- Controller Digital Data bools - these are mapped in each of the button fields
+MPad.crf.mCStick = 0x20
+MPad.bCStick    =  8;  MPad.mCStick    = 0xF00000   # --- CStick nibble
+MPad.bCRight    =  8;  MPad.mCRight    = 0x800000   # Right on CStick
+MPad.bCLeft     =  9;  MPad.mCLeft     = 0x400000   # Left  on CStick
+MPad.bCDown     = 10;  MPad.mCDown     = 0x200000   # Down  on CStick
+MPad.bCUp       = 11;  MPad.mCUp       = 0x100000   # Up    on CStick
+  
+MPad.crf.mStick = 0x10
+MPad.bStick     = 12;  MPad.mStick     = 0x0F0000   # --- Stick nibble
+MPad.bRight     = 12;  MPad.mRight     = 0x080000   # Right on Directional-Stick
+MPad.bLeft      = 13;  MPad.mLeft      = 0x040000   # Left  on Directional-Stick
+MPad.bDown      = 14;  MPad.mDown      = 0x020000   # Down  on Directional-Stick
+MPad.bUp        = 15;  MPad.mUp        = 0x010000   # Up    on Directional-Stick
+  
+MPad.crf.mOther = 0x8
+MPad.bOther     = 16;  MPad.mOther     = 0x00F000   # --- Other nibble
+MPad.bStart     = 19;  MPad.mStart     = 0x001000   # Start Button
+  
+MPad.crf.mButtons = 0x4
+MPad.bButtons   = 20;  MPad.mButtons   = 0x000F00   # --- Buttons nibble
+MPad.bY         = 20;  MPad.mY         = 0x000800   # Y Button
+MPad.bX         = 21;  MPad.mX         = 0x000400   # X Button
+MPad.bB         = 22;  MPad.mB         = 0x000200   # B Button
+MPad.bA         = 23;  MPad.mA         = 0x000100   # A Button
+  
+MPad.crf.mShoulders = 0x2
+MPad.bShoulders = 24;  MPad.mShoulders = 0x0000F0   # --- Shoulders nibble
+MPad.bL         = 25;  MPad.mL         = 0x000040   # L Shoulder -- heavy press only
+MPad.bR         = 26;  MPad.mR         = 0x000020   # R Shoulder -- heavy press only
+MPad.bZ         = 27;  MPad.mZ         = 0x000010   # Z Button
+  
+MPad.crf.mDPad = 0x1
+MPad.bDPad      = 28;  MPad.mDPad      = 0x00000F   # --- DPad nibble
+MPad.bDUp       = 28;  MPad.mDUp       = 0x000008   # Up    on Digital-Pad
+MPad.bDDown     = 29;  MPad.mDDown     = 0x000004   # Down  on Digital-Pad
+MPad.bDRight    = 30;  MPad.mDRight    = 0x000002   # Right on Digital-Pad
+MPad.bDLeft     = 31;  MPad.mDLeft     = 0x000001   # Left  on Digital-Pad
+# MPad.crf.m* values can be used to generate masks for mtcrf instructions
+MPad.xOnAuto = 0xC
+  
+lis r3, MPad.address@h
+ori r3, r3, MPad.address@l
+lwz r3, MPad.xOnAuto(r3)
+andi. r0, r3, MPad.mDDown
+beq+ _return
+  bl <point.inline>
+  b 0f
+    .asciz "User Query"
+    .align 2
+  0:
+  mr r4, r3
+  li r3, 0xFF
+  bl <log.printf_HSD_region_summary>
+   
+_return:
+lwz r0, 0x0014 (sp)
+.long 0
+  
+
+
+
+<log.printf> NTSC 1.02
+# This logs a formatted print message in the Dolphin logger
+# - log messages will flood EXI buffer with ascii, obfuscating some error outputs in the game
+  
+# --- args:
+# r3 = address of format string
+# - string MUST begin with a space
+# - string may include escapes for inserting formatted arguments:
+#   - GPR escapes:  %s = str,  %x = hex,  %d, %i = signed decimal,  %u = unsigned decimal
+# r4...r10 = GPR arguments
+# - these will be fed into the escapes found in the format string, as needed
+  
+crandc 6, 6, 6  # disables FPR args
+b 0x80323eb4   # printf
+  
+<log.printff> NTSC 1.02
+# This logs a formatted print message in the Dolphin logger, and can use floating point args
+# - log messages will flood EXI buffer with ascii, obfuscating some error outputs in the game
+  
+# --- args:
+# r3 = address of format string
+# - string MUST begin with a space, and may include escapes for inserting formatted arguments
+#   - GPR escapes:  %s = str,  %x = hex,  %d, %i = signed decimal,  %u = unsigned decimal
+#   - FPR escapes:  %f = float,  %e = exponent
+# r4...r10 = GPR arguments
+# f1...f8  = FPR arguments
+# - these will be fed into the escapes found in the format string, as needed
+  
+crorc 6, 6, 6  # enables FPR args
+b 0x80323eb4   # printf
+  
+
+<log.printf_nl>
+# Prints a null message to give the appearence of a newline without emitting one
+mflr r0
+stwu sp, -0x20(sp)
+stw  r0,  0x20+4(sp)
+li r0, 0
+stw r0, 0x10(sp)
+addi r3, sp, 0x10
+bl <log.printf>
+lwz  r0,  0x20+4(sp)
+addi sp, sp, 0x20
+mtlr r0
+blr
+  
+
+
+<log.printf_HSD_region_summary> NTSC 1.02
+# Logs the current state of the HSD Memory Regions, with an argument title
+  
+# --- args:
+# r3 = region mask, and format options:
+#    + 001 = HSD[0]    --  RAM -- Minor -- Object Heap
+#    + 002 = HSD[1]    -- ARAM -- Minor -- Auxiliary Heap
+#    + 004 = HSD[2]    --  RAM -- Persist -- Priority Archive Arena
+#    + 008 = HSD[3]    --  RAM -- Persist -- Main Major Archive Arena
+#    + 010 = HSD[4]    --  RAM -- Major -- Minor Preload Archive Arena
+#    + 020 = HSD[5]    -- ARAM -- Major -- Auxiliary Preload Archive Arena
+#    + 040 = OSArenaLo --  RAM -- Persist
+#    + 080 = OSArenaHi --  RAM -- Persist
+#    + 100 = Skip Header
+#    + 200 = Skip Group padding (before/after lines)
+#    + 400 = Skip Header padding
+#    + 800 = Skip Line padding
+# r4 = Header title, or null for default 'Memory' title
+#    - can be skipped if the 'Skip Header' flag is true
+  
+mflr r0
+stwu sp, -0x100(sp)
+stw  r0,  0x100+4(sp)
+stmw r20, 0x10(sp)
+mr r27, r3
+mfcr r26
+mr r28, r4
+bSkipLinePad=20; bSkipHeadPad=21; bSkipGroupPad=22
+bSkipHead=23;    bOSArenaHi=24;   bOSArenaLo=25
+  
+bl <point.inline>
+b 100f
+  0:  .asciz " HSD[%d] :  %8x free  :  %8x alloc  :  %8x total  :  %8x biggest free  :  %8x start"
+  1:  .asciz " (%sRAM) :  %8x frags :  %8x frags  :  %8x frags  :  %8x biggest alloc :  %8x end"
+  2:  .asciz " HSD[%d] -- %s"
+  5:  .asciz " OSArena%s %8x free  :  %8x alloc  : %8x point  --  %s"
+  3:  .asciz " "
+  4:  .asciz "A"
+  6:  .asciz "Lo"
+  7:  .asciz "Hi"
+  8:  .asciz "Open"
+  9:  .asciz "Closed"
+  10: .asciz " %s  --  Scene: %4x, %04x  --  Frame: %8x + %3x.%05x"
+  11: .asciz "Memory"
+  .align 2
+   
+100:
+mr r31, r3  # r31 points to base of inline data
+mtcrf 0x06, r27
+bt- bSkipHead, _end_of_head
+  bt- bSkipGroupPad, 100f  # skip header and/or header padding according to flags
+    bl <log.printf_nl>
+     
+  100:
+  bl <log.timestamp>
+  mr r5, r7
+  rlwinm r6, r6, 0, 0xFFFF
+  mr r7, r3
+  rlwinm r8, r4, 12, 0xFFF
+  rlwinm r9, r4, 0, 0xFFFFF
+  mr. r4, r28
+  addi r3, r31, 10b-0b
+  blt+ 100f
+    addi r4, r31, 11b-0b
+     
+  100:
+  bl <log.printf>  # print header, with optional custom title
+  bt- bSkipHeadPad, _end_of_head
+    bl <log.printf_nl>
+     
+_end_of_head:
+li r30, 0
+addi r28, sp, 0x80  # set up loop for 6 HSD regions
+  
+_for_each_region:
+  andi. r0, r27, 1
+  beq+ _next_region  # only print off flagged regions, skipping unflagged ones
+     
+    mr r3, r30
+    li r4, -1
+    bl <HSD.region_bytes>  # use the returned information to format print message:
+  # cr1.lt = bIsAvailable   -- this is true if a free fragment is available
+  # cr1.gt = bIs RAM        -- as opposed to ARAM, which can't be navigated directly by the CPU
+  # cr1.eq = bIsArena       -- uses an Arena metadata structure instead of a Heap metadata structure
+   
+  # r3 = first found free fragment (of sufficient size)
+  # r4 = size of first found free fragment
+  #    - these will be blank if bIsAvailable == False
+   
+  # r5 = region start
+  # r6 = region size
+  #    - these are almost always returned if the ID was correct
+   
+  # r7 = Free fragments counted in this region
+  # r8 = Biggest free fragment counted in this region
+  # r9 = Total free bytes counted in this region
+  # r10 = Allocated fragments counted in this region
+  # r11 = Biggest allocated fragment counted in this region
+  # r12 = Total allocated bytes counted in this region
+  #    - these will only count all of the region if the size you give it is not found
+  #      - you can ensure this by using -1 as an input, which is checked with an unsigned comparison
+     
+    add. r0, r12, r9
+    beq- _not_available
+       
+      _available:
+      mfcr r29
+      stswi r5, r28, 0x20
+      mr r3, r31
+      mr r0, r5
+      mr r5, r9
+      mr r9, r0
+      mr r4, r30
+      mr r6, r12
+      add r7, r5, r6
+      # r8 is in place
+      bl <log.printf>  # print first line
+      lswi r5, r28, 0x20
+      mtcr r29
+      addi r3, r31, 1b-0b
+      addi r4, r31, 3b-0b
+      bgt+ cr1, 100f
+        addi r4, r31, 4b-0b
+         
+      100:
+      add r9, r5, r6
+      mr r5, r7
+      mr r6, r10
+      add r7, r5, r6
+      mr r8, r11
+      bl <log.printf>  # print second line
+      b _check_line_padding
+       
+    _not_available:
+    addi r3, r31, 2b-0b
+    mr r4, r30
+    addi r5, r31, 9b-0b
+    bl <log.printf>  # else announce unavailable line
+     
+  _check_line_padding:
+  bt- bSkipLinePad, _next_region
+    bl <log.printf_nl>
+     
+  _next_region:
+  addi r30, r30, 1
+  cmpwi r30, 5
+  srwi r27, r27, 1
+  ble+ _for_each_region # continue for 6 regions
+   
+cror 0, bOSArenaHi, bOSArenaLo
+bf+ 0, _check_group_nl  # at end, if neither OSArena region is flagged, check for end padding
+   
+  lwz r25, -0x4330(r13) # else, check to see if OSArena is still open
+  lwz r24, -0x5a90(r13)
+  sub. r21, r25, r24
+  addi r23, r31, 9b-0b  # closed
+  beq+ 100f
+    addi r23, r31, 8b-0b # open
+     
+  100:
+  bf+ bOSArenaLo, _check_high
+    addi r3, r31, 5b-0b
+    lis r7, 0x80431fa0@h  # this points to where the HSD region memory boundary starts
+    addi r4, r31, 6b-0b
+    lwz r7, 0x1fa0(r7)
+    mr r5, r21
+    cmpwi r7, 0
+    lis r0, 0x8180
+    mr r8, r23
+    mr r10, sp
+    lwz r9, 0(r10)
+    bne+ 100f
+      mr r7, r24  # if closed, the HSD memory region will have recorded closing point
+       
+    100:
+    cmpw r9, r0
+    bge- 100f
+      mr r10, r9
+      lwz r9, 0(r9) # get first stack frame, from r1 (sp)
+      b 100b
+       
+    100:
+    addi r9, r10, 0x8 # r9 = ceiling of static memory, floor of OSArenaLo
+    sub r6, r7, r9   # r6 = bytes between floor and ceiling (allocated)
+    bl <log.printf>
+    bt- bSkipLinePad, _check_high
+      bl <log.printf_nl>
+       
+  _check_high:
+  bf- bOSArenaHi, _check_group_nl
+    addi r3, r31, 5b-0b
+    addi r4, r31, 7b-0b
+    mr r5, r21
+    lis r6, 0x8000
+    mr r8, r23
+    lwz r6, 0x34(r6) # get OS ArenaHi definition for ceiling
+    mr r7, r25
+    sub r6, r6, r25  # and pointer for floor
+    bl <log.printf>
+    bt- bSkipLinePad, _check_group_nl
+      bl <log.printf_nl>
+       
+_check_group_nl:
+bt- bSkipGroupPad, 100f
+  bl <log.printf_nl>  # extra newline helps visually separate multiple outputs in a sequence
+100:
+
+_return:
+mtcr r26
+lmw r20, 0x10(sp)
+lwz  r0,  0x100+4(sp)
+addi sp, sp, 0x100
+mtlr r0
+blr
+  
+
+
+<log.timestamp> NTSC 1.02
+# takes no args, and returns the following identifying timestamp data:
+# --- Retrns:
+# f1 = Scene frame
+#    - integer index counter -- not a real timer
+#      - index counts up once before the GProc, GXDraw steps in a scene frame execute
+#      - updated as part of the HSD Performance stat routine implemented in the scene loop
+# f2 = Relative frame
+#    - using HSD Performance stat timestamps
+#      - f2 is the real time relative to the start of the counted frame in f1
+#      - very accurate -- should maintain precision of 20-nanosecond increments
+# f3 = Boot frame
+#    - using OS boot timestamp to create a sample runtime frame timestamp
+  
+# r3 = Scene frame
+# r4 = Relative frame (in microframes)
+#    + FFF00000 = full frames
+#    + 000FFFFF = microframes
+#    - microframes count in-between frames, relative to the performance monitor timestamps
+#    - full frames will be <1 unless something is causing the scene frame ticks to stall:
+#      - >1 when the GProc or GXDraw step of a scene takes too long
+#      - >1 when the CPU is stalling while waiting for hardware to sync
+# r5 = Boot frame
+  
+# r6 = compressed ID: [r7, r8, r9]
+#    - r6 is convenient for implementing into timestamp messages if individual IDs are not needed
+# r7 = Scene Transition Count
+# r8 = Major Scene ID
+# r9 = Minor Scene ID
+# r10, r11 = raw TBU, TBL
+#          - r10, r11 make a timestamp counting from epoch in jan 2000 -- unnormalized
+  
+OSGlobals  = 0x80000000
+Frac = 0x88888889
+xBUS_MHz   = 0xF8
+xBoot_time = 0x30D8
+# clock speed and boot time references
+  
+Scene_Controller = 0x80479D30 + 0x10000
+xMajor = 0    + (Scene_Controller & 0xFFFF) - 0x10000
+xMinor = 3    + (Scene_Controller & 0xFFFF) - 0x10000
+xFrame = 0x2C + (Scene_Controller & 0xFFFF) - 0x10000
+# performance stat frame counter and scene controller IDs
+  
+Scene_transitions = 0x804320CC
+# part of archive globals, apparently
+  
+xHSD_PerfStat = -0x3FA8
+# r13 performance stat time base sample
+  
+fScene=1; fRel=2; fBoot=3
+rScene=3; rRel=4; rBoot=5; rID=6; rTrans=7; rMajor=8; rMinor=9; rTBU=10; rTBL=11
+fTicks=1; fFloor=2; fCeil=3; rCeil=6; rOS=7; rGlobals=8
+xBoot=0xC; xRel=0x10
+  
+0: mftbu rTBU
+mftbl rTBL
+mftbu r0
+cmpw r0, rTBU
+bne- 0b
+# get timestamp, correcting for unlikely (but possible) 85-second mark error
+  
+mflr r0
+stwu sp, -0x20(sp)
+stw  r0,  0x20+4(sp)
+# callsafe prolog
+  
+lis  rOS, OSGlobals@h
+lwz  rCeil, xBUS_MHz(rOS)
+lis r0, Frac@h
+srwi rCeil, rCeil, 2
+ori r0, r0, Frac@l # fixed point fraction
+mulhwu r3, r0, rCeil # high multiply, to apply fixed point fraction
+li r4, 5
+bl <float.u32_>
+# all casting functions called here have a minimal impact on volatile registers
+# - only r0, r3, r4, f0, f1 are affected
+  
+fmr fCeil, fTicks
+fsubs fFloor, fCeil, fCeil
+# fCeil represents a total number of ticks per 'frame', according to BUS speed
+# fFloor = 0.0
+# - this formats a call/return register pipeline for the <norm> instruction that we can re-use
+  
+# <norm> is like a safe division operation that provides a reciprocal and optional floor
+#   - f1 = in/out;  f2 and f3 stay the same as a ceiling/floor for sequential division ops
+  
+lwz  r3, xBoot_time+0(rOS)
+lwz  r4, xBoot_time+4(rOS)
+subfc r4, r4, rTBL
+subfe r3, r3, rTBU
+bl <float.s64>
+bl <norm>
+# boot ticks have been sampled, casted, and normalized into a percentage in f1
+  
+stfs f1, xBoot(sp)
+bl <u32.float>
+mr rBoot, r3
+# rBoot is now ready for return, and fBoot is stored in stack frame
+  
+lwz r3, xHSD_PerfStat+0(r13)
+cmpwi r3, 0
+lwz r4, xHSD_PerfStat+4(r13)
+beq- 0f
+  subfc r4, r4, rTBL
+  subfe r3, r3, rTBU
+  bl <float.s64>
+  bl <norm>
+  # Performance stat sample is used to create relative timestamp base
+  # - if not available (before first frame of the first scene), then use boot time instead
+   
+0:
+stfs f1, xRel(sp)
+li r3, 20
+bl <u32_.float>
+#  20-bit fractional component == micro-frame units
+  
+stw r3, xRel+4(sp)
+lis rGlobals, Scene_Controller@h
+lwz r3, xFrame(rGlobals)
+bl <float.u32>
+lwz rRel, xRel+4(sp)
+lfs fRel, xRel(sp)
+lfs fBoot, xBoot(sp)
+# all timestamps are ready for return:
+#   rScene, fScene
+#   rRel,   fRel
+#   rBoot,  fBoot
+  
+lis rTrans, Scene_transitions@h
+lbz rMinor, xMinor(rGlobals)
+lwz rTrans, (Scene_transitions & 0xFFFF) (rTrans)
+lbz rMajor, xMajor(rGlobals)
+rlwinm rID, rTrans, 16, 0xFFFF0000
+rlwimi rID, rMajor, 8, 0xFF00
+rlwimi rID, rMinor, 0, 0xFF
+# Scene transition ID has been compiled
+  
+_return:
+lwz  r0,  0x20+4(sp)
+addi sp, sp, 0x20
+mtlr r0
+blr
+  
+
+
+<HSD.region> NTSC 1.02
+# Converts an input ID (0...5) into a corresponding HSD Memory Region
+# - this info can be used to navigate all known allocations, or freed fragments in a given region
+  
+# --- args:
+# r3 = HSD Memory Region ID
+# - 0  --  HEAP  -- RAM -- the Object Heap (OSHeap[1])
+# - 1  -- ARENA? -- ARAM -- Excess ARAM fragment
+# - 2  -- ARENA  -- RAM -- Priority Archive Arena
+# - 3  -- ARENA  -- RAM -- Main Archive Arena
+# - 4  -- ARENA  -- RAM -- Preload Archive Arena
+# - 5  -- ARENA  -- ARAM -- Auxiliary Preload Archive Aena (ARAM)
+  
+# --- returns:
+# cr1.lt = bIsAvailable -- there is metadata available for this region
+# cr1.gt = bIsRAM      -- as opposed to ARAM, which can't be navigated directly by the CPU
+# cr1.eq = bIsArena     -- uses an Arena metadata structure instead of a Heap metadata structure
+# r3 = given ID
+# r4 = HSD Memory Region descriptor
+#      0x0 = Heap ID
+#      0x4 = point to Arena Boundary Descriptor
+#      0x8 = point to Address of Boundary Start
+#      0xC = Size of Region
+#      0x10 = Region Lo behavior
+#      0x14 = intialized flag? (1 = after init?)
+#      0x18 = disabled flag?   (1 = not available)
+#    - these are high level descriptors of potentially different types of managed memory
+  
+# r5 = Heap region descriptor  -- only Dynamic OSHeaps, from ID 0...3 in 'Heap ID'
+#      0x0 = total bytes (in initial fragment)
+#      0x4 = point to first Free Fragment
+#      0x8 = point to first Allocated Fragment
+#    - these are descriptors specifically for the OSHeap memory manager
+  
+# r6 = Arena region descriptor -- only for archive links in HSD Arena pushes
+#      0x0 = to next descriptor??
+#      0x4 = point to region boundary low pointer
+#      0x8 = point to region boundary high pointer
+#      0xC = point to first Allocated Push
+#    - these are descriptors specifically for the Archive arena memory manager
+  
+# r7 = Address of region start -- may be virtual RAM Address (sign) or ARAM offset (no sign)
+# r8 = Region size
+# - these are returned regardless of memory region type
+  
+# r9  = Arena Static descriptor
+# r10 = Arena Static Size
+# - these only return for IDs 2 ... 5
+  
+
+
+# HSD Memory:
+HSDDescs = 0x80431fb0; HSDDescSize=0x1C; HSDStatic = 0x803ba380; HSDStaticSize = 0x10
+xHSDHeap=0x00;xHSDArena=0x4;xHSDStart=0x8;xHSDSize=0xC # from HSD descs
+xStaticSize=0xC # from HSD static descs
+xOSArenaLo=-0x5a90; xOSArenaHi=-0x4330;
+  
+# Heap Memory:
+xHeapDescs=-0x4340; HeapDescSize=0xC
+rID=3;rHSD=4;rHeap=5;rArena=6;rStart=7;rSize=8;rStatic=9;rSSize=10
+lt=0;gt=1;eq=2;bIsAvailable=4;bIsRAM=5;bIsArena=6
+  
+cmplwi rID, 5
+li rHSD, 0
+mtcrf 0x40, r4
+li rHeap, 0
+li rArena, 0
+li rStart, -1
+li rSize, 0
+li rStatic, 0
+li rSSize, 0
+ble+ 0f
+  lwz rSize, xOSArenaHi(r13)
+  lwz rStart, xOSArenaLo(r13)
+  sub rSize, rSize, rStart
+  b _return
+  # Return with nulls and info about OSArena if an invalid ID was given
+  # - all returned descriptor values will be null, but r7, r8 will reflect OSArena range
+  # - after HSDArenas have been instantiated, OSArena size will be 0
+   
+0:
+lis r0, HSDDescs@h
+ori rHSD, r0, HSDDescs@l
+mulli r0, rID, 0x1C
+add rHSD, rHSD, r0
+# return HSD Region description
+  
+subic. r0, rID, 2
+blt+ 0f
+  lis rStatic, HSDStatic@h
+  ori rStatic, rStatic, HSDStatic@l
+  slwi rSSize, r0, 4
+  add rStatic, rStatic, rSSize
+  lwz rSSize, xStaticSize(rStatic)
+  b 0f
+  # return static arena description, if one is defined
+   
+0:
+lwz r0, xHSDHeap(rHSD)
+cmpwi r0, -1
+beq- 0f
+  crorc bIsAvailable, bIsAvailable, bIsAvailable
+  lwz rHeap, xHeapDescs(r13)
+  mulli r0, r0, 0xC
+  add rHeap, rHeap, r0
+  # return heap description, if region is available
+  # - sets bIsAvailable if found
+   
+0: lwz r0, xHSDArena(rHSD)
+cmpwi r0, -1
+beq- 0f
+  crorc bIsAvailable, bIsAvailable, bIsAvailable
+  mr rArena, r0
+  crorc bIsArena, bIsArena, bIsArena
+  # return arena description, if region is available
+  # - sets bIsAvailable if found
+   
+0: lwz rStart, xHSDStart(rHSD)
+lwz rSize, xHSDSize(rHSD)
+# return summary of HSD Region description
+  
+_return:
+lis r0, 0x8180
+cmpw rStart, r0
+crmove bIsRAM, lt
+# - sets bIsRAM if in virtual RAM range
+  
+blr
+  
+
+
+<HSD.region_bytes> NTSC 1.02
+# Checks for the first occurance of a free fragment large enough to allocate argument byte size
+# - if bytes are specified as -1, then full returns are given with a summary of the region
+  
+# --- args:
+# r3 = HSD Memory Region ID
+# r4 = byte count
+  
+# --- returns
+# cr1.lt = bIsAvailable   -- this is true if a free fragment is available
+# cr1.gt = bIsRAM        -- as opposed to ARAM, which can't be navigated directly by the CPU
+# cr1.eq = bIsArena       -- uses an Arena metadata structure instead of a Heap metadata structure
+  
+# r3 = first found free fragment (of sufficient size)
+# r4 = size of first found free fragment
+#    - these will be blank if bIsAvailable == False
+  
+# r5 = region start
+# r6 = region size
+#    - these are almost always returned if the ID was correct
+  
+# r7 = Free fragments counted in this region
+# r8 = Biggest free fragment counted in this region
+# r9 = Total free bytes counted in this region
+# r10 = Allocated fragments counted in this region
+# r11 = Biggest allocated fragment counted in this region
+# r12 = Total allocated bytes counted in this region
+#    - these will only count all of the region if the size you give it is not found
+#      - you can ensure this by using -1 as an input, which is checked with an unsigned comparison
+  
+
+
+# HSD Memory:
+xArenaLow=0x4; xArenaHigh=0x8; xArenaList=0xC # from arena descriptor
+xNextPush=0x0; xPushAlloc=0x4; xPushSize=0x8 # from bounds list of archive links
+  
+# Heap Memory:
+xFreeList=0x4; xAllocList=0x8 # from heap descs
+xPrevFrag=0x0; xNextFrag=0x4; xFragSize=0x8 # from heap fragment metadata header
+  
+# regs:
+rFoundFrag=3; rFoundSize=4; rRegionStart=5; rRegionSize=6
+rFFrags=7;  rFBig=8;  rFBytes=9;
+rAFrags=10; rABig=11; rABytes=12;
+rBytes=31; rBig=30; rFrags=29; rCR=28; rSize=27; rDesc=26;
+rThis=25; rNextX=24; rSizeX=23; rReturn=22
+lt=0;gt=1;eq=2;bIsAvailable=4;bIsRAM=5;bIsArena=6;
+bReturn_from_loop=8;bNoMatch=12+gt
+mflr r0
+stwu sp, -0x100(sp)
+stw  r0,  0x100+4(sp)
+stmw r22, 0x10(sp)
+mfcr rCR
+mr rSize, r4
+bl <HSD.region>
+# check if region is available
+  
+li rFBytes, 0
+addi rReturn, sp, 0x80
+li rABig, 0
+mr rDesc, r6
+li rAFrags, 0
+mr r0, r5
+li rABytes, 0
+mr rRegionStart, r7
+li rFFrags, 0
+mr rRegionSize, r8
+li rFBig, 0
+stswi rFFrags, rReturn, 0x18
+bf- bIsAvailable, _return
+# return all nulls if regions is not available
+   
+  crandc bReturn_from_loop, bReturn_from_loop, bReturn_from_loop
+  li rFoundFrag, 0
+  crandc bIsAvailable, bIsAvailable, bIsAvailable
+  li rFoundSize, 0
+  cmpwi rDesc, 0
+  blt+ _setup_arena_parse
+  # we handle heaps and arenas differently...
+     
+    _setup_heap_parse:
+    mr rDesc, r0
+    lwz rThis, xFreeList(rDesc)
+    li rNextX, xNextFrag
+    li rSizeX, xFragSize
+    b _begin_parse
+    # Heap metadata keeps track of both allocations and fragments in separate lists
+    # - we prioritize free fragments, to find useful information for pending allocations
+     
+    _setup_arena_parse:
+    li rNextX, xNextPush
+    lwz rThis, xArenaList(rDesc)
+    li rSizeX, xPushSize
+    addi rReturn, rReturn, 0xC
+    # Arena metadata does not keep track of free space, only allocated space and total size
+    # - we must total up the currently allocated pushes in order to determine the remainin bytes
+     
+  _begin_parse:
+  lswi rFrags, rReturn, 0xC
+  b _check_element
+  # stack has been filled with 6 null words at start, giving us default return values
+  # - these return values appear in r7...r12
+  #   - they are only updated if the loops complete with no matches, providing complete results
+   
+  _for_each_element:
+    lwzx r0, rThis, rSizeX
+    cmplw cr3, rSize, r0
+    cmplw cr4, rBig, r0
+    cror bNoMatch, bIsArena, bNoMatch
+    bt+ bNoMatch, 0f
+      addi rFoundFrag, rThis, 0x20
+      lwz rFoundSize, xFragSize(rThis)
+      b _return
+      # return early if found a match in free heap fragments
+       
+    0:
+    bge+ cr4, 0f
+      mr rBig, r0
+      # update biggest value, when found
+       
+    0:
+    add rBytes, rBytes, r0
+    lwzx rThis, rThis, rNextX
+    addi rFrags, rFrags, 1
+     
+    _check_element:
+    cmpwi rThis, 0
+    blt+ _for_each_element
+    # else, continue parse...
+     
+  _end_of_shared_loop:
+  stswi rFrags, rReturn, 0xC
+  bt- bReturn_from_loop, _return
+  # if flag is set, then return from loop
+     
+    bt- bIsArena, _arena_return
+    # heaps need to parse both allocs and freed fragments
+       
+      _heap_second_pass:
+      addi rReturn, rReturn, 0xC
+      lwz rThis, xAllocList(rDesc)
+      li rSize, -1
+      crorc bReturn_from_loop, bReturn_from_loop, bReturn_from_loop
+      b _begin_parse
+      # second pass will total up the allocs in addition to the free fragments
+      # - this produces a summary of the heap
+       
+    _arena_return:
+    sub rBytes, rRegionSize, rBytes
+    cmplw cr3, rSize, rBytes
+    add rThis, rRegionStart, rBytes
+    bt- bNoMatch, 0f
+      mr rFoundFrag, rThis
+      crorc bIsAvailable, bIsAvailable, bIsAvailable
+      mr rFoundSize, rBytes
+      # If remaining space in Arena stack is larger than query size, then return it as found
+       
+    0:
+    li r0, 1
+    stw rBytes, -0x8(rReturn)
+    stw 0, -0xC(rReturn)
+    stw rBytes, -0x4(rReturn)
+     
+_return:
+addi rReturn, sp, 0x80
+lswi rFFrags, rReturn, 0x18
+mtcrf 0xBF, rCR
+lmw  r22, 0x10(sp)
+lwz  r0,  0x100+4(sp)
+addi sp, sp, 0x100
+mtlr r0
+blr
+  
+
+
+<point.inline> ALL
+# Returns <point.here> value + 4 -- for reaching branched-over inline data
+  
+# --- returns:
+# r3 = rInline
+  
+## example:
+# bl <point.inline>
+# b _data_end
+# _data_start:
+## <- data goes here
+# _data_end:
+  
+mflr r3
+addi r3, r3, 4
+blr
+  
+
+<norm> ALL
+# Input uses a floating point range floor ... ceil to create a coef value scaled between 0.0 ... 1.0
+# --- args:
+# f1 = index  - value to scale between floor and ceil
+# f2 = floor  - 0.0 key
+# f3 = ceil   - 1.0 key
+  
+# --- returns:
+# f1 = Coef, Reciprocal Coef:
+#    p0 = Coef - the percent (0.0 ... 1.0) that index falls in range of [floor ... ceil]
+#    p1 = RCoef - the number of times [floor ... index] fits inside of [floor ... ceil]
+  
+fSwap=0;fI=1;fFull=1;fCoef=1;fFloor=2;fCeil=3
+ps_cmpo0 cr0, fI, fFloor
+bne+ 0f
+  b <float.zero>
+0:
+ps_cmpo0 cr0, fFloor, fCeil
+bne+ 0f
+  b <float.zero>
+0:
+ps_merge00 fI, fI, fCeil          # index, ceil
+ps_merge00 fFloor, fFloor, fFloor # floor, floor  -
+ps_sub fI, fI, fFloor             # num,   denom
+ps_merge10 fSwap, fFull, fFull    # denom, num
+# swap num and denom in fSwap
+  
+ps_div fCoef, fFull, fSwap        # coef, recip
+blr
+# fCoef = Coef, reciprocal Coef
+# p0 = Coef - the percent (between 0.0 and 1.0) that f1 index falls in range of f2 floor and f3 ceil
+# p1 = Recip - the number of times f1 ... f2 fits inside of f2 ... f3
+  
+
+<float.zero> ALL
+# Simply loads zeroes into f1 and f0
+li r0, 0
+stwu sp, -0x20(sp)
+stw r0, 0x10(sp)
+lfs f1, 0x10(sp)
+addi sp, sp, 0x20
+fmr f0, f1
+blr
+  
+
+
+<float.s64> NTSC 1.02
+7C0802A6 9421FF00 90010104 9141002C 39410010 7C6AE5AA
+bl 0x80322da0
+39410010 7C6AE4AA 8141002C 80010104 38210100 7C0803A6 4E800020
+  
+<float.u32_> ALL
+7C802378
+b <float.__u32_fullcast>
+
+<float.u32> ALL
+38000000
+b <float.__u32_fullcast>
+
+<u32.float> ALL
+38000000
+b <u32.__fullcast>
+
+<u32_.float> ALL
+7C601B78
+b <u32.__fullcast>
+
+<float.__u32_fullcast> ALL
+9421FFE0 90810010 38800000
+b <float.__fullcast>
+
+
+<u32.__fullcast> ALL
+38600005
+b <int.__fullcast>
+
+<float.__fullcast> ALL
+9081000C 54002036 20004330 5400801E 90010008 C8010008 9061000C C8210008 80810010 FC210028 38210020 4E800020
+  
+<int.__fullcast> ALL
+500344AE 9421FFE0 7C17E2A6 3863F000 90010018 5063801E 7C77E3A6 38631000 F021F008 3C000005 E001F008 5003021E 7C77E3A6 EC010028 F001F00A A8010008 A061000A 5400801F 40A00008 3C63FFFF 7C630214 80010018 7C17E3A6 38210020 4E800020
+
+
+	-==-
+
+
+Debug Game-Side Latency (v2)
+Shows latency information on screen while in-game.
+
+<https://smashboards.com/threads/game-engine-lag-display-debugging.513824/>
+[Fizzi]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8016E774 ---- C022A8C8 -> Branch
+
+# External/Debug Inputs/InitOnGameStart.asm
+48000410 4E800021
+00000000 43480000
+41C80000 000000FF
+000000B4 E2E2E2FF
+41200000 41880000
+546F7461 6C204761
+6D65204C 61673A20
+25752075 730A0A00
+506F6C6C 20436F75
+6E743A20 25750A00
+4D696E20 506F6C6C
+20446966 663A2025
+75207573 0A004D61
+7820506F 6C6C2044
+6966663A 20257520
+75730A00 46657463
+682D4665 7463683A
+20257520 75730A00
+506F6C6C 2D466574
+63683A20 25752075
+730A0050 6F6C6C2D
+456E6769 6E653A20
+25752075 730A0000
+4E800021 4E800020
+4E800021 7C0802A6
+90010004 9421FF50
+BE810008 4BFFFF31
+7FE802A6 83DF0000
+83BE0006 887E0000
+2C030001 40820128
+7FA3EB78 3D808030
+618C2BB0 7D8903A6
+4E800421 7FA3EB78
+38800000 38A00000
+3D808030 618C2A3C
+7D8903A6 4E800421
+7FA3EB78 389F0020
+80BE0056 3D808030
+618C2D4C 7D8903A6
+4E800421 7FA3EB78
+389F0038 80BE006E
+3D808030 618C2D4C
+7D8903A6 4E800421
+7FA3EB78 389F0048
+80BE005A 3D808030
+618C2D4C 7D8903A6
+4E800421 7FA3EB78
+389F005E 80BE005E
+3D808030 618C2D4C
+7D8903A6 4E800421
+7FA3EB78 389F0074
+80BE0062 3D808030
+618C2D4C 7D8903A6
+4E800421 7FA3EB78
+389F0088 80BE0066
+3D808030 618C2D4C
+7D8903A6 4E800421
+7FA3EB78 389F009B
+80BE006A 3D808030
+618C2D4C 7D8903A6
+4E800421 3C608046
+6063B6A0 88630008
+2C030000 41820020
+807E0012 3D808034
+618C9CBC 7D8903A6
+4E800421 38600002
+987E0000 BA810008
+800100B4 382100B0
+7C0803A6 4E800020
+7C0802A6 90010004
+9421FF50 BE810008
+4BFFFDCD 7FE802A6
+38600020 3D808037
+618CF1E4 7D8903A6
+4E800421 7C681B78
+3860001E 3880FF2E
+38A0FFD8 38C00001
+38E00001 3D808030
+618C2834 7D8903A6
+4E800421 7C7E1B78
+806DB77C 7FC4F378
+3D808030 618C2810
+7D8903A6 4E800421
+38600000 987E0026
+7FC3F378 389F000C
+3D808030 618C2B90
+7D8903A6 4E800421
+C03F0004 D03E0008
+C03F0008 D03E000C
+807F0000 93C30002
+BA810008 800100B4
+382100B0 7C0803A6
+4E800020 7C0802A6
+90010004 9421FF50
+BE810008 4BFFFD11
+7FE802A6 386003E8
+3D808037 618CF1E4
+7D8903A6 4E800421
+7C681B78 3860001F
+38800000 38A00000
+38C0001D 38E00009
+3D808030 618C2834
+7D8903A6 4E800421
+7C7E1B78 806DB77C
+7FC4F378 3D808030
+618C2810 7D8903A6
+4E800421 38600000
+987E0026 7FC3F378
+389F0010 3D808030
+618C2B90 7D8903A6
+4E800421 7FC3F378
+C03F0018 C05F001C
+3D808030 618C2B10
+7D8903A6 4E800421
+7FC3F378 389F0014
+3D808030 618C2B64
+7D8903A6 4E800421
+7FC3F378 3D808030
+618C2AF0 7D8903A6
+4E800421 807F0000
+93C30006 38600013
+38800014 38A00000
+3D808039 618C01F0
+7D8903A6 4E800421
+4BFFFCE1 7C8802A6
+38A00007 3D808038
+618CFD54 7D8903A6
+4E800421 BA810008
+800100B4 382100B0
+7C0803A6 4E800020
+7C0802A6 90010004
+9421FF50 BE810008
+38600072 3D808037
+618CF1E4 7D8903A6
+4E800421 4BFFFBD1
+7C8802A6 90640000
+7C7E1B78 38800072
+3D808000 618CC160
+7D8903A6 4E800421
+4BFFFDD1 4BFFFE89
+4BFFFC59 7C6802A6
+907E0012 3D808034
+618C9BF0 7D8903A6
+4E800421 BA810008
+800100B4 382100B0
+7C0803A6 C022A8C8
+60000000 00000000
+
+------------- 0x801A4DEC ---- 800D9368 -> Branch
+
+# External/Debug Inputs/LogEngineTime.asm
+3C608048 80639D30
+5463443E 2C030202
+40820124 3C608048
+80639D60 2C030000
+40810114 7C0802A6
+90010004 9421FF50
+BE810008 3D808034
+618C7364 7D8903A6
+4E800421 7C7E1B78
+3C608016 6063E774
+80830000 5485863E
+7CA50774 54A5801E
+5484043A 7C842B78
+7C632214 83E30008
+887F0000 2C030000
+41820098 3C80804C
+60841FAC 80640000
+547C073E 54630036
+90640000 3D808034
+618CC408 7D8903A6
+4E800421 1C9C0004
+38840016 7C9F202E
+7C641850 1C63000C
+3C808000 608400FC
+80840000 38A003E8
+7C842B96 7C842B96
+7C632396 7C7D1B78
+93BF006A 807F0002
+9B810038 9B810039
+9B81003A 80810038
+54842026 608400FF
+90810038 38810038
+3D808030 618C2B90
+7D8903A6 4E800421
+7FC3F378 3D808034
+618C738C 7D8903A6
+4E800421 BA810008
+800100B4 382100B0
+7C0803A6 800D9368
+60000000 00000000
+
+------------- 0x80376A88 ---- 881F0002 -> Branch
+
+# External/Debug Inputs/LogFetchTime.asm
+3C608048 80639D30
+5463443E 2C030202
+40820150 3C608047
+60639D64 80630000
+2C030000 4082013C
+7C0802A6 90010004
+9421FF50 BE810008
+3D808034 618C7364
+7D8903A6 4E800421
+7C7E1B78 3C608016
+6063E774 80830000
+5485863E 7CA50774
+54A5801E 5484043A
+7C842B78 7C632214
+83E30008 806100DC
+54638036 889F0001
+7C632378 5463803E
+906100DC 807F000A
+889F0001 1C840004
+38840016 7C7F212E
+887F0001 38630001
+2C030010 41800008
+38600000 987F0001
+887F0000 2C030000
+4082000C 38600001
+987F0000 3D808034
+618CC408 7D8903A6
+4E800421 7C7D1B78
+809F000E 93BF000E
+7C64E850 1C63000C
+3C808000 608400FC
+80840000 38A003E8
+7C842B96 7C842B96
+7C632396 907F0062
+807F000A 7C63E850
+1C63000C 3C808000
+608400FC 80840000
+38A003E8 7C842B96
+7C842B96 7C632396
+907F0066 7FC3F378
+3D808034 618C738C
+7D8903A6 4E800421
+BA810008 800100B4
+382100B0 7C0803A6
+881F0002 00000000
+
+------------- 0x80349A28 ---- 80B80000 -> Branch
+
+# External/Debug Inputs/LogPollTime.asm
+3C608048 80639D30
+5463443E 2C030202
+4082010C 3C608047
+60639D64 80630000
+2C030000 408200F8
+7C0802A6 90010004
+9421FF50 BE810008
+3D808034 618C7364
+7D8903A6 4E800421
+7C7E1B78 3C608016
+6063E774 80830000
+5485863E 7CA50774
+54A5801E 5484043A
+7C842B78 7C632214
+83E30008 807F006E
+38630001 907F006E
+3D808034 618CC408
+7D8903A6 4E800421
+809F000A 907F000A
+7C641850 1C63000C
+3C808000 608400FC
+80840000 38A003E8
+7C842B96 7C842B96
+7C632396 7C7D1B78
+807F006E 5463063F
+41820028 807F005A
+7C1D1800 40800008
+93BF005A 807F005E
+7C1D1800 40810008
+93BF005E 4800000C
+93BF005A 93BF005E
+7FC3F378 3D808034
+618C738C 7D8903A6
+4E800421 BA810008
+800100B4 382100B0
+7C0803A6 80B80000
+60000000 00000000
+
+------------- 0x80375C14 ---- 80010024 -> Branch
+
+# External/Debug Inputs/LogScanoutTime.asm
+48000034 5464C63E
+5463463E 7C032000
+4182000C 3860FFFF
+48000018 3863FFF1
+1C630006 38800005
+7C632396 5463E73E
+4E800020 3C608048
+80639D30 5463443E
+2C030202 40820110
+3C608047 60639D64
+80630000 2C030000
+408200FC 7C0802A6
+90010004 9421FF50
+BE810008 3D808034
+618C7364 7D8903A6
+4E800421 7C7E1B78
+3C608016 6063E774
+80830000 5485863E
+7CA50774 54A5801E
+5484043A 7C842B78
+7C632214 83E30008
+887F0000 2C030000
+41820080 3C60804A
+60638B10 80630000
+38800000 7C0323AC
+7C0004AC 4C00012C
+83430000 7F43D378
+4BFFFF2D 2C030000
+41800050 7C7C1B78
+3D808034 618CC408
+7D8903A6 4E800421
+1C9C0004 38840016
+7C9F202E 7C641850
+1C63000C 3C808000
+608400FC 80840000
+38A003E8 7C842B96
+7C842B96 7C632396
+7C7D1B78 93BF0056
+7FC3F378 3D808034
+618C738C 7D8903A6
+4E800421 BA810008
+800100B4 382100B0
+7C0803A6 80010024
+60000000 00000000
+
+
+
+	-==-
+
+!
+Output File Load Times
+<https://github.com/UnclePunch/Training-Mode/tree/master/ASM/Additional%20Codes/Output%20File%20Load%20Times>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8001674c ---- BB61001C -> Branch
+
+.macro backup
+mflr r0
+stw r0, 0x4(r1)
+stwu	r1,-0x100(r1)	# make space for 12 registers
+stmw  r20,0x8(r1)
+.endm
+
+.macro load reg, address
+lis \reg, \address @h
+ori \reg, \reg, \address @l
+.endm
+
+.macro branchl reg, address
+lis \reg, \address @h
+ori \reg,\reg,\address @l
+mtctr \reg
+bctrl
+.endm
+
+ .macro restore
+lmw  r20,0x8(r1)
+lwz r0, 0x104(r1)
+addi	r1,r1,0x100	# release the space
+mtlr r0
+.endm
+
+#To be inserted at 8001674c
+.include "../../Globals.s"
+
+.set  REG_Tick,20
+.set  REG_FileSize,21
+.set  REG_FileName,30
+
+backup
+
+#Get Prev Tick
+	lwz	r3,-8(rtoc)
+#Get Current Tick
+	mftbl	r4
+#Find Difference
+	sub	r3,r4,r3
+#Convert to ms
+#Get Clock Bus
+	load 	r4,0x800000f8
+	lwz 	r4,0x0(r4)
+#Clock Bus / 4
+	li	r5,4
+	divw 	r4,r4,r5
+#Divided by 1000
+	li	r5,1000
+	divw	r4,r4,r5
+#divided by ticks
+	divw	REG_Tick,r3,r4
+
+#Get file size
+  mr  r3,r30
+  branchl r12,0x800163d8
+  mr  REG_FileSize,r3
+
+#OSReport Difference
+	bl	OSReportString
+	mflr	r3
+  mr  r4,REG_FileName
+  li  r5,1000
+  divw  r5,REG_FileSize,r5
+  mr  r6,REG_Tick
+	branchl r12,0x803456a8
+	b	Exit
+
+OSReportString:
+blrl
+.string "%s (%dkb) loaded in %dms\n"
+.align 2
+#*************************************************
+Exit:
+restore
+lmw	r27, 0x001C (sp)
+
+------------- 0x80016714 ---- 809C0000 -> Branch
+
+mftbl	r4
+stw	r4,-8(rtoc)
+
+lwz	r4, 0 (r28)

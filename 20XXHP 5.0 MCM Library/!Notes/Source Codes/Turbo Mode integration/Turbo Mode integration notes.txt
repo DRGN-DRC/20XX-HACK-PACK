@@ -1,0 +1,90 @@
+UnclePunch's Turbo Mode released with two Gecko variations: one to be used with regular Melee, and one to be used with 20XX HP 4.07++. The one to be used with regular Melee includes an injection into a function in vanilla Melee for player auras (injection at 0x8006CB7C). 20XX also injects into that location, so UnclePunch's Turbo Mode variation for 20XX instead injects into 20XX's injection.
+
+i.e.:
+
+0x6975C/0x8006CB7C			0x32F224/0x80332644		[somewhere in gecko codelist]
+
+Vanilla game aura function	-> 	NBA Jam aura code	-> 	Turbo Mode  v
+					...	 v		<-		   <-
+				<-		<-
+
+After Turbo Mode, execution goes back to Achilles' aura code, then back to the original game function.
+
+
+Since the location of the NBA Jam code is dynamic when rebuilding the code base (adding/removing codes), this needed addressing. The solution was to pre-pend Achilles' NBA Jam aura code with a slightly modified Turbo Mode aura code, removing the branch back and a few extra unecessary lines (commented out below):
+
+
+
+# Original aura code injection in Turbo Mode
+3DE08048 89EF9D30
+2C0F002C 40820030
+38800023 48000004
+7FE3FB78 3CA0800B
+60A5FFD0 7CA803A6
+38A00000 4E800021
+38600000 907F0430
+48000004 8001001C
+60000000 00000000
+
+
+as ASM:
+
+lis r15,-32696
+lbz r15,-25296(r15)
+cmpwi r15,44
+bne- 0x3c
+li r4,35
+b 0x4
+mr r3,r31
+lis r5,-32757
+ori r5,r5,65488
+mtlr r5
+li r5,0
+blrl
+li r3,0
+stw r3,1072(r31)
+# b 0x4
+# lwz r0,28(r1)
+# nop
+# .long 0x00000000
+
+
+
+
+Finished new code, included with NBA Jam, injected to 0x6975C:
+
+# Turbo Mode modification, sharing this injection
+3DE08048 89EF9D30
+2C0F002C 4082002C
+38800023 48000004
+7FE3FB78 3CA0800B
+60A5FFD0 7CA803A6
+38A00000 4E800021
+38600000 907F0430
+
+# Original NBA Jam code (Applys auras for kill counts); injected at 0x8006CB7C
+81FF0004 2C0F000B
+418200AC 3DE08048
+89EF9D30 2C0F0013
+4082009C 3E008047
+8210B6C4 2C100000
+4182007C 3C608000
+606332C8 889F000C
+7C8320AE 2C040002
+41800074 2C040002
+41820020 39E00009
+7C707BD6 7E2379D6
+7C118000 4082000C
+38800023 4800001C
+39E00007 7C707BD6
+7E2379D6 7C118000
+4082003C 3880000B
+7FE3FB78 3CA0800B
+60A5FFD0 7CA803A6
+38A00000 4E800021
+38600000 907F0430
+48000014 38600000
+3C808000 906432C8
+906432CC 8001001C
+48000000
+

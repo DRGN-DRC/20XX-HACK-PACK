@@ -1,0 +1,1075 @@
+Hold B for Height (Mario/Dr. Mario/Luigi/ICies - SDRC)
+Hold B instead of mashing B to gain height with down or side B moves.
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800e253c --- 801F0668 -> Branch	# Mario & Dr. Mario
+
+81E40004 2C0F0000
+40A20018 3DE0803C
+89EF57D5 2C0F0073
+40A20028 4800001C
+2C0F0015 40A2001C
+3DE0803D 89EF15DD
+2C0F0073 40A2000C
+801F065C 48000008
+801F0668 48000000
+
+1.02 ----- 0x80144ab0 --- 801F0668 -> Branch	# Luigi
+
+3DE0803D 89EF08AD
+2C0F0073 40A2000C
+801F065C 48000008
+801F0668 48000000
+
+1.02 ----- 0x80120554 --- 801F0668 -> Branch	# ICies
+
+3DE0803D 89EFD615
+2C0F0073 40A2000C
+801F065C 48000008
+801F0668 48000000
+
+1.02 ----- 0x80120414 --- 801F0668 -> Branch	# ICies
+
+3DE0803D 89EFD615
+2C0F0073 40A2000C
+801F065C 48000008
+801F0668 48000000
+
+
+	-==-
+
+
+Ice Climbers - Popo and Nana Can Share Ledge (SDRC)
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80082EA4 --- 809E0734 -> Branch
+
+3DE0803D 89EFD615
+2C0F0073 40A20044
+887F000C 889E221F
+5484EFFE 3D808003
+618C418C 7D8903A6
+4E800421 2C030000
+41820020 8063002C
+7C03F000 40820014
+3D808008 618C2EC0
+7D8903A6 4E800420
+809E0734 48000000
+
+1.02 ----- 0x80082ED8 --- 809E0730 -> Branch
+
+3DE0803D 89EFD615
+2C0F0073 40A20044
+887F000C 889E221F
+5484EFFE 3D808003
+618C418C 7D8903A6
+4E800421 2C030000
+41820020 8063002C
+7C03F000 40820014
+3D808008 618C2EF4
+7D8903A6 4E800420
+809E0730 48000000
+
+
+	-==-
+
+
+Nana Direction Update Bug Fix (SDRC)
+Allows ICs to dash-dance together
+<https://smashboards.com/threads/misc-character-codes.446554/>
+[tauKhan, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800b0ae8 --- D0030018 -> Branch
+
+3DE0803D 89EFD615
+2C0F0073 40A20028
+38C40444 3863001C
+7C033040 40820008
+386400FC D0030018
+80640444 80C40444
+48000008 D0030018
+48000000
+
+
+	-==-
+
+
+Nana is Always Level 9 (SDRC)
+Conditionally set during match start if SDR is active for Popo
+[glook, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8011EF3C --- 7C0802A6 -> Branch
+
+# Injecting into FighterOnLoad_Popo
+.macro setWord reg1, reg2, address, word
+  lis \reg1, \word@h
+  ori \reg1, \reg1, \word@l
+  lis \reg2, \address@h
+  ori \reg2, \reg2, \address@l
+  stw \reg1, 0(\reg2)
+.endm
+
+# Check if SDR Popo is enabled
+lis	r15, 0x803D		# 0x803CD615
+lbz	r15, -0x29EB(r15)	# load PlPp._at
+cmpwi	r15, 0x73
+bne+ 	OrigLine
+
+# SDR Popo activated; make SDR changes
+setWord r14, r15, 0x801239a8, 0x60000000
+b END
+
+OrigLine: # Change lines to vanilla
+setWord r14, r15, 0x801239a8, 0x40810008
+
+END:
+mflr r0		# original code line
+b 0
+
+
+	-==-
+
+
+Nana's % is Displayed (SDRC)
+Displays above Popo's like in coin battle
+[Flies killer, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8011EF40 --- 90010004 -> Branch
+
+# Injecting into 0x4 of FighterOnLoad_Popo
+.macro setWord reg1, reg2, address, word
+  lis \reg1, \word@h
+  ori \reg1, \reg1, \word@l
+  lis \reg2, \address@h
+  ori \reg2, \reg2, \address@l
+  stw \reg1, 0(\reg2)
+.endm
+
+# Check if SDR Popo is enabled
+lis	r15, 0x803D		# 0x803CD615
+lbz	r15, -0x29EB(r15)	# load PlPp._at
+cmpwi	r15, 0x73
+bne+ 	OrigLines
+
+# SDR Popo activated; make SDR changes
+setWord r14, r15, 0x804ddc28, 0x40c00000
+setWord r14, r15, 0x8016597c, 0x480000CC
+b END
+
+OrigLines: # Change lines to vanilla
+setWord r14, r15, 0x804ddc28, 0x404CCCCD
+setWord r14, r15, 0x8016597c, 0x40820074
+
+END:
+stw r0,4(r1)		# original code line
+b 0
+
+1.02 ----- 0x80165a64 --- 7C0601D6 -> Branch
+
+# Check if SDR Popo is enabled
+lis	r15, 0x803D		# 0x803CD615
+lbz	r15, -0x29EB(r15)	# load PlPp._at
+cmpwi	r15, 0x73
+bne+ 	END
+
+loc_0x0:
+  lis r17, 0x8046
+  ori r17, r17, 0xB6A0
+  lbz r17, 0(r17)
+  cmpwi r17, 0x0
+  bne- loc_0x24
+  lis r17, 0x8045
+  ori r17, r17, 0x30E2
+  li r16, 0xE90
+  b loc_0x30
+
+loc_0x24:
+  lis r17, 0x804A
+  ori r17, r17, 0x13CE
+  li r16, 0x50
+
+loc_0x30:
+  mr r19, r26
+
+loc_0x34:
+  cmpwi r19, 0x0
+  beq- loc_0x48
+  subi r19, r19, 0x1
+  add r17, r17, r16
+  b loc_0x34
+
+loc_0x48:
+  lhz r0, 0(r17)
+  lis r17, 0x8016
+  ori r17, r17, 0x5AA4
+  mtctr r17
+  bctr 
+  b 8		# Skip original code line
+
+END:
+  mullw r0,r6,r0 	# Original code line
+  b 0
+
+1.02 ----- 0x802f65cc --- 881D0003 -> Branch
+
+# Check if SDR Popo is enabled
+lis	r15, 0x803D		# 0x803CD615
+lbz	r15, -0x29EB(r15)	# load PlPp._at
+cmpwi	r15, 0x73
+bne+ 	OrigLine
+
+loc_0x0:
+  mulli r15, r31, 0xE90
+  lis r16, 0x8045
+  ori r16, r16, 0x3080
+  add r16, r15, r16
+  lbz r17, 7(r16)
+  cmpwi r17, 0xE
+  bne- loc_0x24
+  li r0, 0x80
+  b END
+
+loc_0x24:
+  li r0, 0x0
+  b END
+
+OrigLine:
+  lbz r0,3(r29) 	# Original code line
+END:				# Original code doesn't include orig code line
+  b 0
+
+
+	-==-
+
+
+GaW Can L-Cancel Aerials Rewrite w/GFX (SDRC)
+Differs from the Magus code in that item GFX are preserved on landing
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8014b964 --- 3C608015 -> Branch
+
+# Collision_GaW_Bair
+3DE0803D 89EF28ED
+2C0F0073 40A20058
+80ADAEB4 808500E4
+887F067F 7C032000
+40800044 7FC3F378
+3D808006 618CF484
+7D8903A6 4E800421
+C0028AE8 EC00082A
+C02500E8 C05F0200
+EC220824 EC200824
+7FC3F378 3D808006
+618CF190 7D8903A6
+4E800421 3C608015
+48000000
+
+1.02 ----- 0x8014bac0 --- 3C608015 -> Branch
+
+# Collision_GaW_UAir
+3DE0803D 89EF28ED
+2C0F0073 40A20058
+80ADAEB4 808500E4
+887F067F 7C032000
+40800044 7FC3F378
+3D808006 618CF484
+7D8903A6 4E800421
+C0028AE8 EC00082A
+C02500E8 C05F0204
+EC220824 EC200824
+7FC3F378 3D808006
+618CF190 7D8903A6
+4E800421 3C608015
+48000000
+
+1.02 ----- 0x8014b808 --- 3C608015 -> Branch
+
+# Collision_GaW_Nair
+3DE0803D 89EF28ED
+2C0F0073 40A20058
+80ADAEB4 808500E4
+887F067F 7C032000
+40800044 7FC3F378
+3D808006 618CF484
+7D8903A6 4E800421
+C0028AE8 EC00082A
+C02500E8 C05F01F8
+EC220824 EC200824
+7FC3F378 3D808006
+618CF190 7D8903A6
+4E800421 3C608015
+48000000
+
+
+	-==-
+
+
+Cannot Escape Kirby Throws (SDRC)
+<https://smashboards.com/threads/disable-escaping-from-kirby-throws-and-kirbycide.454066/post-22748043>
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800EE680 --- 7C0802A6 -> Branch
+
+# Performs overwrites in Kirby's OnLoad
+.macro setWord reg1, reg2, address, word
+  lis \reg1, \word@h
+  ori \reg1, \reg1, \word@l
+  lis \reg2, \address@h
+  ori \reg2, \reg2, \address@l
+  stw \reg1, 0(\reg2)
+.endm
+
+# Check if SDR Kirby is enabled
+lis	r15, 0x803D	# 0x803CA30D
+lbz	r15, -0x5CF3(r15)	# load PlKb._at
+cmpwi	r15, 0x73
+bne+ 	OrigLine
+
+# SDR Kirby activated; make SDR changes
+setWord r14, r15, 0x800DE490, 0x48000010
+b END
+
+OrigLine: # Change lines to vanilla
+setWord r14, r15, 0x800DE490, 0x40820010
+
+END:
+mflr r0		# original code line
+b 0
+
+
+	-==-
+
+
+Mewtwo SDR Init (SDRC)
+Contains SDR changes for the following features:
+- Mewtwos Side-b works as a throw
+- Fix's mewtwo's confusion reflect bubble
+Conditionally set during match start if SDR is active for Mewtwo.
+<https://smashboards.com/threads/sd-remix-3-3-full-with-slippi-rollback-released.324620/post-21724293>
+<https://smashboards.com/threads/sd-remix-3-3-full-with-slippi-rollback-released.324620/post-21724263>
+[UnclePunch, jjhoho, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x141A28 ----- 7C0802A6 -> Branch
+
+# Performs overwrites in Mewtwo's OnLoad
+.macro setWord reg1, reg2, address, word
+  lis \reg1, \word@h
+  ori \reg1, \reg1, \word@l
+  lis \reg2, \address@h
+  ori \reg2, \reg2, \address@l
+  stw \reg1, 0(\reg2)
+.endm
+
+# Check if SDR Mewtwo is enabled
+lis	r15, 0x803D0D85@h
+lbz	r15, 0x803D0D85@l(r15)	# load PlMt._at
+cmpwi	r15, 0x73
+bne+ 	OrigLines
+
+# SDR Mewtwo activated; make SDR changes
+setWord r14, r15, 0x80146940, 0x60000000 # Side-B works as throw
+setWord r14, r15, 0x801468ac, 0x60000000 # Side-B works as throw
+setWord r14, r15, 0x80146c58, 0x60000000 # Confusion reflect fix
+b END
+
+OrigLines: # Change lines to vanilla
+setWord r14, r15, 0x80146940, 0x4BF49E41 # Side-B works as throw
+setWord r14, r15, 0x801468ac, 0x4BF49ED5 # Side-B works as throw
+setWord r14, r15, 0x80146c58, 0x981F2218 # Confusion reflect fix
+
+END:
+mflr r0		# original code line
+b 0
+
+
+	-==-
+
+
+GW Pan Momentum Not Applied (SDRC)
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8014A37C --- 7C0802A6 -> Branch
+
+# Performs overwrites in GaW's OnLoad
+.macro setWord reg1, reg2, address, word
+  lis \reg1, \word@h
+  ori \reg1, \reg1, \word@l
+  lis \reg2, \address@h
+  ori \reg2, \reg2, \address@l
+  stw \reg1, 0(\reg2)
+.endm
+
+# Check if SDR Game & Watch is enabled
+lis	r15, 0x803D28ED@h
+lbz	r15, 0x803D28ED@l(r15)	# load PlGw._at
+cmpwi	r15, 0x73
+bne+ 	OrigLine
+
+# SDR GaW activated; make SDR changes
+setWord r14, r15, 0x8014e6e8, 0x60000000
+b END
+
+OrigLine: # Change lines to vanilla
+setWord r14, r15, 0x8014e6e8, 0xD0250084
+
+END:
+mflr r0		# original code line
+b 0
+
+
+	-==-
+
+
+Enter Action State Subaction Event
+75 XX AA AA FFFFFFFF GGGGGGGG HHHHHHHH
+XX = 00 for default float parameters // 01 for specifying parameters
+AAAA = Action State ID to Enter
+FFFFFFFF = AS's starting frame (float)
+GGGGGGGG = AS's speed modifier (float)
+HHHHHHHH = AS's keyframe blend level (float)
+default values for float parameters are 1,0,1 respectively
+<https://smashboards.com/threads/enter-action-state-subaction-event.450151/>
+[UnclePunch]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80071ae8 --- 80A40008 -> Branch
+
+80A40008 88C50000
+2C060075 40820050
+88C50001 2C060000
+40820014 C0228A58
+C0428A60 C0628A58
+48000014 C0250004
+C0450008 C065000C
+48000004 A0850002
+7F63DB78 38A00000
+38C00000 3DC08006
+61CE93AC 7DC903A6
+4E800420 80A40008
+48000000
+
+
+	-==-
+
+
+Custom Action State Logic
+lets you change state to anything else. effective "true" IASA.
+5DxxASID - makes IASA logic match another action state by ID
+5ExxASID - set the logic to match another action state by ID
+5FEEASID - EE -number of events to continue reading from the old action state. (ignores timer events, but counts them). ASID
+[Punkline]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80071960 --- 98032218 -> Branch
+
+80A40008 80A50000
+54A501BF 41A20024
+7C0802A6 90010004
+9421FFF8 4800001D
+38210008 80010004
+7C0803A6 48000158
+98032218 48000150
+7C0802A6 90010004
+9421FF80 BC610008
+7C7F1B78 80840008
+54BB47BF 54BC863E
+54BD053E 41820108
+83DF0018 7C1DF040
+41800010 7C1EE850
+83DF0020 4800000C
+7FA0EB78 83DF001C
+54002834 7FDE0214
+281B0001 418200CC
+281B0002 418200B8
+7C9E2378 3BDE0004
+54BB8FFE 7FA4EB78
+807F0000 3D808008
+618CCFAC 7D8803A6
+4E800021 281B0000
+4182000C 93DF03EC
+480000A8 83BF03EC
+93DF03EC 281C0000
+41820060 807F03EC
+28030000 41820054
+48000045 7C0802A6
+90010004 9421FFC8
+DBE10030 DBC10028
+BF610014 C3C288D4
+D3DF03E4 3BBF03E4
+837F0000 3FE0803C
+63FF06E8 C3C288D8
+3D808007 618C32EC
+7D8803A6 4E800021
+3B9CFFFF 4BFFFFA0
+3BBDFFFC C00288D8
+D01F03E4 93BF03EC
+48000028 837E000C
+937F21A0 4800001C
+837E0010 937F219C
+48000010 8B7F2218
+737B007F 9B7F2218
+B8610008 38210080
+80010004 7C0803A6
+4E800020 48000000
+
+
+	-==-
+
+
+Auto Link Angle 363
+Allows for using SSB Brawl's linking angle
+[Flipsmash]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8007a780 --- 80640020 -> Branch
+
+80640020 2C03016B
+40A20060 C02F00CC
+C04F00C8 C06F00B0
+C09900B0 EC641828
+C0028900 FC030040
+40A0000C C0028910
+EC4000B2 3C008002
+60002C30 7C0903A6
+4E800421 C002893C
+EC200072 FC00081C
+D801FFF8 8061FFFC
+2C030000 40A00008
+38630168 8091000C
+3C004330 C8228928
+48000000
+
+
+	-==-
+
+
+Interrupt Swap Subaction
+*Syntax = 33XX0000 YYYYYYYY
+*XX = 00,01,02 / 00 = IASA Function / 01 = Physics Function / 02 = Collision Function
+*YYYYYYYY = Move Logic Function
+[UnclePunch]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8007162c --- 7C0802A6 -> Branch
+
+81DD0008 89EE0000
+2C0F0033 4082004C
+808E0004 89EE0001
+2C0F0000 41820018
+2C0F0001 41820018
+2C0F0002 41820018
+48000028 909E219C
+48000014 909E21A4
+4800000C 909E21A8
+48000004 39CE0008
+91DD0008 4E800020
+7C0802A6 48000000
+
+
+	-==-
+
+
+Individual Powershield Ratios (SDRC)
+originally a plco offset, now customizable
+[mer?, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8009397c --- C00902A8 -> Branch
+
+3DC0803C 61CE1F40
+81FF0004 1DEF0008
+7DCE7A14 81EE0000
+89CF0005 2C0E0073
+40A200A4 48000088
+4E800021 3F59999A
+3F400000 3F400000
+3F800000 3F400000
+3F800000 3F400000
+3F400000 3F666666
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F666666
+3F400000 3F400000
+3F400000 3F400000
+3F400000 3F400000
+3F400000 4BFFFF7D
+7CC802A6 88E80007
+1CE70004 7C07342E
+48000008 C00902A8
+48000000
+
+
+	-==-
+
+
+Ness Yoyo Goes Over Ledge (SDRC)
+Affects charging of D-Smash and U-Smash
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8011480C --- 7C0802A6 -> Branch
+
+# Performs overwrites in Ness' OnLoad
+3DE0803D 89EFCAD5
+2C0F0073 40A20030
+3DC06000 61CE0000
+3DE08011 61EF6698
+91CF0000 3DC06000
+61CE0000 3DE08011
+61EF5E34 91CF0000
+4800002C 3DC04182
+61CE000C 3DE08011
+61EF6698 91CF0000
+3DC04182 61CE000C
+3DE08011 61EF5E34
+91CF0000 7C0802A6
+48000000
+
+
+	-==-
+
+
+Ness & GaW Can Absorb All Projectiles And Items (SDRC)
+Missiles and turnips no longer a problem
+[UnclePunch, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8007956C --- 546007FF -> Branch
+
+# Injecting into Hitbox_ProjectileHitboxAndFighterHitbox
+81FB0004 2C0F0008
+40A20018 3DE0803D
+89EFCAD5 2C0F0073
+40A20028 4800001C
+2C0F0018 40A2001C
+3DE0803D 89EF28ED
+2C0F0073 40A2000C
+4C421102 48000008
+546007FF 48000000
+
+1.02 ----- 0x8007962C --- 5400CFFF -> Branch
+
+# Injecting into Hitbox_ProjectileHitboxAndFighterHitbox
+81FB0004 2C0F0008
+40A20018 3DE0803D
+89EFCAD5 2C0F0073
+40A20028 4800001C
+2C0F0018 40A2001C
+3DE0803D 89EF28ED
+2C0F0073 40A2000C
+4C421102 48000008
+5400CFFF 48000000
+
+1.02 ----- 0x8026a49c --- 8183002C -> Branch
+
+# Injecting into ItemThink_Shield/Damage
+7C0F0378 81EF002C
+81EF0004 2C0F0008
+40A20018 3DE0803D
+89EFCAD5 2C0F0073
+40A2002C 4800001C
+2C0F0018 40A20020
+3DE0803D 89EF28ED
+2C0F0073 40A20010
+3D80802B 618C5FE8
+48000008 8183002C
+48000000
+
+
+	-==-
+
+
+Link and Young Link Grab Timer Fix (SDRC)
+Allows Link's and Y.Link's grabbox to be controlled by an async timer rather than the DOL.
+<https://smashboards.com/threads/sd-remix-3-3-full-with-slippi-rollback-released.324620/post-21743177>
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x802A7718 ---- 4BDD38E1 -> Branch
+
+# Check if current character is Link
+lwz r15, 4(r28)		# Loading current player internal character ID
+cmpwi	r15, 0x6
+bne+	CheckYoungLink
+
+# Current character is Link. Check if SDR Link is enabled
+lis	r15, 0x803D	# 0x803C80BD
+lbz	r15, -0x7F43(r15)	# load PlLk._at
+cmpwi	r15, 0x73
+bne+	OrigLine
+b END		# Do nothing and exit
+
+CheckYoungLink:
+# Check if current character is Young Link
+cmpwi	r15, 0x14
+bne+	OrigLine
+
+# Check if SDR Young Link is enabled
+lis	r15, 0x803D1245@h
+lbz	r15, 0x803D1245@l(r15)	# load PlCl._at
+cmpwi	r15, 0x73
+bne+	OrigLine
+b END		# Do nothing and exit
+
+OrigLine:
+bl 0x8007AFF8		# Original code line (kind of); bl to Hitbox_Deactivate_All
+END:
+b 0
+
+
+	-==-
+
+
+Brawl Bury Mechanics V1.0.3 (SDRC)
+Only active when SDR DK is enabled
+<https://smashboards.com/threads/brawl-style-bury-mechanics-get-knocked-out-of-bury-if-hit-by-a-strong-knockback-move.514405/>
+[Odante, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8008ECBC ---- 40820018 -> Branch
+
+41A20060 3DE0803D
+89EFBDFD 2C0F0073
+40A20038 C01D1850
+48000041 7C6802A6
+C0230000 FC000840
+40810020 807D1860
+2C030009 4082000C
+38600000 907D1860
+887D2220 4800001C
+3D808008 618CECD4
+7D8903A6 4E800420
+4E800021 42C80000
+48000000
+
+
+	-==-
+
+
+PK Flash Explodes on Stage Collision (SDRC)
+Should affect both Ness and Kirby
+[PKFreeZZy, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x80269384 ---- 801E0004 -> Branch
+
+3DC0803F 61CE6B90
+7C1E7000 40A20080
+81FB0518 81EF002C
+81EF0004 2C0F0008
+40A20018 3DE0803D
+89EFCAD5 2C0F0073
+40A2005C 4800001C
+2C0F0004 40A20050
+3DE0803D 89EFA30D
+2C0F0073 40A20040
+3DE0802A 61EFAD48
+91FB0D14 38800000
+387A0000 3DE0802A
+61EFB128 91FB0D18
+3DE0802A 61EFB29C
+91FB0D1C 3DE08026
+61EF93A4 7DE903A6
+4E800420 801E0004
+48000000
+
+
+	-==-
+
+
+PK Flash Explodes on Interrupt (SDRC)
+Should affect SDR Ness and Kirby
+[PKFreZZy, DRGN]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+NTSC 1.02 ----- 0x802AAD8C --- 28000000 -> Branch
+
+81E60010 2C0F0044
+41820010 2C0F0091
+4182001C 48000030
+3DE0803D 89EFCAD5
+2C0F0073 40A20020
+48000014 3DE0803D
+89EFA30D 2C0F0073
+40A2000C 4C421102
+48000008 28000000
+48000000
+
+
+	-==-
+
+
+ROA-Style WD (alternate version + SDRC)
+This makes wavedashes easier, by widening the window during which a WD can occur; similar to as they are in Rivals of Aether.
+Differences from UnclePunch's original code:
+-- Gives higher priority to R+A grab
+-- Compatible with tauKhan's Extended SH Jump Input Release Window code
+<https://smashboards.com/threads/wavedash-out-of-jumpsquat-roa-style.454197/post-24565408>
+[UnclePunch, tauKhan, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x800CB634 ---- 2C030000 -> Branch
+
+3DE08023 81EF88F8
+2C0F0000 4082002C
+3DE0803C 61EF1F40
+809F002C 80840004
+1C840008 7DEF2214
+808F0000 89E40005
+2C0F0073 40A2009C
+2C030000 40820094
+83DF002C 801E0668
+54000675 41820084
+C03E0624 C0029898
+FC010040 40810020
+7FE3FB78 3D808009
+618C9A9C 7D8903A6
+4E800421 2C1F0000
+48000058 7FC3F378
+3D808007 618CD9D4
+7D8903A6 4E800421
+3D808032 618C6240
+7D8903A6 4E800421
+806DAEB4 C0030338
+EC000072 C023033C
+EC010032 D01E0080
+7FE3FB78 3D808009
+618C9D70 7D8903A6
+4E800421 2C1F0000
+2C030000 48000000
+
+------------- 0x802288F8 ---- 41820008 -> 00000000 # Debug Menu flag
+
+
+	-==-
+
+
+! No longer needed for SDR v5.0, in leu of "Mewtwos Side-b works as a throw"
+
+SD Remix 3.1 - Mewtwo Missfoot
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800907e8 --- 38800026 -> Branch
+
+3DE0803D 89EF0D85
+2C0F0073 40820020
+81FF0010 2C0F012F
+41800014 2C0F0131
+4080000C 388000FB
+48000008 38800026
+48000000
+
+
+	-==-
+
+
+Modified Subaction - Self Damage/Heal
+- updated version of this code, with no static overwrites https://smashboards.com/threads/new-melee-syntax-school-you-can-write-character-commands-now.402587/#post-19190895
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80072C14 --- 80840000 -> Branch
+
+88A40001 A0840002
+8063002C 2C050001
+40820024 3CA08006
+60A5CF5C 7CA803A6
+4E800021 3CA08007
+60A52C3C 7CA803A6
+4E800020 3CA08007
+60A52C24 7CA803A6
+4E800020 48000000
+
+
+	-==-
+
+
+SD Remix - Falcon Kick No Textures
+- no textures during shinesplosion
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800e3eac --- 7C0802A6 -> Branch
+
+80A3002C 80850004
+2C040002 40820024
+80850010 2C040165
+40820018 3C80803C
+8884759D 2C040073
+40820008 4E800020
+7C0802A6 48000000
+
+
+	-==-
+
+
+SD Remix - CFalc/Ganon Side-B
+- enter "Fall" instead of "SpecialFall"
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800e39d0 --- 4BFB2F31 -> Branch
+
+# Aerial Miss
+8083002C 80840004
+2C040002 41820018
+3C80803D 88842CDD
+2C040073 40820024
+48000014 3C80803C
+8884759D 2C040073
+40820010 3C80800C
+6084C730 4800000C
+3C808009 60846900
+7C8803A6 4E800021
+48000000
+
+1.02 ----- 0x800e3aec --- 4BFB2E15 -> Branch
+
+# Aerial Hit
+8083002C 80840004
+2C040002 41820018
+3C80803D 88842CDD
+2C040073 40820024
+48000014 3C80803C
+8884759D 2C040073
+40820010 3C80800C
+6084C730 4800000C
+3C808009 60846900
+7C8803A6 4E800021
+48000000
+
+1.02 ----- 0x800e3cd0 --- 4BFB2C31 -> Branch
+
+# Off Ledge
+8083002C 80840004
+2C040002 41820018
+3C80803D 88842CDD
+2C040073 40820024
+48000014 3C80803C
+8884759D 2C040073
+40820010 3C80800C
+6084C730 4800000C
+3C808009 60846900
+7C8803A6 4E800021
+48000000
+
+
+	-==-
+
+
+SDR Falcon Airdodge out of Up-B
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800E4F2C --- 4BFB19D5 -> Branch
+
+3CC08009 60C66900
+7CC803A6 38C00000
+4E800021 807E002C
+80830004 2C040002
+40820020 3C80803C
+8884759D 2C040073
+40820010 3C808009
+60849A58 9083219C
+48000000
+
+1.02 ----- 0x800E4F58 --- 83E3002C -> Branch
+
+8083002C 83E40004
+2C1F0002 40820044
+3FE0803C 8BFF759D
+2C1F0073 40820034
+3FE08009 63FF9A58
+7FE803A6 7C7F1B78
+4E800021 2C030001
+40820014 3C60800E
+60634FC8 7C6903A6
+4E800420 7FE3FB78
+83E3002C 48000000
+
+
+	-==-
+
+
+PAL & SDR DK do not lose Giant Punch Charge
+- looks for anything but PlDk.dat
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8010fb04 --- 9004222C -> Branch
+
+3CA0803D 88A5BDFD
+2C050064 40820008
+9004222C 48000000
+
+
+	-==-
+
+
+SDR - Spacies Fire Fox Eject
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800e76d8 --- 4E800020 -> Branch
+
+8063002C 80830004
+2C040001 41820018
+3C80803D 88841CAD
+2C040073 41820018
+48000030 3C80803C
+88847BED 2C040073
+40820020 80830668
+548005EF 41820014
+54800677 4182000C
+38000000 90032348
+4E800020
+
+
+	-==-
+
+
+Custom Subaction Event - Character Data Modifications
+Enables changing character attributes mid-match. Requires new subaction lines to have any effect, so this does not affect vanilla characters.
+<https://smashboards.com/threads/custom-subaction-event-character-data-modifications.429112/>
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800716F8 --- 80640008 -> Branch
+
+80A40008 88C50001
+2C0600FF 40820180
+7CC802A6 90C1FFF4
+8063002C A0C50002
+7CE62A14 90E40008
+38C6FFFC 39200008
+7C864BD6 38A50004
+88C50000 88E50001
+A1050002 81250004
+2C060000 4182001C
+2C060001 41820024
+2C060002 4182002C
+2C060003 41820034
+7D8340AE 4800009D
+7D2341AE 480000FC
+7D83422E 4800008D
+7D23432E 480000EC
+7D83402E 4800007D
+7D23412E 480000DC
+C0250004 54E9CFFF
+41820010 C003002C
+FC200072 38E7FF80
+7D234214 C0090000
+2C070000 41820044
+2C070003 418000AC
+4182001C 2C070004
+4182001C 2C070005
+4182001C 2C070006
+4182001C FC21002A
+48000018 FC200828
+48000010 FC210032
+48000008 EC200824
+D0290000 4800006C
+2C070000 4D820020
+2C070001 4182002C
+2C070002 4182002C
+2C070003 4182002C
+2C070004 4182002C
+2C070005 4182002C
+2C070006 4182002C
+7D296038 4E800020
+7D296378 4E800020
+7D296214 4E800020
+7D296050 4E800020
+7D2C49D6 4E800020
+7D2C4BD6 4E800020
+38A50008 3884FFFF
+2C040000 41A1FEBC
+80C1FFF4 7CC803A6
+4E800020 80640008
+48000000

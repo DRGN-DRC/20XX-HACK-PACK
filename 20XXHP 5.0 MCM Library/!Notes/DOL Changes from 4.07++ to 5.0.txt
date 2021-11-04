@@ -1,0 +1,317 @@
+
+			- Changes to the DOL from 20XX 4.07++ to 5.0 -
+
+
+	"20XX 4.07++ Codes_original.txt" is Achilles' original MCM library file.
+	The following mods were removed, or combined into one, for the new 5.0 library:
+
+5 mods combined for "NBA Jam":										-4
+	- NBA Jam Damage Mult and Element
+	- NBA Update Kill Count
+	- NBA Jam Auras
+	- Reset Last Player Who Damaged Upon Ledgegrab
+	- NBA Jam Grab Fire Damage
+4 mods combined for Extended Name Entry:								-3
+	- Extended Name Entry - Main Code
+	- Extended Name Entry - Static Codes Part 1
+	- Extended Name Entry - Static Codes Part 2
+	- Extended Name Entry - Injections
+4 mods combined for Dual 1v1 Mode:									-3	10
+	- Switch FF with 2 Players Left
+	- Players of Diff Teams Can't Nudge
+	- Players on Diff Teams Can Grab Same Ledge
+	- Parse Overwrite Table
+4 mods combined for Blastzone Wrapping:									-3
+	- Codes for Left/Right/Top/Bottom
+3 mods combined for "Tag Team Mode":									-2
+	- Tag Team Mode - FALL at match start
+	- Tag Team Mode - Zelda/Sheik Copy Flags
+	- Tag Team Mode - Main Code
+3 mods combined for "Stage Striking":									-2
+	- Stage Striking
+	- Stage Striking - Striked Stages Cannot be Randomly Selected
+	- Stage Striking - Striked Stages Cannot be Randomly Selected (Pt2)
+3 mods combined for "Beam Sword Battle":								-2
+	- Beam Sword Action States
+	- Beam Sword Battle - Invisible During Sleep
+	- Beam Sword Battle - Spawn Swords
+2 mods combined for "Chess Melee":									-1	20
+	- Chess Melee - Rebirth All Players
+	- Chess Melee - Freeze All Chars on Death
+2 mods combined for Magus Physics Display:								-1
+	- Magus Physics Display (main code, + several text section additions)
+	- Coin Mode Bug Fix
+2 mods combined for "Cursor Hands Default to HMN/CPU Button":						-1
+	- Cursor Hands Default to HMN/CPU Button
+	- Cursor Hands Default to HMN/CPU Button ASM
+2 mods combined for "L-Cancel % on Results Screen":							-1
+	- L-Cancel % on Results Screen
+	- Disable DamageRecovered Results Stat
+2 mods combined for "Sheik/Zelda CPU Disable Transformations":						-1
+	- Sheik/Zelda CPU Disable Transformations (grounded)
+	- Sheik/Zelda CPU Disable Transformations (aerial)
+2 mods removed (included with new "All Players Can Control the Debug Menu"):				-2
+	- Debug Menu - Increased Joystick Deadzone
+	- Debug Menu - Line Tracking
+removed "Smash Turn - 2 Frame Window" (replaced by full UCF)						-1
+removed "Single Button Mode Disable" (this change now included with Super Shine Bros mod)		-1
+removed "Disable Slo-Mo, Lightning, Giant, Tiny, Invisible"; changes now with respective mods		-1
+4 mods removed in order to remove 'Dodgeball' game mode:						-4	33
+	- Dodgeball - Disable Pokemon Spawn
+	- Dodgeball - Only Pokeballs Damage
+	- Dodgeball - Warpstar Battle
+	- Dodgeball - Allow Grabs
+removed "Hot Mr. Saturn"										-1
+2 mods combined for "20XX Stage Swap Engine"								-1
+	- "Stage File Patches"
+	- "20XX Stage Swap"
+The "CPU AI Mods" code has been moved from the DOL to the disc filesystem 				-1
+(the file "AI_Engine.bin"), and its respective mod in the MCM library is now 
+an injection to load this called "20XX AI Engine Loader"
+1 mod removed (now included in "Suppress Button Press Functions"):					-1
+	- "Debug Menu - Disable Start Button Functions"
+2 mods combined into "Corneria Special Taunt":								-1
+	- "Corneria Special Taunt"
+	- "Corneria Special Taunt - Modify Frame Length"
+3 mods combined into "SDR - CFalc/Ganon Side-B Enters "Fall" Action":					-2	40
+	- "SD Remix - CFalc/Ganon Side-B, Aerial Miss"
+	- "SD Remix - CFalc/Ganon Side-B, Aerial Hit"
+3 mods combined into "Frame Speed Modifier Engine"							-2
+	- "FSM Table"
+	- "20XX SDR Frame Speed Mod"
+	- "PAL FSM List block reservation"
+4 mods combined for "20XX Teching Options":								-3	45
+	- "20XX Teching Option - Neutral Tech Interrupt"
+	- "20XX Teching Option - TechRoll Interrupt"
+	- "20XX Teching Option - Getup Frame Perfect"
+	- "20XX Teching Option - DownBoundWait"
+1 mod removed: "SD Remix 3.1 - Mewtwo Missfoot"								-1
+
+
+Total mods removed from library: 
+
+
+
+	-	=	-	=	-
+
+
+	Mods added 	(many built from "Non-MCM_only.txt")
+	(Mods below preceded with ! are in the Mods Library files, 
+	    but are not enabled; i.e. ignored during parsing.)
+
+	
+		"Audio"
+
+1	Audio File Name Changes
+	Music Plays at 20% Volume When All Controllers Are Idle For 1 Minute
+
+
+		"Aux Stuff"	(16)
+
+	Auxiliary Stuff
+    !	Frame Counter (as injection)
+	Frame Counter (Static)
+    !	MnSlChr Injection Point Branches
+5	Line Item Counter Branch
+	VS Style Menu Loader Branch
+	Misc. Flags
+	5F0 Block
+	6DC FLAG
+10	Save State Combo components
+	ACC Block
+	SpawnItemEntity custom spawnitem_t
+	Various Menu Text
+	Color Overlays Table
+15	PAL FSM List block reservation
+	Zeros II
+
+
+		"Characters"
+
+	Kirbys Taunt Without Ability Gives Random Ability (v1.1)
+	Crazy Hand Tag Team Fix
+	GaW Modulo 10 Hammer
+20	Press B to Explode Yoshi Egg and Teleport
+	Nana Respawns After 20 Seconds
+	Link - Buffed Hylian Shield
+	Instant Zelda/Shiek Transform
+	Samus Shoots Random Item
+
+
+		"Core Engines"
+
+25	FSM Table
+	Stage Swap Engine (v2.0)
+	20XX AI Engine Loader
+	Frame Speed Modifier Engine
+	DVD and Archive Functions
+
+
+		"Debug Mode"
+
+30	All Players Can Control the Debug Menu (Rewrite)
+	Suppress Button Press Functions
+	Submenus Resemble Normal Menus
+	Song Preview Debug Line Item
+	Debug Menu Every Frame Code branch
+35	Debug Menu Region Overwrites
+	Enable OSReport Print on Crash
+
+
+		Mechanics & HUD -> "Aesthetics"
+
+	All Characters are 2D
+
+
+		Mechanics & HUD -> "Game Modes"
+
+	Super Shine Bros (v1.2)
+	Turbo Mode (v1.3)
+
+
+		Mechanics & HUD -> "Gameplay.txt"
+
+	Universal Controller Fix, v.80.tm
+	Disable Wobbling
+	Air Grabs
+	Missing L-Cancels Fall Through Floor
+	Disable Dodges
+	Longer Moonwalks
+
+
+		Mechanics & HUD -> "HUD.txt"
+
+	HUD Transparency v1.1
+
+
+		Menus -> "Character Select Screen"
+
+	Boot to Character Select Screen
+	Disable Name Tag and KO Star Reset After Closing Character Port
+	Disable Name Tag Reset After Exiting Character Select Screen
+	Wireframe Character Nametag Changes
+	Name Tag Blank Space Additions
+	Display Time at Top Right of CSS 1.1
+    !	Unplugging Closes CSS Doors
+
+
+		Menus -> "Global Effects, Unlocks, & Menu Features"
+
+	Default Game Settings
+	Unlock All Characters & Stages & Random Stage Select
+	Memory Card File Name Changes
+	HAL Heap 4 Size Increase
+
+
+		Menus -> "Stage Select & Results Screen"
+
+	'RANDOM' is Default Highlighted on Stage Select Screen
+	Reload SSS with D-Pad Up/Down
+
+
+		"SDR"
+
+	Hold B for Height (Mario/Dr. Mario/Luigi/ICies - SDRC)
+	Ice Climbers - Popo and Nana Can Share Ledge (SDRC)
+	Nana Direction Update Bug Fix (SDRC)
+	Nana is Always Level 9 (SDRC)
+	Nana's % is Displayed (SDRC)
+	GaW Can L-Cancel Aerials Rewrite w/GFX (SDRC)
+	Cannot Escape Kirby Throws (SDRC)
+	Mewtwo SDR Init (SDRC)
+	GW Pan Momentum Not Applied (SDRC)
+	Enter Action State Subaction Event
+	Custom Action State Logic
+	Auto Link Angle 363
+	Interrupt Swap Subaction
+	Individual Powershield Ratios (SDRC)
+	Ness Yoyo Goes Over Ledge (SDRC)
+	Ness & GaW Can Absorb All Projectiles And Items (SDRC)
+	Link and Young Link Grab Timer Fix (SDRC)
+	Brawl Bury Mechanics V1.0.3 (SDRC)
+	PK Flash Explodes on Stage Collision (SDRC)
+	PK Flash Explodes on Interrupt (SDRC)
+	ROA-Style WD (alternate version + SDRC)
+
+
+		"Stages"
+
+	Default File Name Changes
+	Stage Spawn Positions Table
+	Battlefield Custom Platform Controller
+	Character Flattening for Meta Mine
+	All Floors Are Drop-Through
+	
+	
+Total mods originally included in "20XXHP++_original.txt": 243
+
+
+ mods removed or combined into existing ones, _ added, for a new grand total of  installed.
+(This grand total excludes mods within the 'Utilities' tab.)
+
+
+
+	-	=	-	=	-
+
+
+Custom Code Region changes:
+
+ (Aux Code Regions restored to vanilla code)
+
+
+	-	=	-	=	-
+
+
+	Notes on Achilles' notes:
+
+
+"Memory Card Names": code change should be 5375 -> 5858
+
+
+Bowser Flame Cancel: note says change is at 0x135686 in RAM, but it should be 0x135684
+
+
+SpawnPointCoords struct in the custom spawns table at 0x3FAAF0 is unused.
+
+
+	-	=	-	=	-
+
+
+	Questions:
+
+
+What is the value at the end of the DOL file for? (Appears to be file size, but is 0x10 smaller)
+
+
+"Debug Menu Replaces Tournament Mode" is slightly different than the usual mod?
+
+
+call "20XX New SDR, PAL, etc." some kind of engine and stick it in the Engines category?
+
+
+"Unlock All Characters & Stages & Random Stage Select" partially redundant with "Unlock All-Star Mode, Random Select, Sound Test, Score Display, and Every Special Message"?
+author of former?
+
+
+Unlock Stage Select Upon Boot		< Not added, in lue of other codes to do this (problem?)
+0x15ba28 ---- 8803186c -> 3800000e
+
+
+Does anything besides Chess Melee use "Rebirth All Active Players"? (these were not in the same mod originally) Why else would it be a static overwrite?
+
+
+NBA Jam uses some flags, reserved as static overwrites in the mod "Misc. Flags". These should be moved to the NBA Jam mod. But how many bytes are required?
+
+
+Why are there 4 [identical] variations of the SdMenu.usd file? Perhaps future use of multiple Special Melee menus?
+
+
+	-	=	-	=	-
+
+
+	other changes between 4.07++ and 5.0:
+
+
+3A0	line tracking (static) function			branch back: 48300540
+6F0	increased joystick deadzone function		branch back: 48300254
+

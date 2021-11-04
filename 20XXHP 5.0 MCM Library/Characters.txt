@@ -1,0 +1,818 @@
+CPU - Disable Rapid Jabs for C. Falcon
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800d6b8c --- 7C0802A6 -> Branch
+
+80C3002C 80861A94
+2C040005 41820030
+8886000C 1C840E90
+3CA08045 60A53088
+7CA5202E 2C050001
+40820014 80860004
+2C040002 40820008
+4E800020 7C0802A6
+48000000
+
+
+	-==-
+
+
+Sheik/Zelda CPU Disable Transformations
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800D68D8 --- 80850004 -> Branch
+# Grounded
+3D808045 618C3088
+8885000C 1C840E90
+7C84602E 2C040000
+41820038 80851A94
+2C040005 4182002C
+80850004 2C040013
+4182000C 2C040007
+40820018 3C60800D
+60636918 7C6903A6
+38600000 4E800420
+80850004 48000000
+
+1.02 ----- 0x80096728 --- 387E0000 -> Branch
+# Aerial
+3C608045 60633088
+80BE002C 8885000C
+1C840E90 7C84182E
+2C040000 41820038
+80851A94 2C040005
+4182002C 80850004
+2C040013 4182000C
+2C040007 40820018
+3C608009 606368B0
+7C6903A6 38600000
+4E800420 387E0000
+48000000
+
+
+	-==-
+
+
+Giga-Bowser & Sandbag Always Fall On Match Start
+- so the game doesn't freeze
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80069328 --- 887E000C -> Branch
+
+807E0004 2C03001F
+4182000C 2C030020
+40820014 3C608006
+60639350 7C6903A6
+4E800420 887E000C
+48000000
+
+
+	-==-
+
+
+Extra Chars Don't Reset Port If Unavailable
+- for Popo, Giga-Bowser, Sheik, Wireframes, Hands
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80264eec --- 3880001A -> Branch
+
+7C801A14 88840001
+2C040003 418200C0
+7C8300AE 2C040012
+41820084 2C040013
+4182007C 2C040000
+4182006C 2C04001B
+41820064 2C04000C
+41820054 2C04001C
+4182004C 2C040005
+4182003C 2C04001D
+41820034 2C04000E
+4182004C 2C040020
+41820044 2C040018
+41820044 2C04001A
+4182003C 2C04000D
+4182003C 2C04001E
+41820034 3A200003
+48000034 3A200004
+4800002C 3A200007
+48000024 3A20000F
+4800001C 3A20000C
+48000014 3A200012
+4800000C 3A200013
+48000004 3C808026
+60844F14 7C8803A6
+4E800020 3880001A
+48000000
+
+
+	-==-
+
+
+Nana Always Throws Debug Option
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800dd368 --- 389E0000 -> Branch
+
+389E0000 83DF0004
+2C1E000B 4082001C
+3FC08040 83DEA32C
+2C1E0000 4182000C
+388000DA 7C84F214
+48000000
+
+
+	-==-
+
+
+Clone (Nana Type) Down-B Freeze Fix
+- ignores Nana's special Down-B logic, except if char is Nana
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800b0bac --- 38000001 -> Branch
+
+38000000 80A30004
+2C05000B 40820008
+38000001 48000000
+
+
+	-==-
+
+
+PAL Samus - Disable Extender
+- checks for .pat extension, specifically the 'p'
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x802b8110 --- 801C0010 -> Branch
+
+3FA0803D 8BBDE515
+2C1D0070 4082000C
+38000000 981C2240
+801C0010 48000000
+
+
+	-==-
+
+
+PAL Samus - Disable Bomb Jump Grapple Cancel
+- modifies the action state flags for aerial grapple (ID 0x137) to match PAL, which disables bomb jump during this action state
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80069b68 --- 80990004 -> Branch
+
+3C80803D 8884E515
+2C040070 40820020
+3C80803C 6084E4D0
+7C04C800 40820010
+3C800024 60840464
+48000008 80990004
+48000000
+
+
+	-==-
+
+
+Character Data Struct Custom Flag Init
+- executed after internal char data struct allocation
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80068EEC --- 3C808046 -> Branch
+
+38800000 909F0020
+909F0024 9883000D
+B083000E 988321FD
+B08321FE 3C808046
+48000000
+
+
+	-==-
+
+
+Fire Emblem Sword Swing Colors
+- looks for the "SRGB" keyword at the end of the file
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8013651c --- 4E800020 -> Branch
+
+3C808040 8084A2D8
+2C040000 41820070
+8085E124 80840068
+3CC00002 60C6BFB4
+8065DB54 2C030012
+41A2000C 3CC00002
+60C65448 7C843214
+8865E169 2C030000
+40A20008 3884FFFC
+3CC05352 60C64742
+80640000 7C033000
+40820024 38A5FFF0
+88640004 98650000
+80640005 90650001
+80640009 5463C23E
+90650005 4E800020
+48000000
+
+
+	-==-
+
+
+Bowser Flame Cancel
+Restores his Flame Cancel ability to as it was in v1.00.
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ------ 0x132264 ----- 38800155 -> 38800156
+
+
+	-==-
+
+
+Ness - PK Thunder v1.00
+- SSBM v1.00 behavior where PK Thunder does not disappear after Ness gets hit.
+[Glook]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x802ABCB0 --- 4BFFFC5D -> 4bfc7481
+1.02 ----- 0x802ABCB4 --- 38600001 -> 60000000
+
+
+	-==-
+
+
+Link/Y. Link - Boomerang Hookshot Cancel
+- Enables SSBM v1.00 boomerang hookshot cancel
+- nulls action state flags
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ------ 0x3c507c ---- 00200000 -> 00000000
+
+1.02 ------ 0x3c509c ---- 00C00000 -> 00000000
+
+1.02 ------ 0x3ce204 ---- 00200000 -> 00000000
+
+1.02 ------ 0x3ce224 ---- 00C00000 -> 00000000
+
+
+	-==-
+
+
+MasterHand & CrazyHand Controlled By All Ports
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801508B8 --- 80C30088 -> 80C4065C
+1.02 ----- 0x80156AFC --- 800300CC -> 8006065C
+
+
+	-==-
+
+
+CrazyHand - Disable D-Pad Up+B  Attack
+- normally freezes game
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80156ce0 --- 4182006C -> 4800006c
+
+
+	-==-
+
+
+Crazy Hand Tag Team Fix
+If Crazy Hand is in a match without Master Hand, he will remain stuck in his idle pose when requesting for a tag team attack since Master Hand doesn't exist in the match. This checks if Master Hand exists in the match, and if not, cancels any tag team requests.
+
+<https://smashboards.com/threads/crazy-hand-cancels-tag-team-attack-if-master-hand-isnt-in-the-match.514398/>
+[Odante]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8015C2F8 ---- 28000001 -> Branch
+
+28030000 40820008
+38000000 28000001
+60000000 00000000
+
+
+	-==-
+
+
+Mewtwo - Always Full Shadowball
+- Debug Menu flag @ 0x803faf64
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80144f90 --- FC010000 -> Branch
+
+3C808040 8084AF64
+2C040000 41A20018
+FC20001E D8210018
+8081001C 90832234
+FC200090 FC010000
+48000000
+
+
+	-==-
+
+
+Sheik - Always Full Needles
+- Debug Menu flag @ 0x803faf60
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801101DC --- 8003222C -> Branch
+
+3C808040 8084AF60
+2C040000 41A2000C
+38000006 9003222C
+8003222C 48000000
+
+
+	-==-
+
+
+Samus - Always Full Charge Shot
+- Debug Menu flag @ 0x803fa2dc
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80128660 --- FC010000 -> Branch
+
+3C808040 8084A2DC
+2C040000 41A20018
+FC20001E D8210018
+8081001C 90832230
+FC200090 FC010000
+48000000
+
+
+	-==-
+
+
+DK - Always Full Giant Punch
+- Debug Menu flag @ 0x803fa2d0
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8010D988 --- 7C050000 -> Branch
+
+3C808040 8084A2D0
+2C040000 41A2000C
+9003222C 7C050378
+7C050000 48000000
+
+
+	-==-
+
+
+Luigi - Always Misfire
+- Debug Menu flag @ 0x803fa2d4
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80142AF8 --- 38000000 -> Branch
+
+3C608040 8063A2D4
+2C030000 41A2000C
+38000001 48000008
+38000000 48000000
+
+
+	-==-
+
+
+Peach Down-B Pulls
+- Debug Flag @ 803faf68
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x802BD570 --- 907A0DD8 -> Branch
+
+3C808040 8084AF68
+2C040000 41A20010
+2C040009 40800008
+3864FFFF 907A0DD8
+48000000
+
+
+1.02 ----- 0x8011D07C --- 3BE00063 -> Branch
+
+3BE00063 3C808040
+8084AF68 2C040000
+41A2008C 2C040009
+41800074 3BE00007
+4182006C 3BE00006
+2C04000A 41820060
+3BE0000C 2C04000B
+41820054 2C04000C
+4182003C 38600023
+3C808038 60840580
+7C8803A6 4E800021
+2C03001C 41820014
+2C03001A 4182000C
+2C03001B 40820008
+38600063 7C7F1B78
+48000014 3C808011
+6084D094 7C8803A6
+4E800020 3C808011
+6084D0A0 7C8803A6
+4E800020 48000000
+
+
+	-==-
+
+
+Kirbys Taunt Without Ability Gives Random Ability (v1.1)
+May have problems if debug mode is enabled.
+Controlled by debug menu flag at 0x225590 | 802289B0.
+
+<https://smashboards.com/threads/kirbys-taunt-without-ability-gives-random-ability-v1-1.484561/>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8016E18C ---- 2C1B0000 -> Branch
+
+3CA08023 80A589B0
+2C050000 41A20064
+9421FFBC BE810008
+7C0802A6 90010040
+7C7E1B78 3BE00000
+7FE3FB78 7FC4F378
+3D808003 618C1DA8
+7D8903A6 4E800421
+3BFF0001 2C1F001B
+4180FFE0 80010040
+7C0803A6 BA810008
+38210044 3D808016
+618CE1D4 7D8903A6
+4E800420 48000008
+2C1B0000 00000000
+
+------------- 0x800DEC2C ---- 387E0000 -> Branch
+
+3C608023 806389B0
+2C030000 41A20060
+807F2238 2C030004
+40820054 3860001B
+3D808038 618C0580
+7D8903A6 4E800421
+2C030004 4182FFE8
+2C03000B 4182FFE0
+7C641B78 7FC3F378
+38A00001 3D80800F
+618C1BAC 7D8903A6
+4E800421 3D80800D
+618CEC38 7D8903A6
+4E800420 387E0000
+00000000
+
+------------- 0x802289B0 ---- 00000000 -> 00000000 # Debug Menu flag
+
+
+	-==-
+
+
+GaW Modulo 10 Hammer
+GaW hammer number equals the rightmost digit of his current percent.
+<https://smashboards.com/threads/gaw-modulo-10-hammer.492028/>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8014C784 ---- 8001007C -> Branch
+
+3DE08023 81EF89B4
+2C0F0000 41A2004C
+48000041 7C6802A6
+C03F1830 C0430000
+3D808036 618C4340
+7D8903A6 4E800421
+FC20081E D8210020
+80610024 2C030000
+41820018 3863FFFF
+907F222C 4800000C
+4E800021 41200000
+8001007C 48000000
+
+------------- 0x802289B4 ---- 3C60804C -> 00000000 # Debug Menu Flag
+
+
+	-==-
+
+
+Press B to Explode Yoshi Egg and Teleport w/ Momentum Based on Angle+Distance From Egg
+This variation of the code calculates distance and angle from the egg and gives momentum and speed after teleporting based on this.
+<https://smashboards.com/threads/press-b-to-explode-yoshi-egg-and-teleport-v1-1.448803/>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x802B2ABC ---- 7FE3FB78 -> Branch
+
+3DE08023 81EF89B8
+2C0F0000 41A20054
+38600000 3D808002
+618C9044 7D8903A6
+4E800421 809F002C
+90640520 88040DCD
+38A00022 50A02E32
+98040DCD 808DB688
+C004014C D0030040
+C0040150 D0030044
+C0040154 D0030048
+C0040158 D003004C
+7FE3FB78 48000000
+
+------------- 0x802B2B88 ---- C002D5E4 -> Branch
+
+3DE08023 81EF89B8
+2C0F0000 41A2016C
+9421FF00 BE810008
+7C0802A6 900100FC
+7C7E1B78 7C9F2378
+839F0518 83BC002C
+887D221F 54630673
+40820124 887D1969
+546007BD 40820118
+807D0668 546005AD
+4182010C 48000101
+7F6802A6 7F83E378
+3D80800C 618CC730
+7D8903A6 4E800421
+C2BD00B0 C2DD00B4
+C2FF004C C31F0050
+EC37A828 EC56C028
+EC210072 EC4200B2
+EC41102A FC201034
+EFE100B2 C03B0000
+EFFF0072 EC55B828
+EC38B028 3D808002
+618C2C30 7D8903A6
+4E800421 FFC00890
+FC20F090 3D808032
+618C6240 7D8903A6
+4E800421 EC2107F2
+FC200850 D03D0080
+FC20F090 3D808032
+618C63D4 7D8903A6
+4E800421 EC2107F2
+D03D0084 D2FD00B0
+D2FD00BC D31D00B4
+D31D00C0 C03F0054
+D03D00B8 D03D00C4
+7F83E378 3D808008
+618C1B38 7D8903A6
+4E800421 7FC3F378
+3D80802B 618C2C38
+7D8903A6 4E800421
+881D1969 38600001
+50600FBC 981D1969
+4800000C 4E800021
+3CCCCCCD 7FC3F378
+7FE4FB78 C03F0D44
+800100FC 7C0803A6
+BA810008 38210100
+C002D5E4 48000000
+
+------------- 0x802289B8 ---- 38631D80 -> 00000000 # Debug Menu Flag
+
+
+	-==-
+
+
+Nana Respawns After 20 Seconds
+<https://smashboards.com/threads/nana-respawns-after-20-seconds.453938/>
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8011EF58 ---- 38600001 -> Branch
+
+# Injecting into FighterOnLoad_Popo 
+# (avoiding extra checks mid-match)
+3DE08023 81EF89BC
+2C0F0000 41A2001C
+3DC06000 61CE0000
+3DE0800D 61EF5378
+91CF0000 48000018
+3DC04082 61CE00C4
+3DE0800D 61EF5378
+91CF0000 38600001
+48000000
+
+------------- 0x8006A37C ---- 8803221F -> Branch
+7C7F1B78 3C608023
+806389BC 2C030000
+41A20114 887F221F
+5460D7FF 41820108
+5460EFFE 41820100
+887F000C 3D808003
+618C2330 7D8903A6
+4E800421 3C80803B
+6084CDE0 1C030003
+7C640214 88030002
+2C000000 408200D0
+807F0894 3C80BF80
+60840000 7C032000
+40820014 386004B0
+907F2354 38600000
+907F0894 807F2354
+3863FFFF 907F2354
+2C030000 40820098
+887F000C 388100C0
+38A100D0 3D808016
+618C7638 7D8903A6
+4E800421 887F000C
+388100C0 3D808003
+618C2D80 7D8903A6
+4E800421 3D808022
+618C4A80 7D8903A6
+4E800421 D02100C4
+887F000C 388100C0
+3D808003 618C2768
+7D8903A6 4E800421
+38600000 881F221F
+50601F38 981F221F
+7FC3F378 3D80800D
+618C4FF4 7D8903A6
+4E800421 38600001
+881F221F 50601F38
+981F221F 7FE3FB78
+8803221F 48000000
+
+------------- 0x802289BC ---- A0A30004 -> 00000000 # Debug Menu Flag
+
+
+	-==-
+
+
+Link - Buffed Hylian Shield
+This combines two of UnclePunch's shield codes, along with some conditional code to only enable this if its debug menu flag at 802289C0 is set.
+Mods included:
+- Link's Shield Blocks Melee Attacks
+- Link Shield Always Active
+<https://smashboards.com/threads/links-shield-blocks-melee-attacks-other-shield-codes.450150/>
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x800EAE44 ---- 7C0802A6 -> Branch
+
+# Injecting into Link's OnLoad function 
+# (avoiding extra checks mid-match)
+3DE08023 81EF89C0
+2C0F0000 41A20038
+3DC04800 61CE0028
+3DE0800E 61EFB3F0
+91CF0000 3DC06000
+3DE08000 61EF7C44
+91CF0000 3DE08000
+61EFA80C 91CF0000
+48000040 3DC0881F
+61CE221B 3DE0800E
+61EFB3F0 91CF0000
+3DC0981F 61CE0004
+3DE08000 61EF7C44
+91CF0000 3DC0981D
+61CE0004 3DE08000
+61EFA80C 91CF0000
+7C0802A6 48000000
+
+------------- 0x8006A19C ---- 800100A4 -> Branch
+
+# Link Shield Always Active
+# Check if the Debug Menu flag is set
+3DE08023 81EF89C0
+2C0F0000 41A20034
+81DE002C 89CE0007
+2C0E0006 41820010
+2C0E0014 41820008
+48000018 7FC3F378
+3DC0800E 61CEB3BC
+7DC903A6 4E800421
+800100A4 48000000
+
+------------- 0x802289C0 ---- 7FC4F378 -> 00000000 # Debug Menu Flag
+
+
+	-==-
+
+
+Instant Zelda/Shiek Transform
+Conditionally enables or disables the code during Zelda's OnLoad function, based on a debug menu flag @802289C4
+<https://smashboards.com/threads/misc-character-codes.446554/post-21831358>
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+
+## Original code changes as static overwrites
+## NTSC 1.02 --- 0x80114184 ---- C0429CC8 -> C042A1DC
+## ------------- 0x80114790 ---- C0429CC8 -> C042A1DC
+## ------------- 0x80114248 ---- C0429CC8 -> C042A1DC
+## ------------- 0x8013B510 ---- C042A218 -> C042A1DC
+## ------------- 0x8013AF04 ---- C042A218 -> C042A1DC
+## ------------- 0x8013AFC8 ---- C042A218 -> C042A1DC
+
+NTSC 1.02 --- 0x80139334 ---- 7C0802A6 -> Branch
+
+3DE08011 3DC08023
+81CE89C4 2C0E0000
+41A2002C 3DC0C042
+61CEA1DC 91CF4184
+91CF4790 91CF4248
+3DE08014 91CFB510
+91CFAF04 91CFAFC8
+48000030 3DC0C042
+61CE9CC8 91CF4184
+91CF4790 91CF4248
+3DE08014 3DC0C042
+61CEA218 91CFB510
+91CFAF04 91CFAFC8
+7C0802A6 48000000
+
+------------- 0x802289C4 ---- A0030008 -> 00000000 # Debug Menu Flag
+
+
+	-==-
+
+
+Samus Shoots Random Item
+Controlled by a debug menu flag at 0x802289C8
+<https://smashboards.com/threads/misc-character-codes.446554/post-22011485>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x802B632C ---- D3E10054 -> Branch
+
+loc_0x0:
+  stfs f31, 84(r1)	# orig code line
+
+# Check the debug menu flag
+lis r15, 0x8023	# 0x802289C8
+lwz r15, -0x7638(r15)
+cmpwi r15, 0
+beq+ END
+
+loc_0x4:
+  li r3, 0x23
+  lis r12, 0x8038
+  ori r12, r12, 0x580
+  mtctr r12
+  bctrl 
+  mr r31, r3
+  cmpwi r3, 0x2
+  beq+ loc_0x4
+  cmpwi r3, 0x5
+  beq+ loc_0x4
+  cmpwi r3, 0x8
+  beq+ loc_0x4
+  cmpwi r3, 0x9
+  beq+ loc_0x4
+  cmpwi r3, 0xA
+  beq+ loc_0x4
+  cmpwi r3, 0x12
+  beq+ loc_0x4
+  cmpwi r3, 0x1A
+  beq+ loc_0x4
+  cmpwi r3, 0x1B
+  beq+ loc_0x4
+  cmpwi r3, 0x1C
+  beq+ loc_0x4
+  cmpwi r3, 0x1D
+  beq+ loc_0x4
+  cmpwi r3, 0x1F
+  beq+ loc_0x4
+  cmpwi r3, 0x20
+  beq+ loc_0x4
+  cmpwi r3, 0x21
+  beq+ loc_0x4
+  stw r31, 36(r1)
+
+END:
+  b 0
+
+------------- 0x802B6370 ---- 7C7F1B79 -> Branch
+
+# Check the debug menu flag
+lis r15, 0x8023	# 0x802289C8
+lwz r15, -0x7638(r15)
+cmpwi r15, 0
+beq+ OrigLine
+
+loc_0x0:
+  mr r31, r3
+  lwz r3, 44(r31)
+  lwz r3, 184(r3)
+  lwz r12, 20(r3)
+  cmpwi r3, 0x0
+  beq- loc_0x50
+  mtlr r12
+  mr r3, r31
+  blrl 
+  bl loc_0x48
+  mflr r3
+  lfs f1, 0(r3)
+  lwz r3, 44(r31)
+  lfs f2, 44(r3)
+  fmuls f1, f1, f2
+  stfs f1, 64(r3)
+  stw r28, 1304(r3)
+  b loc_0x50
+
+loc_0x48:
+  blrl 
+
+loc_0x4C:
+  bge+ cr4, loc_0x4C
+
+loc_0x50:
+  lis r12, 0x802B
+  ori r12, r12, 0x63D0
+  mtctr r12
+  bctr 
+  b END
+
+OrigLine:
+  mr. r31,r3	# orig code line
+
+END:
+  b 0
+
+------------- 0x802289C8 ---- 3861000C -> 00000000 # Debug Menu Flag
+
+

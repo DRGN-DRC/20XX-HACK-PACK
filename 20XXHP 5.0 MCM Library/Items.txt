@@ -1,0 +1,212 @@
+
+
+Item Switch - 1P Modes
+- Uses Debug Menu flags
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8017eb5c --- 88630000 -> Branch
+
+3C808040 8084A268
+2C040000 4182001C
+2C040001 4182000C
+3864FFFE 48000010
+386000FF 48000008
+88630000 48000000
+
+
+1.02 ----- 0x8017e520 --- 88630000 -> Branch
+
+3C808040 8084A264
+2C040000 4182001C
+2C040001 4182000C
+3864FFFE 48000010
+386000FF 48000008
+88630000 48000000
+
+
+1.02 ----- 0x8018a180 --- 88630000 -> Branch
+
+3C808040 8084A260
+2C040000 4182001C
+2C040001 4182000C
+3864FFFE 48000010
+386000FF 48000008
+88630000 48000000
+
+
+	-==-
+
+
+Item Frequencies - VS Mode
+- for extremely high and rain
+- probably needs to be removed and changed in a larger "match flags" function
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80167e34 --- 881F0000 -> Branch
+
+3C60803F 6063A26C
+80630000 2C030000
+4182000C 38030004
+48000008 881F0000
+48000000
+
+
+	-==-
+
+
+Bombomb Rain - Change Time
+- Rain start time from 20 secs to 3 secs
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x801c0eb0 --- 2C0304B0 -> 2c0300b4
+
+
+	-==-
+
+
+Invisible Items
+- checks 20XX debug flag
+[wParam]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80268b48 --- 8001001C -> Branch
+
+3FE0803F 63FFA224
+83FF0000 2C1F0000
+41820014 3BE00000
+2C030000 41820008
+93E3001C 8001001C
+48000000
+
+
+	-==-
+
+
+Pokemon Selector
+- specify a Pokemon to always spawn in Debug Menu
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8027a970 --- 7CA3002E -> Branch
+
+3C80803F 6084A3B8
+80840000 2C040000
+4182000C 38A400A0
+48000008 7CA3002E
+48000000
+
+
+1.02 ----- 0x8027a748 --- 90E30E24 -> Branch
+
+3FE0803F 63FFA3B8
+83FF0000 2C1F0000
+41820008 38FF00A0
+90E30E24 48000000
+
+	-==-
+
+
+Container Item Switch Toggles
+- uses Debug Menu toggle values
+- only for VS/Special mode matches
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x80167efc --- 2C030001 -> Branch
+
+8B9A002F 3FA08040
+801DA250 501C07FE
+801DA258 501C0FBC
+801DA254 501C177A
+801DAEAC 501C1F38
+9B9A002F 2C030001
+48000000
+
+
+	-==-
+
+
+Monster Spawn
+Changes every item that would spawn into a 
+random monster (zombie, goomba, octorok)
+(checks 20XX debug flag)
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8026c83c --- 7C0418AE -> Branch
+
+7C0418AE 3C60803F
+6063A24C 80630000
+2C030000 41820048
+3C608047 60639D30
+88630000 3C80801A
+60844340 7C8803A6
+7C040378 4E800021
+7C802378 2C030001
+4182001C 3C608038
+60630580 7C6803A6
+38600004 4E800021
+3803002B 48000000
+
+
+	-==-
+
+
+Max Items on Stage
+- controlled by Debug Menu value
+- Event Match 3 - Barrel Buster logic for only 4 as well
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8026787c --- 80050088 -> Branch
+
+3C608040 8003A270
+3C608048 88639D30
+2C03002B 40820018
+3C608046 8863ABF5
+2C030002 40820008
+38000004 80650084
+48000000
+
+
+	-==-
+
+
+Item Stealing
+Press B while in CatchWait
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x800da3b8 --- 8001001C -> Branch
+
+3D20803F 6128A278
+81080000 2C080000
+41820094 811F1A58
+2C080000 41820088
+813F1974 2C090000
+4082007C 813F065C
+71290200 2C090200
+4082006C 80A8002C
+83E51974 2C1F0000
+4182005C 48000025
+38210040 3C608009
+606348A8 7C6803A6
+7FC3F378 7FE4FB78
+4E800021 48000038
+7C0802A6 3821FFC0
+3C608026 6063AD24
+7C6903A6 3C603F80
+90620000 C0220000
+38810018 38A10024
+7FE3FB78 38C00001
+4E800420 8001001C
+48000000
+
+
+	-==-
+
+
+Items - Containers can spawn containers
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8026C784 --- 7C7C1B78 -> Branch
+
+3F808040 839CA2FC
+2C1C0000 41820014
+609C0E50 7C03E040
+40820008 60830E34
+7C7C1B78 48000000
