@@ -9,10 +9,9 @@ Loads the AI Engine code into the Object Heap (OSHeap 1 / HSD Heap 0) on scene-c
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 --- 0x8016E91C --- 80010024 -> Branch
 
-# Injecting into StartMelee (0x8016E730)
-# Source code available in the Source Codes folder
 
 .include "CommonMCM.s"
+.include "melee"; melee
 backupall
 
 # Load the AI Engine binary file
@@ -35,14 +34,21 @@ stw r5, 0(r3)
 # Calculate and place the return branch for the AI Engine
 # r6 should currently have the loaded file's size
 add r4, r4, r6 # r4 address is now directly after the end of the AI f(x)
-sub r5, r4, r3 # New branch distance is now in r5 (needs adjustment)
-subi r5, r5, 8 # Adjust distance to 4 bytes past the injection point
-lis r7, 0x100
-sub r5, r7, r5
-oris r5, r5, 0x4B00 # Turn this into a branch back instruction
+sub r5, r3, r4 # New branch distance is now in r5 (needs adjustment)
+addi r5, r5, 8 # Adjust distance to 4 bytes past the injection point
+
+# Turn this into a branch back instruction
+li r0, 18  # opcode for high end
+rlwimi r5, r0, 0xFC000000
 stw r5, -4(r4)
 
-# Flush instruction cache
+# Flush instruction cache for the new branch
+lis r3, injectionSite@h
+ori r3, r3, injectionSite@l
+li r4, 4	# Size of the flush
+bl <data.flush_IC>
+
+# Flush instruction cache for the new file
 mr r3, r8	# New file address
 mr r4, r6	# New file size
 bl <data.flush_IC>

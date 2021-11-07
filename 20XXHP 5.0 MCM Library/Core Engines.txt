@@ -1796,19 +1796,20 @@ bl <DVD.read>
 7C882378 3C608006
 6063B008 7CA32050
 64A54800 90A30000
-7C843214 7CA32050
-38A5FFF8 3CE00100
-7CA53850 64A54B00
-90A4FFFC 7D034378
-7CC43378
+7C843214 7CA41850
+38A50008 38000012
+5005D00A 90A4FFFC
+3C608006 6063B008
+38800004
+bl <data.flush_IC>
+7D034378 7CC43378
 bl <data.flush_IC>
 B8610008 80010104
 38210100 7C0803A6
 80010024 48000000
 
-
 <AiEngineFileString>
-# "AI_Engine.bin" string (need a known address for this)
+# "AI_Engine.bin" string
 41495F45 6E67696E
 652E6269 6E00
 
@@ -2307,6 +2308,7 @@ B8610008 80010104
 DVD and Archive Functions - Minified
 Higher-level DVD IO functions, wrapping the HSD library functions.
 This is a reduced (minified and assembled) set of functions for specific functionality, which also contains all required Archive handlers and data functions. See the github repo for the full set of DVD and Archive functionality.
+<https://github.com/Punkline/ppc_melee_codefuncs>
 [HSD, Punkline]
 
 <DVD.file> NTSC 1.02
@@ -2774,14 +2776,12 @@ BB610040 80010064
 
 
 <arch.dict.init_default_events> NTSC 1.02
-
 00000003
 .long <<arch.init.event.flush>>
 .long <<arch.init.event.static>>
 .long <<arch.init.event.call>>
 
 <arch.init.event.flush> NTSC 1.02
-
 48000010 696E6974
 2E666C75 73680000
 7C0802A6 9421FFE0
@@ -2797,7 +2797,6 @@ bl <data.flush_IC>
 
 
 <arch.init.event.call> NTSC 1.02
-
 48000010 696E6974
 2E63616C 6C000000
 7C0802A6 9421FFE0
@@ -2815,7 +2814,6 @@ bl <data.flush_IC>
 
 
 <arch.init.event.static> NTSC 1.02
-
 48000010 696E6974
 2E737461 74696300
 386AFFFC 808A0000
