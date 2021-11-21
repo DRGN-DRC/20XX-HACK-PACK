@@ -1,0 +1,41 @@
+
+Disable Dodges
+Debug Menu options for both spot dodges and airdodges.
+Controlled by debug menu flags at 0x80228900 and 0x80228904.
+<https://smashboards.com/threads/disable-airdodge.446990/post-21719528>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8009980C ---- 7C0802A6 -> Branch
+
+# Spot Dodges -
+# Check the debug menu flag
+lis r15, 0x8023	# 0x80228900
+lwz r15, -0x7700(r15)
+cmpwi r15, 0
+beq+ OrigLine
+
+li r3, 0
+blr
+
+OrigLine:
+mflr r0
+b 0
+
+------------- 0x80099A58 ---- 7C0802A6 -> Branch
+
+# Air Dodges -
+# Check the debug menu flag
+lis r15, 0x8023	# 0x80228904
+lwz r15, -0x76FC(r15)
+cmpwi r15, 0
+beq+ OrigLine
+
+li r3, 0
+blr
+
+OrigLine:
+mflr r0
+b 0
+
+------------- 0x80228900 ---- 38600003 -> 00000000 # Spot Dodges debug menu flag
+------------- 0x80228904 ---- 1CA30044 -> 00000000 # Air Dodges debug menu flag

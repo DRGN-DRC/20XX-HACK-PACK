@@ -232,6 +232,7 @@ b 0
 	-==-
 
 
+
 Nana's % is Displayed (SDRC)
 Displays above Popo's like in coin battle
 [Flies killer, DRGN]
@@ -268,7 +269,6 @@ b 0
 
 1.02 ----- 0x80165a64 --- 7C0601D6 -> Branch
 
-# Injecting to MatchEnd_GetTimeWhenPlayerDied
 # Check if SDR Popo is enabled
 lis	r15, 0x803D		# 0x803CD615
 lbz	r15, -0x29EB(r15)	# load PlPp._at
@@ -315,7 +315,6 @@ END:
 
 1.02 ----- 0x802f65cc --- 881D0003 -> Branch
 
-# Injecting to HUD_PlayerCreate
 # Check if SDR Popo is enabled
 lis	r15, 0x803D		# 0x803CD615
 lbz	r15, -0x29EB(r15)	# load PlPp._at
@@ -499,10 +498,12 @@ Mewtwo SDR Init (SDRC)
 Contains SDR changes for the following features:
 - Mewtwos Side-b works as a throw
 - Fix's mewtwo's confusion reflect bubble
-Conditionally set during match start if SDR is active for Mewtwo. 
+Conditionally set during match start if SDR is active for Mewtwo.
+<https://smashboards.com/threads/sd-remix-3-3-full-with-slippi-rollback-released.324620/post-21724293>
+<https://smashboards.com/threads/sd-remix-3-3-full-with-slippi-rollback-released.324620/post-21724263>
 [UnclePunch, jjhoho, DRGN]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x80144E48 --- 7C0802A6 -> Branch
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x141A28 ----- 7C0802A6 -> Branch
 
 # Performs overwrites in Mewtwo's OnLoad
 .macro setWord reg1, reg2, address, word
@@ -568,151 +569,6 @@ setWord r14, r15, 0x8014e6e8, 0xD0250084
 END:
 mflr r0		# original code line
 b 0
-
-
-	-==-
-
-
-Enter Action State Subaction Event
-75 XX AA AA FFFFFFFF GGGGGGGG HHHHHHHH
-XX = 00 for default float parameters // 01 for specifying parameters
-AAAA = Action State ID to Enter
-FFFFFFFF = AS's starting frame (float)
-GGGGGGGG = AS's speed modifier (float)
-HHHHHHHH = AS's keyframe blend level (float)
-default values for float parameters are 1,0,1 respectively
-<https://smashboards.com/threads/enter-action-state-subaction-event.450151/>
-[UnclePunch]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x80071ae8 --- 80A40008 -> Branch
-
-80A40008 88C50000
-2C060075 40820050
-88C50001 2C060000
-40820014 C0228A58
-C0428A60 C0628A58
-48000014 C0250004
-C0450008 C065000C
-48000004 A0850002
-7F63DB78 38A00000
-38C00000 3DC08006
-61CE93AC 7DC903A6
-4E800420 80A40008
-48000000
-
-
-	-==-
-
-
-Custom Action State Logic
-lets you change state to anything else. effective "true" IASA.
-5DxxASID - makes IASA logic match another action state by ID
-5ExxASID - set the logic to match another action state by ID
-5FEEASID - EE -number of events to continue reading from the old action state. (ignores timer events, but counts them). ASID
-[Punkline]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x80071960 --- 98032218 -> Branch
-
-80A40008 80A50000
-54A501BF 41A20024
-7C0802A6 90010004
-9421FFF8 4800001D
-38210008 80010004
-7C0803A6 48000158
-98032218 48000150
-7C0802A6 90010004
-9421FF80 BC610008
-7C7F1B78 80840008
-54BB47BF 54BC863E
-54BD053E 41820108
-83DF0018 7C1DF040
-41800010 7C1EE850
-83DF0020 4800000C
-7FA0EB78 83DF001C
-54002834 7FDE0214
-281B0001 418200CC
-281B0002 418200B8
-7C9E2378 3BDE0004
-54BB8FFE 7FA4EB78
-807F0000 3D808008
-618CCFAC 7D8803A6
-4E800021 281B0000
-4182000C 93DF03EC
-480000A8 83BF03EC
-93DF03EC 281C0000
-41820060 807F03EC
-28030000 41820054
-48000045 7C0802A6
-90010004 9421FFC8
-DBE10030 DBC10028
-BF610014 C3C288D4
-D3DF03E4 3BBF03E4
-837F0000 3FE0803C
-63FF06E8 C3C288D8
-3D808007 618C32EC
-7D8803A6 4E800021
-3B9CFFFF 4BFFFFA0
-3BBDFFFC C00288D8
-D01F03E4 93BF03EC
-48000028 837E000C
-937F21A0 4800001C
-837E0010 937F219C
-48000010 8B7F2218
-737B007F 9B7F2218
-B8610008 38210080
-80010004 7C0803A6
-4E800020 48000000
-
-
-	-==-
-
-
-Auto Link Angle 363
-Allows for using SSB Brawl's linking angle
-[Flipsmash]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x8007a780 --- 80640020 -> Branch
-
-80640020 2C03016B
-40A20060 C02F00CC
-C04F00C8 C06F00B0
-C09900B0 EC641828
-C0028900 FC030040
-40A0000C C0028910
-EC4000B2 3C008002
-60002C30 7C0903A6
-4E800421 C002893C
-EC200072 FC00081C
-D801FFF8 8061FFFC
-2C030000 40A00008
-38630168 8091000C
-3C004330 C8228928
-48000000
-
-
-	-==-
-
-
-Interrupt Swap Subaction
-*Syntax = 33XX0000 YYYYYYYY
-*XX = 00,01,02 / 00 = IASA Function / 01 = Physics Function / 02 = Collision Function
-*YYYYYYYY = Move Logic Function
-[UnclePunch]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x8007162c --- 7C0802A6 -> Branch
-
-81DD0008 89EE0000
-2C0F0033 4082004C
-808E0004 89EE0001
-2C0F0000 41820018
-2C0F0001 41820018
-2C0F0002 41820018
-48000028 909E219C
-48000014 909E21A4
-4800000C 909E21A8
-48000004 39CE0008
-91DD0008 4E800020
-7C0802A6 48000000
 
 
 	-==-
@@ -948,10 +804,11 @@ b 0
 
 
 Link and Young Link Grab Timer Fix (SDRC)
-Allows Link's and Y.Link's grabbox to be controlled by an async timer rather than the dol
+Allows Link's and Y.Link's grabbox to be controlled by an async timer rather than the DOL.
+<https://smashboards.com/threads/sd-remix-3-3-full-with-slippi-rollback-released.324620/post-21743177>
 [UnclePunch, DRGN]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x802a7718 --- 4BDD38E1 -> Branch
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x802A7718 ---- 4BDD38E1 -> Branch
 
 # Check if current character is Link
 lwz r15, 4(r28)		# Loading current player internal character ID

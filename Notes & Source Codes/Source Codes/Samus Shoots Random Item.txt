@@ -1,10 +1,10 @@
 
-
 	-==-
 
 
 Samus Shoots Random Item
 Controlled by a debug menu flag at 0x802289C8
+<https://smashboards.com/threads/misc-character-codes.446554/post-22011485>
 [UnclePunch]
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 --- 0x802B632C ---- D3E10054 -> Branch
@@ -102,3 +102,6 @@ OrigLine:
 
 END:
   b 0
+
+------------- 0x802289C8 ---- 3861000C -> 00000000 # Debug Menu Flag
+

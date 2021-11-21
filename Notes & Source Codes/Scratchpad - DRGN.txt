@@ -1,8 +1,8 @@
 Created by DRGN of Smashboards
-My own R&D combined with random notes of interest from others.
+My own R&D combined with random notes of interest from others, mostly specific to 20XX.
 
 
-	TOC:
+	TOC (can CTRL-F for these):
 
 		General / Dolphin
 		DOL 20XX Differences
@@ -14,11 +14,13 @@ My own R&D combined with random notes of interest from others.
 		DOL Data Tables
 		Color Modifications
 		On the Debug Menu
+		Animation File Preloading
 
 
              /-------------------\
 =============  General / Dolphin  =====================================
-             \-------------------/
+             \-------------------/		+ Mem card/flag info
+
 
 20XX version number changes need to be updated in 3 places:
 	0x3A4CDD in MnSlChr (for Debug Menu display)
@@ -28,12 +30,42 @@ My own R&D combined with random notes of interest from others.
 		- Includes "20XX" string, followed by bytes for project#/major/minor/patch
 		- cannot do major/minor/patch numbers >9 without updating "Enable OSReport Print on Crash"
 
-There's a flag for playing audio files @804D6B94; handled by the Every Frame Function (in Scratchpad). Processes any non-0 ID set there. Should be linked to the SFX player code in the 20XXHP MCM Library. From Achilles:
+The version shown in OSReport prints is sourced from the DOL location.
+
+
+There's a flag for playing audio files @804D6B94 (i.e. -0x4B0C(r13)); handled by the Every Frame Function (in Scratchpad). Processes any non-0 ID set there. Should be linked to the SFX player code in the 20XXHP MCM Library. From Achilles:
 
 "I have a custom function that is executed every frame of the game to monitor a flag value, and if not 0, take the value as a SFX ID and play the SFX, then null the flag value. So if I ever need to play a SFX for a code, I just write the SFX ID to this RAM address and I know my every-frame code will take care of it next frame (ex. the SFX when hitting L/R for alternate costumes)."
 
 
 IfAll.usd is loaded into a persistent heap after advancing from the title screen, and is present for the entire time the game is running.
+
+
+input structs start at 0x804c1fac, with P1
+	structs are 0x44 long, thus P2=804C1FF0, P3=804C2034, P4=804C2078
+	5th struct at 804C20BC, which detects for all players
+
+	can simulate controller inputs by writing to this area at 
+	the start of ButtonPresses_CopyInputsToStruct (80019900)
+
+	probably better to load inputs to the fighter properties at 0x65C
+
+    0x02:
+	1000 = START
+	0200 = B
+	0100 = A
+	0800 = Y
+	0400 = X
+	0010 = Z
+	0040 = L
+	0020 = R
+	0008 = D UP
+	0004 = D DOWN
+	0001 = D LEFT
+	0002 = D RIGHT
+
+
+more detailed info here: https://github.com/Punkline/ppc_melee_codefuncs/blob/main/.include/melee_modules/MPad.s
 
 
 Dolphin FYI:
@@ -47,9 +79,9 @@ Stages upgrades:
 https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.351221/page-178#post-21761748
 
 
-	Memory card stuff
+	Memory card space and flag regions
 
-	- OnBoot code copies flag data from memory card to DOL space
+	- The 'OnBoot Function' code copies flag data from memory card to DOL space
 	- Every Frame Code copies flag data from DOL space to memory card RAM space
 	- Default 20XX flags are stored in MnSlChr at 0x3E2010
 	- The DOL space is broken into two sections:		Ranges restored by 'Reset 20XX' code:
@@ -60,18 +92,68 @@ https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.
 
 # Initial copy in RAM; one contiguous region
 8045D850   Start of nametag data (Vulnerable name on memory card);
-					^ I think he means the version string may be overwritten on save
+					^ I think the version string may be overwritten on save
 80469B94   End of last nametag (start of 20XX debug menu flag saves)
 8046B0EC   End of memcard data (61892/F1C4 total); last byte saved/restored is at B0E8
 	   B0EC-9B94= 0x1558 bytes
 
 # In DOL space; broken into two sections
-803FA154   Start of 20XX flags, section 1; 0x378 bytes
+803FA174   Start of 20XX flags, section 1; 0x358 bytes
 	   A154+1558=B6AC
 803FA4CC   End of section 1
+
 803FA848   Start of section 2; 0x11DC bytes
 	   A848+11DC=BA24
 803FBA24   End of memcard data/20XX flags space (inclusive; the word here is the last saved)
+
+
+code flags:							string offset:
+
+# New code flags in DOL (802288E0 - 
+0x2254C0    802288E0	Display Time at Top Right of CSS
+0x2254C4		Disable Wobbling
+0x2254C8		All Floors Are Drop-Through
+0x2254CC		low-poly mode
+0x2254D0    802288F0	big heads mode
+0x2254D4    802288F4	2D characters
+0x2254D8    802288F8	Easier Wavedashes (ROA-Style)
+0x2254DC    802288FC	Missing L-Cancels Fall Through Floor
+0x2254E0    80228900	Disable Spot Dodges
+0x2254E4    80228904	Disable Air Dodges
+0x2254E8    80228908	Longer Moonwalks
+0x2254EC    8022890C	Air Grabs
+0x2254F0    80228910	Everyone Can Float
+0x2254F4    80228914	Half-Frame Lag Reduction
+- Reserving space for more general codes here
+
+0x225590    802289B0	Kirby Taunt Gives Random Ability
+0x225594		G&W Modulo
+0x225598		Yoshi Eggs code
+0x22559C		Nana Respawns After 20 Seconds		80FAEEAA
+0x2255A0		Buffed Hylian Sheild			80FAEEDA
+0x2255A4    802289C4	Instant Zelda/Shiek Transform		80FAEEF8
+0x2255A8    802289C8	Samus - Shoots Random Items		80FAEF20
+- Reserving space for more character codes here
+
+'Live' or in-use flags are kept here:
+Section 1 (803FA174|0x3F7174 to 803FA4CC|0x3F74CC; 0x358 bytes)
+0x3F7154		"20XX" string
+0x3F7158		version bytes
+-
+0x3F7210		UCF
+0x3F72D0		DK Always Full Giant Punch
+0x3F72D4		Luigi Always Misfire
+0x3F72D8		Fire Emblem Sword Swing Colors
+0x3F72DC		Samus Always Full Charge Shot
+0x3F7310		Battlefield Rainbow Water BG
+0x3F7360    803FA360	Greece Stage Variations
+0x3F73B4		Rainbow FD
+0x3F7F60		Sheik Always Full Needles
+0x3F7F64		Mewtwo Always Full Shadow Ball
+0x3F7F68		Peach Down-B Pull
+
+Default flags are kept in the CSS file, at 0x3E2010 - 0x3E2380
+
 
 
 	From Achilles (on the GAMEID and memory card saves):
@@ -95,48 +177,6 @@ With the save files in the new Memory Card Management Debug Menu, it saves them 
 I have not figured out a way, if possible, to change the game ID of a save. This is the main reason why I haven't changed the Game ID of 20XX from GALE01, and don't plan to - so that I can create GALE01 saves from this Debug Menu.
 
 20XXTE exploit cannot be activated from the Hack Pack."
-
-
-code flags:							string offset:
-
-# New code flags in DOL (802288E0 - 
-0x2254C0		Display Time at Top Right of CSS
-0x2254C4		Disable Wobbling
-0x2254C8		All Floors Are Drop-Through
-0x2254CC		low-poly mode
-0x2254D0		big heads mode
-0x2254D4		2D characters
-0x2254D8    802288E8	Easier Wavedashes (ROA-Style)
-0x2254DC    802288FC	Missing L-Cancels Fall Through Floor
-0x2254E0    80228900	Disable Spot Dodges
-0x2254E4    80228904	Disable Air Dodges
-0x2254E8    80228908	Longer Moonwalks
-0x2254EC    8022890C	Air Grabs
-0x2254F0    80228910	Everyone Can Float
-- Reserving space for more general codes here
-
-0x225590		Kirby Taunt Gives Random Ability
-0x225594		G&W Modulo
-0x225598		Yoshi Eggs code
-0x22559C		Nana Respawns After 20 Seconds		80FAEEAA
-0x2255A0		Buffed Hylian Sheild			80FAEEDA
-0x2255A4    802289C4	Instant Zelda/Shiek Transform		80FAEEF8
-0x2255A8    802289C8	Samus - Shoots Random Items		80FAEF20
-- Reserving space for more character codes here
-
-
-DOL Section 1 (803FA154|0x3F7154 to 803FA4CC|0x3F74CC)
-0x3F7210		UCF
-0x3F72D0		DK Always Full Giant Punch
-0x3F72D4		Luigi Always Misfire
-0x3F72D8		Fire Emblem Sword Swing Colors
-0x3F72DC		Samus Always Full Charge Shot
-0x3F7310		Battlefield Rainbow Water BG
-0x3F7360    803FA360	Greece Stage Variations
-0x3F73B4		Rainbow FD
-0x3F7F60		Sheik Always Full Needles
-0x3F7F64		Mewtwo Always Full Shadow Ball
-0x3F7F68		Peach Down-B Pull
 
 
 
@@ -178,9 +218,16 @@ Standalone CSS Color Modifications:
 	https://smashboards.com/threads/standalone-css-color-modification.450087/
 
 
-Area to copy from .0sd to update .1sd/.2sd/.3sd: 
-	1) 0x3A2848 to 0x3C8FFF		<- Debug Menu changes
-	2) 0x3E3B10 to 0x3EB1FF		<- Every Frame Code and CSS Icon data
+Area to copy from .0sd to update .1sd/.2sd/.3sd:			len
+	1) Tri-CSPs	(for 0sd/2sd only)	0x4CA40 to 0x33CE40	0x2F0400    (vanilla CSPs in 1sd/3sd same offsets)
+	2) CSP Trim Colors			0x3A3C90 to 0x3A45E0	0x950
+	3) Random Neutral Stage names		0x3C10C0 to 0x3C1F10	0xE50
+	4) Song (Hex Track) Titles		0x3EC3C0 to 0x3EE1A8	0x1DE8
+
+
+other regions that may want to be synced:
+Debug Menu code				0x3A2848 to 0x3C8FFF
+Every Frame Code and CSS Icon data	0x3E3B10 to 0x3EB1FF
 
 
 	Diffs from vanilla to 20XX 4.07++
@@ -345,9 +392,10 @@ Closed Port Door alignment fix:
    to
   EOF
 
+I don't know the date of the above change notes, but they likely no longer include everything.
 
 Changes for the Closed Port Doors (CPDs) mentioned above are given 
-in greater detail in the "UCP_14_9 Notes.txt" file.
+in greater detail in the "Unique Closed Ports" section.
 
 
 All data/changes to MnSlChr after 0x3A2849 should be identical between the .0sd and .1sd files.
@@ -442,11 +490,15 @@ textures	 0x51c0 -
 
 CSS structs	0x395440 -
 
-rt table	0x397C44 - 0x3A2848	AC04
+rt table	0x397C2C - 0x3A2848	AC1C
 & root nodes
 
+	tail data start
 
 Debug Menu	0x3A2848 - 0x3A45F0	1DA8
+
+CSP Trim	0x3A3C90 - 0x3A45E0	950
+colors
 
 CSP Color	0x3A45F0 - 0x3A4720	130
 Pointers - External ID
@@ -540,7 +592,7 @@ Mechanics	0x3C2900		Reserving block of 0x160 bytes for these strings
 Codes Strings
 		   |	0x65A0
 
-Port Door	0x3C9000				In 4.07: 1 texture (0x19000 in length)
+Port Door	0x3C9000				In 4.07: 1 texture (0x19000 in length. ended at 0x3E2000)
 Texture(s)						In 5.0:  2 textures (0x6400), 2 palettes, 
 		   |	0x13040					 and 2 palette headers
 							Refer to "Unique Closed Ports" section for details
@@ -552,32 +604,35 @@ Relocated	0x3E1FAC		Original file structures, relocated here for CPD edits
 structs
 		   |			0x54
 
-Flags/		0x3E2000	<- "20XX RESET DEFAUL" label; these are default flags for
-Music Code					resetting 20XX data (X+A at CSS to Reset 20XX)
-		   |			192C
+Default Flags	0x3E2010 - 0x3E2380	370	<- "20XX RESET DEFAUL" label right before this; set 1 of default 
+						flags for resetting 20XX data (X+A at CSS to Reset 20XX)
+		   |
+
+Song Locations	0x3E276C
+
+		   |
 
 CPU		0x3E392C
 Clone Flags
-		   |			1E4
+		   |	1D4
 
-Every Frame	0x3E3B00		FUNCTION; 0x11C4 long		in RAM at 80FD0220
+Every Frame	0x3E3B10 - 0x3E4E40		FUNCTION; 0x1330 long		in RAM at 80FD0220
    Code
 	(branched to by "All Players Can Control the Debug Menu")
-	(actual code start is 0x3E3B10)
 
-		   |			11D4
+		   |	1C0
 
-[empty?]	0x3E4CD4
+Char Icons	0x3E5000 - 0x3EB200	6200	CSS Char Icon alt image data; 
+						contains image data for 7 textures, each 0xE00 bytes
+		   |	11C0
 
-		   |	76EC
+Song titles	0x3EC3C0 - 0x3EDDA0	19E0	strings for hex tracks 0x31 to 0xFF
+table 2						(bottom-up order; "ends" with string for ID 0x00)
+		   |	3			(range accounts for empty entries)
 
-Song titles	0x3EC3C0 - 0x3EDDA4	19E4	strings for hex tracks 0x31 to 0xFF
-table 2						(bottom-up order; ends with string for 0x00)
-		   |	4
-
-Song title	0x3EDDA8 - 0x3EE1A4	3FC	space for 0xFF pointers
+Song title	0x3EDDA8 - 0x3EE1A8	400	reserving space for 256 pointers
 pointer table
-		   |	2C
+		   |	28			(range accounts for empty entries)
 
 Song titles	0x3EE1D0 - 0x3EE485	2B5	strings for hex tracks 0x01 to 0x30
 table 1						(top-down order)
@@ -598,21 +653,11 @@ EOF		0x3F0011
 =============  On Unique Closed Ports ==================================
              \-----------------------/
 
-These are old notes regarding the Closed Port Door (CPD) modifications on the CSS for 20XX HP v5.0. Typically, in vanilla Melee and prior 20XX versions, a single texture is shared across all port doors. It's fairly simple to instead use different textures for each, by adding space to the file (assuming you use the same texture properties). However, in 20XX (starting with v5.0), this is achieved through a much trickier way, due to limitations on file space, and the existance of data at the end of the file whos offsets needed to be preserved.
-
-
-v1.0 - complete CPD_9 project file. framework only; no textures imported
-v3.x - CPD_14 project files. 3.3 has complete framework, with textures
-v4.0 - hybrid CPD_14_9 project file. All players textures added as _14, except P2, which is _9
-v4.2 - Framework changed to represent image order explained below (P1, P4, P2, P3)
-v4.2.1 - Textures added
-v4.3 - Framework changed so all textures are _14, except P3, which is _9
-v4.4 - Final image order/type changed to P1/E, P2/E, P3/9, P4/E
+These are old notes regarding the Closed Port Door (CPD) modifications on the CSS for 20XX HP v5.0. Typically, in vanilla Melee and prior 20XX versions, a single texture is shared across all port doors. It's fairly simple to instead use different textures for each, by adding space to the file (assuming you use the same texture properties). However, in 20XX (starting with v5.0), this is achieved through a much trickier way, due to limitations on file space, and data at the end of the file which needs to have its offsets preserved.
 
 
 RT start: 397C2C
 String table start: 3A2834
-
 						as type 3	as type 6	as type 9	as type 14
 						(original)
 
@@ -628,15 +673,16 @@ for same bit depth (double image data):						0xc800		0x6400
 	Data/Header 2 = Lower-Left side
 
 				     type:   length:   _
-0x2F760		P1 Image Data 1		9	0x3200	\
-0x32960		P1 Image Data 2		9		 \______/ 0xC800 total space, contained
-0x35B60		P2 Image Data 1		9		 /	\ in original texture location
-0x38D60		P2 Image Data 2		9	       _/
--
-0x3C9000	P3 Image Data 1		14	0x6400
-0x3CF400	P3 Image Data 2		14
-0x3D5800	P4 Image Data 1		9	0x3200
-0x3D8A00	P4 Image Data 2		9
+0x2F760		P1 Image Data 1		14	0x3200	\
+0x32960		P1 Image Data 2		14		 \______/ 0xC800 total space, contained
+0x35B60		P2 Image Data 1		14		 /	\ in original texture location.
+0x38D60		P2 Image Data 2		14	       _/
+
+-								v Textures here onward in tail data
+0x3C9000	P3 Image Data 1		9	0x6400
+0x3CF400	P3 Image Data 2		9
+0x3D5800	P4 Image Data 1		14	0x3200
+0x3D8A00	P4 Image Data 2		14
 0x3DBC00	P3 Palette Data 1	2	0x200
 0x3DBE00	P3 Palette Header 1		0x20
 0x3DBE20	P3 Palette Data 2	2
@@ -694,10 +740,9 @@ Space remaining: 0x3E1FAC - 0x3DC040 = 0x5F6C
 
 =============  Relocation Table Additions and Struct Relocations  ==================================
 
-New RT entries were required, for pointers in the texture structs and the new palette data headers.
+New RT entries were required for pointers in the texture structs and the new palette data headers.
 However, without more changes, I wasn't able to add to the end of the RT table (can't move 20XX data below it), 
 so I added to the RT's start. Thus, 6 structures at the end of the data section have been relocated, to make space above the RT.
-
 
 	Struct 0x397BFC (len 0xC) moved to 0x3E1FAC		<- Each struct moved 0x4A3B0 forward
 	Struct 0x397C08 (len 0xC) moved to 0x3E1FB8
@@ -1281,4 +1326,10 @@ Song Preview target function
 80FA5780 | 3B9060 (CSS)		branches to DebugMenu_ButtonPressCheck
 				loads hex track ID, branches to Music_HandleLoading if A is pressed
 				uses a blr to get back
+
+
+             /---------------------------\
+=============  Animation File Preloading  ==================================
+             \---------------------------/
+
 

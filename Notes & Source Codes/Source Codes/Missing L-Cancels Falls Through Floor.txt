@@ -1,0 +1,45 @@
+
+
+	-==-
+
+
+Missing L-Cancels Fall Through Floor
+Uses a slightly different injection point than the original code to make the conditional switch (determined by debug menu flag 802288FC) simpler.
+<https://smashboards.com/threads/missed-l-cancels-fall-through-floor.484410/>
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8008D6E4 ---- 2C04FFFF -> Branch
+
+#To be inserted at 8008d69c
+.include "CommonMCM.s"
+
+# Check the debug menu flag
+lis r15, 0x8023	# 0x802288FC
+lwz r15, -0x7704(r15)
+cmpwi r15, 0
+beq+ OrigLine
+
+# Check for missed L-cancel
+cmpw r5,r0
+blt OrigLine
+
+#MissedLCancel:
+#Get GObj data again
+  lwz r5,0x2C(r3)
+#Copy Projected TopN to Current TopN and Physics X and Y
+  lwz r3,0x718(r5)
+  stw r3,0x6F4(r5)
+  stw r3,0xB0(r5)
+  lwz r3,0x71C(r5)
+  stw r3,0x6F8(r5)
+  stw r3,0xB4(r5)
+  lwz r3,0x720(r5)
+  stw r3,0x6FC(r5)
+  branch r12,0x8008d6f8
+
+OrigLine:
+  cmpwi r4,-1 # Original code line
+END:
+  b 0
+
+------------- 0x802288FC ---- 900DB4F0 -> 00000000 # Debug menu flag
