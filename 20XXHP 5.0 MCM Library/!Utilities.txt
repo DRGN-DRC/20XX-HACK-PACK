@@ -37,6 +37,45 @@ b 0
 	-==-
 
 
+Force Crash Mid-Match
+Forces the game to crash, 3 seconds after match start; for testing OSReport Printout.
+[UnclePunch, DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801a507c ---- 8019000C -> Branch
+
+# Injects into "updateFunction", near the start of its loop.
+# Crash code should execute every frame, once the scene reaches the specified frame.
+
+# Check the scene's current frame to see if we should execute
+lis r15, 0x80479D30@h		# Load address of scene controller
+ori r15, r15, 0x80479D30@l
+
+# Check if the current scene is within a match to see if we should execute
+lbz r14, 0(r15)			# Load Major Scene ID
+cmpwi r14, 2
+bne+ OrigLine
+lbz r14, 3(r15)			# Load Minor Scene ID
+cmpwi r14, 2
+bne+ OrigLine
+
+# Check the scene's current frame to see if we should execute
+lwz r14, 0x2C(r15)		# Load GX frame count
+cmpwi r14, 180
+blt+ OrigLine
+
+# Cause a crash
+lwz r0, 0x000C(r0)
+b END
+
+OrigLine:
+lwz r0, 0x000C(r25)
+END:
+b 0
+
+
+	-==-
+
+
 Disable Character Rendering
 Useful for grabbing stage screenshots for SSS icons.
 [Achilles]
@@ -1978,3 +2017,37 @@ mftbl	r4
 stw	r4,-8(rtoc)
 
 lwz	r4, 0 (r28)
+
+
+
+	-==-
+
+
+Split Audio Channels 2.0 (v1.02)
+Game must be set to Mono to take effect, stereo is preserved
+<https://smashboards.com/threads/split-audio-channels.499408/>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x8038A984 ---- 807A000C -> Branch
+
+800DC0B4 2C000000
+40820034 887A000B
+2C030001 40820018
+38600000 B07F0228
+B07F0230 B07F0238
+48000014 38600000
+B07F0224 B07F022C
+B07F0234 807A000C
+389F0224 00000000
+
+------------- 0x8038A80C ---- 807A000C -> Branch
+
+800DC0B4 2C000000
+40820034 887A000B
+2C030001 40820018
+38600000 B07F0228
+B07F0230 B07F0238
+48000014 38600000
+B07F0224 B07F022C
+B07F0234 807A000C
+389F0224 00000000
