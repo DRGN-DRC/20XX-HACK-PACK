@@ -99,33 +99,15 @@ Conditionally set during match start if SDR is active for Popo
 [glook, DRGN]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x8011EF3C --- 7C0802A6 -> Branch
-
-# Injecting into FighterOnLoad_Popo
-.macro setWord reg1, reg2, address, word
-  lis \reg1, \word@h
-  ori \reg1, \reg1, \word@l
-  lis \reg2, \address@h
-  ori \reg2, \reg2, \address@l
-  stw \reg1, 0(\reg2)
-.endm
-
-# Check if SDR Popo is enabled
-lis	r15, 0x803D		# 0x803CD615
-lbz	r15, -0x29EB(r15)	# load PlPp._at
-cmpwi	r15, 0x73
-bne+ 	OrigLine
-
-# SDR Popo activated; make SDR changes
-setWord r14, r15, 0x801239a8, 0x60000000
-b END
-
-OrigLine: # Change lines to vanilla
-setWord r14, r15, 0x801239a8, 0x40810008
-
-END:
-mflr r0		# original code line
-b 0
-
+3DE0803D 89EFD615
+2C0F0073 40A2001C
+3DC06000 61CE0000
+3DE08012 61EF39A8
+91CF0000 48000018
+3DC04081 61CE0008
+3DE08012 61EF39A8
+91CF0000 7C0802A6
+48000000
 
 	-==-
 
@@ -136,107 +118,50 @@ Displays above Popo's like in coin battle
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x8011EF40 --- 90010004 -> Branch
 
-# Injecting into 0x4 of FighterOnLoad_Popo
-.macro setWord reg1, reg2, address, word
-  lis \reg1, \word@h
-  ori \reg1, \reg1, \word@l
-  lis \reg2, \address@h
-  ori \reg2, \reg2, \address@l
-  stw \reg1, 0(\reg2)
-.endm
-
-# Check if SDR Popo is enabled
-lis	r15, 0x803D		# 0x803CD615
-lbz	r15, -0x29EB(r15)	# load PlPp._at
-cmpwi	r15, 0x73
-bne+ 	OrigLines
-
-# SDR Popo activated; make SDR changes
-setWord r14, r15, 0x804ddc28, 0x40c00000
-setWord r14, r15, 0x8016597c, 0x480000CC
-b END
-
-OrigLines: # Change lines to vanilla
-setWord r14, r15, 0x804ddc28, 0x404CCCCD
-setWord r14, r15, 0x8016597c, 0x40820074
-
-END:
-stw r0,4(r1)		# original code line
-b 0
+3DE0803D 89EFD615
+2C0F0073 40A20030
+3DC040C0 61CE0000
+3DE0804D 61EFDC28
+91CF0000 3DC04800
+61CE00CC 3DE08016
+61EF597C 91CF0000
+4800002C 3DC0404C
+61CECCCD 3DE0804D
+61EFDC28 91CF0000
+3DC04082 61CE0074
+3DE08016 61EF597C
+91CF0000 90010004
+48000000
 
 1.02 ----- 0x80165a64 --- 7C0601D6 -> Branch
 
-# Check if SDR Popo is enabled
-lis	r15, 0x803D		# 0x803CD615
-lbz	r15, -0x29EB(r15)	# load PlPp._at
-cmpwi	r15, 0x73
-bne+ 	END
-
-loc_0x0:
-  lis r17, 0x8046
-  ori r17, r17, 0xB6A0
-  lbz r17, 0(r17)
-  cmpwi r17, 0x0
-  bne- loc_0x24
-  lis r17, 0x8045
-  ori r17, r17, 0x30E2
-  li r16, 0xE90
-  b loc_0x30
-
-loc_0x24:
-  lis r17, 0x804A
-  ori r17, r17, 0x13CE
-  li r16, 0x50
-
-loc_0x30:
-  mr r19, r26
-
-loc_0x34:
-  cmpwi r19, 0x0
-  beq- loc_0x48
-  subi r19, r19, 0x1
-  add r17, r17, r16
-  b loc_0x34
-
-loc_0x48:
-  lhz r0, 0(r17)
-  lis r17, 0x8016
-  ori r17, r17, 0x5AA4
-  mtctr r17
-  bctr 
-  b 8		# Skip original code line
-
-END:
-  mullw r0,r6,r0 	# Original code line
-  b 0
+3DE0803D 89EFD615
+2C0F0073 40A20064
+3E208046 6231B6A0
+8A310000 2C110000
+40820014 3E208045
+623130E2 3A000E90
+48000010 3E20804A
+623113CE 3A000050
+7F53D378 2C130000
+41820010 3A73FFFF
+7E318214 4BFFFFF0
+A0110000 3E208016
+62315AA4 7E2903A6
+4E800420 48000008
+7C0601D6 48000000
 
 1.02 ----- 0x802f65cc --- 881D0003 -> Branch
 
-# Check if SDR Popo is enabled
-lis	r15, 0x803D		# 0x803CD615
-lbz	r15, -0x29EB(r15)	# load PlPp._at
-cmpwi	r15, 0x73
-bne+ 	OrigLine
-
-loc_0x0:
-  mulli r15, r31, 0xE90
-  lis r16, 0x8045
-  ori r16, r16, 0x3080
-  add r16, r15, r16
-  lbz r17, 7(r16)
-  cmpwi r17, 0xE
-  bne- loc_0x24
-  li r0, 0x80
-  b END
-
-loc_0x24:
-  li r0, 0x0
-  b END
-
-OrigLine:
-  lbz r0,3(r29) 	# Original code line
-END:				# Original code doesn't include orig code line
-  b 0
+3DE0803D 89EFD615
+2C0F0073 40A20030
+1DFF0E90 3E008045
+62103080 7E0F8214
+8A300007 2C11000E
+4082000C 38000080
+48000010 38000000
+48000008 881D0003
+48000000
 
 
 	-==-
@@ -310,31 +235,15 @@ Cannot Escape Kirby Throws (SDRC)
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x800EE680 --- 7C0802A6 -> Branch
 
-# Performs overwrites in Kirby's OnLoad
-.macro setWord reg1, reg2, address, word
-  lis \reg1, \word@h
-  ori \reg1, \reg1, \word@l
-  lis \reg2, \address@h
-  ori \reg2, \reg2, \address@l
-  stw \reg1, 0(\reg2)
-.endm
-
-# Check if SDR Kirby is enabled
-lis	r15, 0x803D	# 0x803CA30D
-lbz	r15, -0x5CF3(r15)	# load PlKb._at
-cmpwi	r15, 0x73
-bne+ 	OrigLine
-
-# SDR Kirby activated; make SDR changes
-setWord r14, r15, 0x800DE490, 0x48000010
-b END
-
-OrigLine: # Change lines to vanilla
-setWord r14, r15, 0x800DE490, 0x40820010
-
-END:
-mflr r0		# original code line
-b 0
+3DE0803D 89EFA30D
+2C0F0073 40A2001C
+3DC04800 61CE0010
+3DE0800D 61EFE490
+91CF0000 48000018
+3DC04082 61CE0010
+3DE0800D 61EFE490
+91CF0000 7C0802A6
+48000000
 
 
 	-==-
@@ -351,35 +260,25 @@ Conditionally set during match start if SDR is active for Mewtwo.
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 ---- 0x141A28 ----- 7C0802A6 -> Branch
 
-# Performs overwrites in Mewtwo's OnLoad
-.macro setWord reg1, reg2, address, word
-  lis \reg1, \word@h
-  ori \reg1, \reg1, \word@l
-  lis \reg2, \address@h
-  ori \reg2, \reg2, \address@l
-  stw \reg1, 0(\reg2)
-.endm
-
-# Check if SDR Mewtwo is enabled
-lis	r15, 0x803D0D85@h
-lbz	r15, 0x803D0D85@l(r15)	# load PlMt._at
-cmpwi	r15, 0x73
-bne+ 	OrigLines
-
-# SDR Mewtwo activated; make SDR changes
-setWord r14, r15, 0x80146940, 0x60000000 # Side-B works as throw
-setWord r14, r15, 0x801468ac, 0x60000000 # Side-B works as throw
-setWord r14, r15, 0x80146c58, 0x60000000 # Confusion reflect fix
-b END
-
-OrigLines: # Change lines to vanilla
-setWord r14, r15, 0x80146940, 0x4BF49E41 # Side-B works as throw
-setWord r14, r15, 0x801468ac, 0x4BF49ED5 # Side-B works as throw
-setWord r14, r15, 0x80146c58, 0x981F2218 # Confusion reflect fix
-
-END:
-mflr r0		# original code line
-b 0
+3DE0803D 89EF0D85
+2C0F0073 40A20044
+3DC06000 61CE0000
+3DE08014 61EF6940
+91CF0000 3DC06000
+61CE0000 3DE08014
+61EF68AC 91CF0000
+3DC06000 61CE0000
+3DE08014 61EF6C58
+91CF0000 48000040
+3DC04BF4 61CE9E41
+3DE08014 61EF6940
+91CF0000 3DC04BF4
+61CE9ED5 3DE08014
+61EF68AC 91CF0000
+3DC0981F 61CE2218
+3DE08014 61EF6C58
+91CF0000 7C0802A6
+48000000
 
 
 	-==-
@@ -390,31 +289,15 @@ GW Pan Momentum Not Applied (SDRC)
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x8014A37C --- 7C0802A6 -> Branch
 
-# Performs overwrites in GaW's OnLoad
-.macro setWord reg1, reg2, address, word
-  lis \reg1, \word@h
-  ori \reg1, \reg1, \word@l
-  lis \reg2, \address@h
-  ori \reg2, \reg2, \address@l
-  stw \reg1, 0(\reg2)
-.endm
-
-# Check if SDR Game & Watch is enabled
-lis	r15, 0x803D28ED@h
-lbz	r15, 0x803D28ED@l(r15)	# load PlGw._at
-cmpwi	r15, 0x73
-bne+ 	OrigLine
-
-# SDR GaW activated; make SDR changes
-setWord r14, r15, 0x8014e6e8, 0x60000000
-b END
-
-OrigLine: # Change lines to vanilla
-setWord r14, r15, 0x8014e6e8, 0xD0250084
-
-END:
-mflr r0		# original code line
-b 0
+3DE0803D 89EF28ED
+2C0F0073 40A2001C
+3DC06000 61CE0000
+3DE08014 61EFE6E8
+91CF0000 48000018
+3DC0D025 61CE0084
+3DE08014 61EFE6E8
+91CF0000 7C0802A6
+48000000
 
 
 	-==-
@@ -683,35 +566,16 @@ Allows Link's and Y.Link's grabbox to be controlled by an async timer rather tha
 [UnclePunch, DRGN]
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 --- 0x802A7718 ---- 4BDD38E1 -> Branch
-
-# Check if current character is Link
-lwz r15, 4(r28)		# Loading current player internal character ID
-cmpwi	r15, 0x6
-bne+	CheckYoungLink
-
-# Current character is Link. Check if SDR Link is enabled
-lis	r15, 0x803D	# 0x803C80BD
-lbz	r15, -0x7F43(r15)	# load PlLk._at
-cmpwi	r15, 0x73
-bne+	OrigLine
-b END		# Do nothing and exit
-
-CheckYoungLink:
-# Check if current character is Young Link
-cmpwi	r15, 0x14
-bne+	OrigLine
-
-# Check if SDR Young Link is enabled
-lis	r15, 0x803D1245@h
-lbz	r15, 0x803D1245@l(r15)	# load PlCl._at
-cmpwi	r15, 0x73
-bne+	OrigLine
-b END		# Do nothing and exit
-
-OrigLine:
-bl 0x8007AFF8		# Original code line (kind of); bl to Hitbox_Deactivate_All
-END:
-b 0
+81FC0004 2C0F0006
+40A20018 3DE0803D
+89EF80BD 2C0F0073
+40A20024 48000024
+2C0F0014 40A20018
+3DE0803D 89EF1245
+2C0F0073 40A20008
+48000008
+bl 0x8007AFF8
+48000000
 
 
 	-==-

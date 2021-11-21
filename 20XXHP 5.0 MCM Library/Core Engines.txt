@@ -2418,11 +2418,9 @@ b <DVD.__read_handler>
 # r9  = Allocation Metadata
 # r10 = path string
 # r11 = async file info pointer
-mr r7, r5
-mr r9, r6
-li r6, -1
-li r5, 0
-li r8, -1
+7CA72B78 7CC93378
+38C0FFFF 38A00000
+3900FFFF
 b <DVD.__read_handler>
 
 
