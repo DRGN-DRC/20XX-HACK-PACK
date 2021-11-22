@@ -4,12 +4,12 @@
 # Script version 1.2
 
 version=5.0.0
-vanillamd5="0e63d4223b01d9aba596259dc155a174"
-modmd5="17756217401a39227feea1ebb8542376"
+sourceMd5="0e63d4223b01d9aba596259dc155a174"
+modmd5="b67c7f8c107107b9db7e6d00a2b40817"
 
 infile="$1"
 outfile="SSBM, 20XXHP ${version}.iso"
-delta="SSBM, 20XXHP ${version} xdelta patch.xdelta"
+delta="SSBM, 20XXHP ${version} patch (NTSC 1.02 base).xdelta"
 
 # make sure you have these binaries installed somewhere
 xdelta=xdelta3
@@ -59,7 +59,7 @@ if [ "$infile" = "" ]; then
 fi
 
 printf "\nVerifying that the given file is a vanilla NTSC v1.02 copy of SSBM.\n"
-checkhash "$infile" "$vanillamd5"
+checkhash "$infile" "$sourceMd5"
 printf "The ISO has been verified!\n\n"
 
 
