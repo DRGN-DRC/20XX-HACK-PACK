@@ -2,7 +2,7 @@
 
 A full-game enhancement to the hit GameCube game, Super Smash Bros. Melee.
 
-Find the official thread on Smashboards [here](https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.351221/).
+Find the official thread on Smashboards [here](https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v5-0-11-21-2021.351221/).
 
 ![Downloads](/imgs/Downloads.png)
 
