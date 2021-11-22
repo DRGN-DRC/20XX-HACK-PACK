@@ -1332,4 +1332,125 @@ Song Preview target function
 =============  Animation File Preloading  ==================================
              \---------------------------/
 
+Melee preloads character files when a character is chosen on the CSS (or when the selected color is changed) in order to speed up match loading. Animation files in particular are preloaded to an ARAM cache: HSD[5], which is about 10 MB. However, animation files are larger in 20XX, which have extra sections added onto the end of them in order to unlock extra animations within matches (like the StarFox special taunts). If unchecked, this can lead to crashes if the total animations file sizes exceeds the size of the cache. 
 
+The 4 character selections with the largest animation files are shown below:
+
+
+			vanilla		20XX 4.07++	20XX 5.0 (w/.sat files and largest costume .dat)
+			  size:		size:		size:
+
+	  Zelda/Sheik:
+
+	PlZd.dat	  187,304			189,256
+	EfZdData.dat	   86,954			-
+	PlSk.dat	  166,907			168,071
+	PlZdNr.dat	  350,082			-
+	PlSkNr.dat	  380,176			627,064 (Wh.r)
+	PlZdAJ.dat	2,182,400 -> 2,265,728		2,275,712
+	PlSkAJ.dat	1,366,336 -> 1,438,304		1,460,096
+
+		Total:  4,720,159 -> 4,875,455		5,157,235
+
+	  Peach:
+
+	PlPe.dat	  269,820			- (sat is smaller)
+	EfPeData.dat	    5,094			-
+	PlPeNr.dat	  809,794			958,814
+	PlPeAJ.dat	2,102,080 -> 2,225,280		-
+
+		Total:  3,186,788 -> 3,309,988		3,459,008
+
+	  Roy:
+
+	PlFe.dat	  268,085			- (sat is smaller)
+	EfFeData.dat	   26,843			-
+	PlFeNr.dat	  660,284 ->   660,296		660,300
+	PlFeAJ.dat	2,027,200 -> 2,114,528		2,191,168
+
+		Total:  2,982,412 -> 3,069,752		3,146,396
+
+	  Marth:
+
+	PlMs.dat	  175,023			-
+	EfMsData.dat	   23,977			-
+	PlMsNr.dat	  594,960 ->   594,972		594,976
+	PlMsAJ.dat	1,942,752 -> 2,035,488		-
+
+		Total:  2,736,712 -> 2,829,460		2,829,464
+
+	
+		2,085 kB audio/01.hps	2,085,824 = 0x1FD3C0
+
+			total diff, vanilla to 4.07++:    458 kB = 
+
+
+		 vanilla:	20XX 4.07++:	5.0:
+AJ grand total:  9,620,768 	10,079,328	10,187,744
+		 0x92CD20	0x99CC60	0x9B73E0
+
+
+	vanilla HSD[5] cache size:		0096C800	<- This is why 4.07++ crashes with the above selected
+initial heap increase to fix 4.07++ bug: 	009AC800
+	5.0 size for new AJ files:		009C0000
+
+
+
+				 This is Vanilla file and object allocation after loading the CSS:
+
+
+59:50:027 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e38->80191e34|  After Initialization  --  Scene:    2, 0200  --  Frame:        2 +  b7.60550
+59:50:027 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80323eb4| 
+59:50:027 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e8c->80191e5c|  HSD[0] :     8ef20 free  :    548b60 alloc  :    5d7a80 total  :     8ef20 biggest free  :  80bd5c40 start
+59:50:027 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191ebc->80191ea4|  ( RAM) :         1 frags :       4ba frags  :       4bb frags  :    3a2880 biggest alloc :  811ad6c0 end
+59:50:027 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80004678| 
+59:50:027 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e8c->80191e5c|  HSD[1] :     69960 free  :         0 alloc  :     69960 total  :     69960 biggest free  :    f966a0 start
+59:50:028 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191ebc->80191e8c|  (ARAM) :         1 frags :         0 frags  :         1 frags  :         0 biggest alloc :   1000000 end
+59:50:028 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80004678| 
+59:50:028 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e8c->80191e5c|  HSD[2] :       380 free  :       480 alloc  :       800 total  :       380 biggest free  :  806dcc40 start
+59:50:028 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191ebc->80191ea4|  ( RAM) :         1 frags :         2 frags  :         3 frags  :       420 biggest alloc :  806dd440 end
+59:50:028 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80004678| 
+59:50:028 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e8c->80191e5c|  HSD[3] :     dc5e0 free  :    41c220 alloc  :    4f8800 total  :     dc5e0 biggest free  :  806dd440 start
+59:50:029 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191ebc->80191ea4|  ( RAM) :         1 frags :         6 frags  :         7 frags  :    2d5f00 biggest alloc :  80bd5c40 end
+59:50:029 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80004678| 
+59:50:029 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e8c->80191e5c|  HSD[4] :    64b400 free  :         0 alloc  :    64b400 total  :    64b400 biggest free  :  811ad6c0 start
+59:50:029 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191ebc->80191ea4|  ( RAM) :         1 frags :         0 frags  :         1 frags  :         0 biggest alloc :  817f8ac0 end
+59:50:029 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80004678| 
+59:50:029 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191e8c->80191e5c|  HSD[5] :    96c800 free  :         0 alloc  :    96c800 total  :    96c800 biggest free  :    629ea0 start
+59:50:030 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191ebc->80191e8c|  (ARAM) :         1 frags :         0 frags  :         1 frags  :         0 biggest alloc :    f966a0 end
+59:50:030 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80004678| 
+59:50:030 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191f5c->80191f50|  OSArenaLo        0 free  :    1ee040 alloc  : 806dcc40 point  --  Closed
+59:50:030 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80004380->80323eb4| 
+59:50:030 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80191f8c->80191f64|  OSArenaHi        0 free  :         0 alloc  : 817f8ac0 point  --  Closed
+
+
+
+				And this is 20XX after increasing the cache size and loading Z/P/R/M:
+
+
+05:48:334 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334270->8033426c|  User Query  --  Scene:    2, 0200  --  Frame:      65e +   0.ffbf6
+05:48:334 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80323eb4| 
+05:48:334 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342c4->80334294|  HSD[0] :     3cba0 free  :    598860 alloc  :    5d5400 total  :     3cba0 biggest free  :  80bd5c40 start
+05:48:335 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342f4->803342dc|  ( RAM) :         1 frags :       4de frags  :       4df frags  :    3f0040 biggest alloc :  811ab040 end
+05:48:335 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80004690| 
+05:48:335 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342c4->80334294|  HSD[1] :     16160 free  :         0 alloc  :     16160 total  :     16160 biggest free  :    fe9ea0 start
+05:48:336 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342f4->803342c4|  (ARAM) :         1 frags :         0 frags  :         1 frags  :         0 biggest alloc :   1000000 end
+05:48:337 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80004690| 
+05:48:337 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342c4->80334294|  HSD[2] :       380 free  :       480 alloc  :       800 total  :       380 biggest free  :  806dcc40 start
+05:48:338 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342f4->803342dc|  ( RAM) :         1 frags :         2 frags  :         3 frags  :       420 biggest alloc :  806dd440 end
+05:48:338 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80004690| 
+05:48:338 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342c4->80334294|  HSD[3] :       3c0 free  :    4f8440 alloc  :    4f8800 total  :       3c0 biggest free  :  806dd440 start
+05:48:339 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342f4->803342dc|  ( RAM) :         1 frags :         8 frags  :         9 frags  :    2d5f00 biggest alloc :  80bd5c40 end
+05:48:339 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80004690| 
+05:48:339 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342c4->80334294|  HSD[4] :    279000 free  :    3d2400 alloc  :    64b400 total  :    279000 biggest free  :  811ab040 start
+05:48:340 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342f4->803342dc|  ( RAM) :         1 frags :        1c frags  :        1d frags  :     c5b60 biggest alloc :  817f6440 end
+05:48:340 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80004690| 
+05:48:340 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342c4->80334294|  HSD[5] :      8c20 free  :    9b73e0 alloc  :    9c0000 total  :      8c20 biggest free  :    629ea0 start
+05:48:341 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803342f4->803342c4|  (ARAM) :         1 frags :         5 frags  :         6 frags  :    22b980 biggest alloc :    fe9ea0 end
+05:48:341 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80004690| 
+05:48:341 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334394->80334388|  OSArenaLo        0 free  :    1ee040 alloc  : 806dcc40 point  --  Closed
+05:48:342 HLE\HLE_OS.cpp:65 N[OSREPORT]: 80334408->80323eb4| 
+05:48:342 HLE\HLE_OS.cpp:65 N[OSREPORT]: 803343c4->8033439c|  OSArenaHi        0 free  :         0 alloc  : 817f6440 point  --  Closed
+
+
+Note that HSD[1] doesn't have much space left, but this should be fine. It's only expected to be used for the current scene for objects, but the CSS doesn't seem to use it.
