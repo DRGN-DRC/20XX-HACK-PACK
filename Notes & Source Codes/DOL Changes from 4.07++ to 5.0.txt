@@ -86,9 +86,11 @@ an injection to load this called "20XX AI Engine Loader"
 	- "20XX Teching Option - Getup Frame Perfect"
 	- "20XX Teching Option - DownBoundWait"
 1 mod removed: "SD Remix 3.1 - Mewtwo Missfoot"								-1
+2 mods combined into "Hold X+A to Reset 20XX":								-1
+	- "Debug Menu - Hold X+A to Reset 20XX"
+	- "CSS - Hold X+A to Reset 20XX"
 
-
-Total mods removed from library: 
+Total mods removed from library: 47
 
 
 
@@ -144,7 +146,7 @@ Total mods removed from library:
 	Stage Swap Engine (v2.0)
 	20XX AI Engine Loader
 	Frame Speed Modifier Engine
-	DVD and Archive Functions
+	DVD and Archive Functions - Minified
 
 
 		"Debug Mode"
@@ -167,6 +169,8 @@ Total mods removed from library:
 
 	Super Shine Bros (v1.2)
 	Turbo Mode (v1.3)
+40	Low-Poly v2
+	Big Head Mode
 
 
 		Mechanics & HUD -> "Gameplay.txt"
@@ -174,9 +178,10 @@ Total mods removed from library:
 	Universal Controller Fix, v.80.tm
 	Disable Wobbling
 	Air Grabs
-	Missing L-Cancels Fall Through Floor
+45	Missing L-Cancels Fall Through Floor
 	Disable Dodges
 	Longer Moonwalks
+	Everyone Can Float v1.1
 
 
 		Mechanics & HUD -> "HUD.txt"
@@ -186,12 +191,12 @@ Total mods removed from library:
 
 		Menus -> "Character Select Screen"
 
-	Boot to Character Select Screen
+50	Boot to Character Select Screen
 	Disable Name Tag and KO Star Reset After Closing Character Port
 	Disable Name Tag Reset After Exiting Character Select Screen
 	Wireframe Character Nametag Changes
 	Name Tag Blank Space Additions
-	Display Time at Top Right of CSS 1.1
+55	Display Time at Top Right of CSS 1.1
     !	Unplugging Closes CSS Doors
 
 
@@ -201,6 +206,7 @@ Total mods removed from library:
 	Unlock All Characters & Stages & Random Stage Select
 	Memory Card File Name Changes
 	HAL Heap 4 Size Increase
+60	Apply Half-Frame Lag Reduction on Boot
 
 
 		Menus -> "Stage Select & Results Screen"
@@ -213,22 +219,22 @@ Total mods removed from library:
 
 	Hold B for Height (Mario/Dr. Mario/Luigi/ICies - SDRC)
 	Ice Climbers - Popo and Nana Can Share Ledge (SDRC)
-	Nana Direction Update Bug Fix (SDRC)
+65	Nana Direction Update Bug Fix (SDRC)
 	Nana is Always Level 9 (SDRC)
 	Nana's % is Displayed (SDRC)
 	GaW Can L-Cancel Aerials Rewrite w/GFX (SDRC)
 	Cannot Escape Kirby Throws (SDRC)
-	Mewtwo SDR Init (SDRC)
+70	Mewtwo SDR Init (SDRC)
 	GW Pan Momentum Not Applied (SDRC)
 	Enter Action State Subaction Event
 	Custom Action State Logic
 	Auto Link Angle 363
-	Interrupt Swap Subaction
+75	Interrupt Swap Subaction
 	Individual Powershield Ratios (SDRC)
 	Ness Yoyo Goes Over Ledge (SDRC)
 	Ness & GaW Can Absorb All Projectiles And Items (SDRC)
 	Link and Young Link Grab Timer Fix (SDRC)
-	Brawl Bury Mechanics V1.0.3 (SDRC)
+80	Brawl Bury Mechanics V1.0.3 (SDRC)
 	PK Flash Explodes on Stage Collision (SDRC)
 	PK Flash Explodes on Interrupt (SDRC)
 	ROA-Style WD (alternate version + SDRC)
@@ -237,7 +243,7 @@ Total mods removed from library:
 		"Stages"
 
 	Default File Name Changes
-	Stage Spawn Positions Table
+85	Stage Spawn Positions Table
 	Battlefield Custom Platform Controller
 	Character Flattening for Meta Mine
 	All Floors Are Drop-Through
@@ -246,7 +252,7 @@ Total mods removed from library:
 Total mods originally included in "20XXHP++_original.txt": 243
 
 
- mods removed or combined into existing ones, _ added, for a new grand total of  installed.
+47 mods removed or combined into existing ones, 88 added
 (This grand total excludes mods within the 'Utilities' tab.)
 
 
