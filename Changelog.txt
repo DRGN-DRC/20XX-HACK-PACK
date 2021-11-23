@@ -9,34 +9,43 @@ To v5.0:
 	- Added many useful and fun codes. Most of which are toggleable in the Debug Menu (list below)
 	- Super Shine Bros. game mode added (replaces Hot Mr. Saturn)
 	- Turbo Mode game mode added (replaces Dodgeball)
-	- Swapped in 40 new and/or improved character costumes (see below for details)
-	- Added 80 custom stage mods (see below for details)
+	- Swapped in 40 new and/or improved character costumes (see below for details)†
+	- Added 80 custom stage mods (see below for details)†. I recommend turning on Random Neutrals!
 	- New, blazing-fast transitions between Stage Select Screen pages (special thanks to Punkline)
 	- Custom music tracks (e.g. "42.hps") can now be used on ANY stage, without needing a playlist
 	- Gave alt. music to some stages that didn't have it (for vanilla as well as custom stages)**
 	- Special character selections on the CSS now toggle their icons for Sheik/Wireframes/etc.
 	- Added L/R Alt costumes for Master Hand and Crazy Hand (trim color changes not yet available)
 	- Changed all Special Melee menu descriptions to reflect their respective game modes
-	- Debug Menu now exits to the Character Select Screen instead of main menus
-	- Tri-CSPs now enabled by default (vanilla CSPs can be toggled on/off in the Debug Menu)
+	- Debug Menu now exits to the Character Select Screen instead of the main menus
+	- Tri-CSPs are now enabled by default (vanilla CSPs can be toggled on/off in the Debug Menu)
 	- New Character Select Screen textures (original textures also still available in Debug Menu)
 	- Slight alignment improvements to CSS's closed-port doors w/respect to CSPs***
 	- Updated the disc's Image Name and Short/Long Titles (useful for game launcher identification)
 	- Resolved conflicts with OSReport Printout code, and enabled it for crash debugging
 	- You can now press L+R+A+Start to restart the game after crashes
 	- Rainbow FD code modified so that it does not apply to some custom stages (those above .7at)
-	- The SSS cursor texture can now be colored and asymetrical (as seen on SSS pages 3 & 4)
+	- The SSS cursor texture can now be colored and asymmetrical (as seen on SSS pages 3 & 4)
 	- Fixed crashes that could occur on the CSS when certain character combinations were selected
 	- Fixed a bug in the stage swap code for loading random [non-neutral] stages
 	- Fix added for a Debug Menu bug in the "VS. Melee Player Flags" text (thanks to UnclePunch)
 	- Fix added to DI Drawing functionality (i.e. memory allocation function fix, by tauKhan)
+	- Made a new tier list infographic in the Debug Menu for the current official 2021 tier list
 	- Dolphin .map symbol file generated to map all custom code injections
 	- Some other textures and aesthetics upgraded
+
+* See this post for more on what this means:
+	https://smashboards.com/threads/melee-code-manager-v4-0-easily-add-mods-to-your-game.416437/page-4#post-21932144
+** The new alt. music has a 15% chance to play. Or any player may hold L on stage load to force it to play. The affected stages are Princess Peach's Castle, Rainbow Cruise, Kongo Jungle, Jungle Japes, Green Greens, Corneria, Venom, Flat Zone, Brinstar, Brinstar Depths, Fourside, Mute City, PokeFloats, Dreamland 64, Yoshi's Island 64, and Kongo Jungle 64. Note that playlists will take priority for any stage that uses one.
+*** Character Select Portraits (CSPs) were previously slightly visible behind the closed port doors when a player port was turned off.
+
+† I've documented exactly which character costumes and stages have been changed or added in the "20XXHP Costume List.xls" file, which you can find in this GitHub repo.
 
 
 To 4.07:
 
 	https://www.reddit.com/r/SSBM/comments/6la944/20xx_melee_hack_pack_407_release_bug_fixes_and_a/
+
 
 To 4.06:
 
@@ -45,6 +54,7 @@ To 4.06:
 
 From Beta04:
  - n/a
+
 
 From Beta03:
 
