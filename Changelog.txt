@@ -6,14 +6,15 @@ To v5.0:
 	- UCF is now compatible with replays. It's toggleable in the Debug Menu, and on by default
 	- SD Remix updated from v3.1 to v5.0
 	- Prompts on boot to apply Half-Frame Lag Reduction code if playing on console and using HDMI
-	- Added many useful and fun codes. Most of which are toggleable in the Debug Menu (list below)
+	- Added many useful and fun codes. Most of which are toggleable in the Debug Menu
 	- Super Shine Bros. game mode added (replaces Hot Mr. Saturn)
 	- Turbo Mode game mode added (replaces Dodgeball)
 	- Swapped in 40 new and/or improved character costumes (see below for details)†
 	- Added 80 custom stage mods (see below for details)†. I recommend turning on Random Neutrals!
 	- New, blazing-fast transitions between Stage Select Screen pages (special thanks to Punkline)
 	- Custom music tracks (e.g. "42.hps") can now be used on ANY stage, without needing a playlist
-	- Gave alt. music to some stages that didn't have it (for vanilla as well as custom stages)**
+	- Custom music has now been set by default on many of the custom stages
+	- Gave alt. music to some vanilla stages that didn't already have it**
 	- Special character selections on the CSS now toggle their icons for Sheik/Wireframes/etc.
 	- Added L/R Alt costumes for Master Hand and Crazy Hand (trim color changes not yet available)
 	- Changed all Special Melee menu descriptions to reflect their respective game modes
@@ -25,6 +26,7 @@ To v5.0:
 	- Resolved conflicts with OSReport Printout code, and enabled it for crash debugging
 	- You can now press L+R+A+Start to restart the game after crashes
 	- Rainbow FD code modified so that it does not apply to some custom stages (those above .7at)
+	- Battlefield BG code modified so that it does not apply to some custom stages (those above .7at)
 	- The SSS cursor texture can now be colored and asymmetrical (as seen on SSS pages 3 & 4)
 	- Fixed crashes that could occur on the CSS when certain character combinations were selected
 	- Fixed a bug in the stage swap code for loading random [non-neutral] stages
