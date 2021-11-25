@@ -32,8 +32,8 @@ checkhash () {
 
 build () {
 	# Confirm that xdelta is installed
-	if type xdelta >/dev/null 2>&1; then
-		echo >&2 "xdelta does not appear to be installed. Exiting script.\n"
+	if [ ! -n "`command -v $xdelta 2>/dev/null`" ] ; then
+		echo >&2 "xdelta does not appear to be installed. Exiting script."
 		exit 1
 	fi
 
