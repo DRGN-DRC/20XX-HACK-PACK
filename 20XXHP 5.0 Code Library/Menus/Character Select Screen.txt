@@ -707,8 +707,8 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 	-==-
 
 
-Wireframe Character Nametag Changes
-Places character name strings for the Male/Female Wireframes.
+Extra Character Nametag Changes
+Places character name strings for the Male/Female Wireframes (overwrites Japanese name strings).
 ZAKA otoko -> M Wireframe
 ZAKA onna -> F Wireframe
 Also adds a string for "Ice Climber", and a pointer to it.
@@ -716,34 +716,30 @@ Also adds a string for "Ice Climber", and a pointer to it.
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 ---- 0x3D1F7C -----
 
-82798260 826A826E
-20828F82
+82798260826A826E20828F82
 
  -> 
 
 # M Wireframe
-4D205769 72656672
-616D6500
+4D20576972656672616D6500
 
 -------------- 0x3D1F88 -----
 
-94828F82 8B828F00
-82798260
+94828F828B828F0082798260
 
  -> 
 
-49636520436C696D62657200 # Ice Climber
+# Ice Climber
+49636520436C696D62657200
 
 -------------- 0x3D1F94 -----
 
-826A826E 20828F82
-8E828E82 81000000
+826A826E20828F828E828E8281000000
 
  -> 
 
 # F Wireframe
-4620576972656672616D6500
-00000000
+4620576972656672616D650000000000
 
 -------------- 0x3D205C ----- 00000000 -> 803D4F88 # New pointer to "Ice Climber" string
 -------------- 0x3D204F ----- 90 -> 94 # Modified pointer to F Wireframe

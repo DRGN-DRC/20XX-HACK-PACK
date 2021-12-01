@@ -114,7 +114,7 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 
 Nana's % is Displayed (SDRC)
 Displays above Popo's like in coin battle
-[Flies killer, DRGN]
+[flieskiller, DRGN]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x8011EF40 --- 90010004 -> Branch
 

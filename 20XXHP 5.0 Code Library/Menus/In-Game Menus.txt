@@ -21,7 +21,7 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 OnEveryFrame
 - in-game menu controls
 - in-game 20XX toggles
-	- invinicibility
+- invinicibility
 [Achilles]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x802259E4 --- 8001002C -> Branch

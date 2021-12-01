@@ -194,7 +194,7 @@ Total mods removed from library: 47
 50	Boot to Character Select Screen
 	Disable Name Tag and KO Star Reset After Closing Character Port
 	Disable Name Tag Reset After Exiting Character Select Screen
-	Wireframe Character Nametag Changes
+	Extra Character Nametag Changes
 	Name Tag Blank Space Additions
 55	Display Time at Top Right of CSS 1.1
     !	Unplugging Closes CSS Doors
@@ -290,9 +290,6 @@ What is the value at the end of the DOL file for? (Appears to be file size, but 
 
 
 "Debug Menu Replaces Tournament Mode" is slightly different than the usual mod?
-
-
-call "20XX New SDR, PAL, etc." some kind of engine and stick it in the Engines category?
 
 
 "Unlock All Characters & Stages & Random Stage Select" partially redundant with "Unlock All-Star Mode, Random Select, Sound Test, Score Display, and Every Special Message"?
