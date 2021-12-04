@@ -26,9 +26,10 @@ My own R&D combined with random notes of interest from others, mostly specific t
 	0x3A4CDD in MnSlChr (for Debug Menu display)
 	Texture on CSS upper-right (in MnSlChr @0x12760)
 	In DOL at 803FA154|0x3F7154; checked by OnBoot code
-		- this last one is the main one and the most detailed (referenced by internal code)
-		- Includes "20XX" string, followed by bytes for project#/major/minor/patch
-		- cannot do major/minor/patch numbers >9 without updating "Enable OSReport Print on Crash"
+	  - this last one is the main one and the most detailed (referenced by internal code)
+	  - includes "20XX" string, followed by bytes for project#/major/minor/patch
+	  - cannot do major/minor/patch numbers >9 without updating "Enable OSReport Print on Crash"
+	  - included with the "Debug Menu Region Overwrites" mod
 
 The version shown in OSReport prints is sourced from the DOL location.
 
@@ -98,13 +99,13 @@ https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.
 	   B0EC-9B94= 0x1558 bytes
 
 # In DOL space; broken into two sections
-803FA174   Start of 20XX flags, section 1; 0x358 bytes
-	   A154+1558=B6AC
-803FA4CC   End of section 1
+0x3F7174  803FA174   Start of 20XX flags, section 1; 0x358 bytes
+			A154+1558=B6AC
+0x3F74CC  803FA4CC   End of section 1
 
-803FA848   Start of section 2; 0x11DC bytes
-	   A848+11DC=BA24
-803FBA24   End of memcard data/20XX flags space (inclusive; the word here is the last saved)
+0x3F7848  803FA848   Start of section 2; 0x11DC bytes
+		   	A848+11DC=BA24
+0x3F8A24  803FBA24   End of memcard data/20XX flags space (inclusive; the word here is the last saved)
 
 
 code flags:							string offset:
@@ -137,17 +138,28 @@ code flags:							string offset:
 
 'Live' or in-use flags are kept here:
 Section 1 (803FA174|0x3F7174 to 803FA4CC|0x3F74CC; 0x358 bytes)
-0x3F7154		"20XX" string
-0x3F7158		version bytes
+0x3F7154    803FA154	"20XX" string
+0x3F7158    803FA158	version (the 4 bytes are project#/major/minor/patch)
+-
+0x3F71B4    803FA1B4	Random Stage Select flags for pages 1 through 4 (0x10 bytes)
+						^ the game's reference is at 8045C388
 -
 0x3F7210		UCF
 0x3F72D0		DK Always Full Giant Punch
 0x3F72D4		Luigi Always Misfire
 0x3F72D8		Fire Emblem Sword Swing Colors
 0x3F72DC		Samus Always Full Charge Shot
-0x3F7310		Battlefield Rainbow Water BG
+-
+0x3F72E4    803FA2E4	current SSS page (1 byte)
+-
+0x3F72E7    803FA2E4	next SSS page (1 byte)
+-
+0x3F7310    803FA310	Battlefield Rainbow Water BG
+-
 0x3F7360    803FA360	Greece Stage Variations
+-
 0x3F73B4		Rainbow FD
+-
 0x3F7F60		Sheik Always Full Needles
 0x3F7F64		Mewtwo Always Full Shadow Ball
 0x3F7F68		Peach Down-B Pull

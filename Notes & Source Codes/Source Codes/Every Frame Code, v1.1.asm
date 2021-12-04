@@ -190,7 +190,7 @@ loc_0x1B0:
   mulli r17, r16, 0x44			# relative offset for input address (players are 0x44 apart)
   add r15, r15, r17				# new input address
   lhz r17, 10(r15)
-  cmpwi r17, 0x10				# checking if z-button is pressed
+  cmpwi r17, 0x10				# check if z-button is pressed
   bne- loc_0x300
   addi r16, r16, 0x1
   li r18, 0x0
@@ -581,24 +581,24 @@ loc_0x5B4:
 
 loc_0x5B8:
   stw r17, 2028(r16)
-  lwz r15, -608(r14)
+  lwz r15, -608(r14)        # loading from 803FA174 (default value here is a float of 1.0)
   stw r15, 2036(r16)
-  lbz r15, -237(r14)
+  lbz r15, -237(r14)        # loading SSS reload indicator (byte at 803fa2e7); if non-0, indicates a new SSS should be loaded
   lis r17, 0x8047
   ori r17, r17, 0x9D64
-  cmpwi r15, 0x0
+  cmpwi r15, 0x0            # check whether a new SSS should be loaded. depricated; remove in new version
   beq- loc_0x634
   cmpwi r15, 0xFD
   bge- loc_0x640
-  lis r20, 0x8045
+  lis r20, 0x8045           # 8045C388; random stage select flags from memory card data?
   ori r20, r20, 0xC388
-  lwz r21, 0(r20)
-  lbz r18, -240(r14)
-  subi r18, r18, 0x30
-  mulli r18, r18, 0x4
-  subi r19, r14, 0x224
-  stwx r21, r19, r18
-  stb r15, -240(r14)
+  lwz r21, 0(r20)           # load random stage select flags?
+  lbz r18, -240(r14)        # load current/last SSS page
+  subi r18, r18, 0x30       # convert SSS page number to 1-index
+  mulli r18, r18, 0x4       # converting SSS page to a multiple of 4 byte index
+  subi r19, r14, 0x224      # load 803FA1B0 to r19
+  stwx r21, r19, r18        # save current random stage select flags to allocation for current page number
+  stb r15, -240(r14)        # update current SSS page
   subi r18, r15, 0x30
   mulli r18, r18, 0x4
   lwzx r21, r18, r19
@@ -606,7 +606,7 @@ loc_0x5B8:
   li r15, 0x1
   stb r15, 0(r17)
   li r15, 0x0
-  stb r15, -237(r14)
+  stb r15, -237(r14)         # clear SSS reload indicator
   lbz r15, -240(r14)
   lis r16, 0x803F
   stb r15, -14905(r16)
@@ -618,11 +618,11 @@ loc_0x634:
   stb r15, 2592(r16)
 
 loc_0x640:
-  lis r14, 0x8048
+  lis r14, 0x8048           # Load 80479D60
   lwz r14, -25248(r14)
   cmpwi r14, 0x0
   bne- loc_0x69C
-  lis r14, 0x804C				# <- loading button input address for P1
+  lis r14, 0x804C           # loading button input address for P1
   ori r14, r14, 0x1FAC
   li r15, 0x0
   li r16, 0x0
