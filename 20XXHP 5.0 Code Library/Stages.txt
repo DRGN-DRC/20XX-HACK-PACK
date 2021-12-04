@@ -419,20 +419,6 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 	-==-
 
 
-RANDOM Stage Select uses 20XX Stage Swap Code
-[Achilles]
-Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
-1.02 ----- 0x8025b878 --- 88030000 -> Branch
-
-3983FFF5 7C832378
-7D846378 3D808025
-618CBB40 7D8903A6
-4E800420 48000000
-
-
-	-==-
-
-
 HRC VS Mode Camera
 - regular camera outside of HRC, home-run contest
 [Achilles]

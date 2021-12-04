@@ -23,7 +23,7 @@ NTSC 1.02 --- 0x80003304 ----
  -> 
 
 # Cursor position storage area
-0000000000000000
+00000000 00000000
 
 ------------- 0x8025A3BC ---- C022C9E8 -> Branch
 
@@ -205,6 +205,20 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1D8C0044 7D8C182E
 558306F7 41820008
 38800004 48000000
+
+
+	-==-
+
+
+RANDOM Stage Select uses 20XX Stage Swap Code
+[Achilles]
+Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
+1.02 ----- 0x8025b878 --- 88030000 -> Branch
+
+3983FFF5 7C832378
+7D846378 3D808025
+618CBB40 7D8903A6
+4E800420 48000000
 
 
 	-==-

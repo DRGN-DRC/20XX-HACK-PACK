@@ -1,5 +1,5 @@
 
-			- Changes to the DOL from 20XX 4.07++ to 5.0 -
+			- Changes to the MCM Library from 20XX 4.07++ to 5.0 -
 
 
 	"20XX 4.07++ Codes_original.txt" is Achilles' original MCM library file.
@@ -76,6 +76,7 @@ an injection to load this called "20XX AI Engine Loader"
 3 mods combined into "SDR - CFalc/Ganon Side-B Enters "Fall" Action":					-2	40
 	- "SD Remix - CFalc/Ganon Side-B, Aerial Miss"
 	- "SD Remix - CFalc/Ganon Side-B, Aerial Hit"
+	- "SD Remix - CFalc/Ganon Side-B, Off Ledge"
 3 mods combined into "Frame Speed Modifier Engine"							-2
 	- "FSM Table"
 	- "20XX SDR Frame Speed Mod"
@@ -85,13 +86,12 @@ an injection to load this called "20XX AI Engine Loader"
 	- "20XX Teching Option - TechRoll Interrupt"
 	- "20XX Teching Option - Getup Frame Perfect"
 	- "20XX Teching Option - DownBoundWait"
-1 mod removed: "SD Remix 3.1 - Mewtwo Missfoot"								-1
+removed "SD Remix 3.1 - Mewtwo Missfoot"								-1
 2 mods combined into "Hold X+A to Reset 20XX":								-1
 	- "Debug Menu - Hold X+A to Reset 20XX"
 	- "CSS - Hold X+A to Reset 20XX"
 
-Total mods removed from library: 47
-
+Total modules removed from library: 47
 
 
 	-	=	-	=	-
@@ -114,7 +114,7 @@ Total mods removed from library: 47
     !	Frame Counter (as injection)
 	Frame Counter (Static)
     !	MnSlChr Injection Point Branches
-5	Line Item Counter Branch
+	Line Item Counter Branch
 	VS Style Menu Loader Branch
 	Misc. Flags
 	5F0 Block
@@ -124,7 +124,6 @@ Total mods removed from library: 47
 	SpawnItemEntity custom spawnitem_t
 	Various Menu Text
 	Color Overlays Table
-15	PAL FSM List block reservation
 	Zeros II
 
 
@@ -133,8 +132,8 @@ Total mods removed from library: 47
 	Kirbys Taunt Without Ability Gives Random Ability (v1.1)
 	Crazy Hand Tag Team Fix
 	GaW Modulo 10 Hammer
-20	Press B to Explode Yoshi Egg and Teleport
-	Nana Respawns After 20 Seconds
+	Press B to Explode Yoshi Egg and Teleport
+20	Nana Respawns After 20 Seconds
 	Link - Buffed Hylian Shield
 	Instant Zelda/Shiek Transform
 	Samus Shoots Random Item
@@ -142,21 +141,20 @@ Total mods removed from library: 47
 
 		"Core Engines"
 
-25	FSM Table
-	Stage Swap Engine (v2.0)
 	20XX AI Engine Loader
 	Frame Speed Modifier Engine
+	Stage Swap Engine (v2.2)
 	DVD and Archive Functions - Minified
 
 
 		"Debug Mode"
 
-30	All Players Can Control the Debug Menu (Rewrite)
+	All Players Can Control the Debug Menu (Rewrite)
 	Suppress Button Press Functions
-	Submenus Resemble Normal Menus
+30	Submenus Resemble Normal Menus
 	Song Preview Debug Line Item
 	Debug Menu Every Frame Code branch
-35	Debug Menu Region Overwrites
+	Debug Menu Region Overwrites
 	Enable OSReport Print on Crash
 
 
@@ -169,16 +167,16 @@ Total mods removed from library: 47
 
 	Super Shine Bros (v1.2)
 	Turbo Mode (v1.3)
-40	Low-Poly v2
+	Low-Poly v2
 	Big Head Mode
 
 
 		Mechanics & HUD -> "Gameplay.txt"
 
-	Universal Controller Fix, v.80.tm
+40	Universal Controller Fix, v.80.tm
 	Disable Wobbling
-	Air Grabs
-45	Missing L-Cancels Fall Through Floor
+	Air Grabs v3
+	Missing L-Cancels Fall Through Floor
 	Disable Dodges
 	Longer Moonwalks
 	Everyone Can Float v1.1
@@ -191,12 +189,12 @@ Total mods removed from library: 47
 
 		Menus -> "Character Select Screen"
 
-50	Boot to Character Select Screen
+	Boot to Character Select Screen
 	Disable Name Tag and KO Star Reset After Closing Character Port
-	Disable Name Tag Reset After Exiting Character Select Screen
+50	Disable Name Tag Reset After Exiting Character Select Screen
 	Extra Character Nametag Changes
 	Name Tag Blank Space Additions
-55	Display Time at Top Right of CSS 1.1
+	Display Time at Top Right of CSS 1.1
     !	Unplugging Closes CSS Doors
 
 
@@ -206,44 +204,44 @@ Total mods removed from library: 47
 	Unlock All Characters & Stages & Random Stage Select
 	Memory Card File Name Changes
 	HAL Heap 4 Size Increase
-60	Apply Half-Frame Lag Reduction on Boot
+	Apply Half-Frame Lag Reduction on Boot
 
 
 		Menus -> "Stage Select & Results Screen"
 
 	'RANDOM' is Default Highlighted on Stage Select Screen
-	Reload SSS with D-Pad Up/Down
+60	Reload SSS with D-Pad Up/Down
 
 
 		"SDR"
 
 	Hold B for Height (Mario/Dr. Mario/Luigi/ICies - SDRC)
 	Ice Climbers - Popo and Nana Can Share Ledge (SDRC)
-65	Nana Direction Update Bug Fix (SDRC)
+	Nana Direction Update Bug Fix (SDRC)
 	Nana is Always Level 9 (SDRC)
 	Nana's % is Displayed (SDRC)
 	GaW Can L-Cancel Aerials Rewrite w/GFX (SDRC)
 	Cannot Escape Kirby Throws (SDRC)
-70	Mewtwo SDR Init (SDRC)
+	Mewtwo SDR Init (SDRC)
 	GW Pan Momentum Not Applied (SDRC)
-	Enter Action State Subaction Event
+70	Enter Action State Subaction Event
 	Custom Action State Logic
 	Auto Link Angle 363
-75	Interrupt Swap Subaction
+	Interrupt Swap Subaction
 	Individual Powershield Ratios (SDRC)
 	Ness Yoyo Goes Over Ledge (SDRC)
 	Ness & GaW Can Absorb All Projectiles And Items (SDRC)
 	Link and Young Link Grab Timer Fix (SDRC)
-80	Brawl Bury Mechanics V1.0.3 (SDRC)
+	Brawl Bury Mechanics V1.0.3 (SDRC)
 	PK Flash Explodes on Stage Collision (SDRC)
-	PK Flash Explodes on Interrupt (SDRC)
+80	PK Flash Explodes on Interrupt (SDRC)
 	ROA-Style WD (alternate version + SDRC)
 
 
 		"Stages"
 
 	Default File Name Changes
-85	Stage Spawn Positions Table
+	Stage Spawn Positions Table
 	Battlefield Custom Platform Controller
 	Character Flattening for Meta Mine
 	All Floors Are Drop-Through
@@ -252,17 +250,9 @@ Total mods removed from library: 47
 Total mods originally included in "20XXHP++_original.txt": 243
 
 
-47 mods removed or combined into existing ones, 88 added
-(This grand total excludes mods within the 'Utilities' tab.)
+47 mods removed or combined into existing ones, 86 added, for a new grand total of 282
+	(This grand total excludes mods within the 'Utilities' tab.)
 
-
-
-	-	=	-	=	-
-
-
-Custom Code Region changes:
-
- (Aux Code Regions restored to vanilla code)
 
 
 	-	=	-	=	-

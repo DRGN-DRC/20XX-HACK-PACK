@@ -1,5 +1,6 @@
 Hold B for Height (Mario/Dr. Mario/Luigi/ICies - SDRC)
 Hold B instead of mashing B to gain height with down or side B moves.
+<https://smashboards.com/threads/misc-character-codes.446554/post-21695173>
 [UnclePunch, DRGN]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x800e253c --- 801F0668 -> Branch	# Mario & Dr. Mario
@@ -40,6 +41,7 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 
 
 Ice Climbers - Popo and Nana Can Share Ledge (SDRC)
+<https://smashboards.com/threads/nana-and-popo-can-share-ledge.453939/>
 [UnclePunch, DRGN]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x80082EA4 --- 809E0734 -> Branch
@@ -658,10 +660,11 @@ NTSC 1.02 ----- 0x802AAD8C --- 28000000 -> Branch
 
 
 ROA-Style WD (alternate version + SDRC)
-This makes wavedashes easier, by widening the window during which a WD can occur; similar to as they are in Rivals of Aether.
+This makes wavedashes easier by widening the window during which a WD can occur; similar to as they are in Rivals of Aether.
 Differences from UnclePunch's original code:
 -- Gives higher priority to R+A grab
 -- Compatible with tauKhan's Extended SH Jump Input Release Window code
+-- Conditionals added to only be active with SDR characters or if Debug Menu option is enabled.
 <https://smashboards.com/threads/wavedash-out-of-jumpsquat-roa-style.454197/post-24565408>
 [UnclePunch, tauKhan, DRGN]
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
