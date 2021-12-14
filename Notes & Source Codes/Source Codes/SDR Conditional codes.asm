@@ -576,7 +576,7 @@ b 0
 
 Individual Powershield Ratios (SDRC)
 originally a plco offset, now customizable
-[mer?, DRGN]
+[mer, DRGN]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x8009397c --- C00902A8 -> Branch
 
