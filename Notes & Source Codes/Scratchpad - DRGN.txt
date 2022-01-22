@@ -152,7 +152,7 @@ Section 1 (803FA174|0x3F7174 to 803FA4CC|0x3F74CC; 0x358 bytes)
 -
 0x3F72E4    803FA2E4	current SSS page (1 byte)
 -
-0x3F72E7    803FA2E4	next SSS page (1 byte)
+0x3F72E7    803FA2E7	next SSS page (1 byte); SSS reload indicator for Every Frame Code; depricate?
 -
 0x3F7310    803FA310	Battlefield Rainbow Water BG
 -
@@ -1272,6 +1272,16 @@ needs verification, but seems to be:
 	
 		803CD615	Popo
 		803CFC9D	Zelda
+
+
+
+RandomStageSelect ID to External Stage ID look-up table
+
+	- In DOL @ 0x3B4808 (803b7808)
+	- 29 entries (half-word each)
+	- 0x3A in length
+	- referenced by function RandomStageSelectID->ExternalStageID (801641cc)
+
 
              /------------------------\
 =============  On Color Modifications  ==================================

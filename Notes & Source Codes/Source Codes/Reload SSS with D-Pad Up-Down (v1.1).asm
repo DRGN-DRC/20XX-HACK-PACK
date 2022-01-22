@@ -1,16 +1,20 @@
 
 
-Reload SSS with D-Pad Up/Down
+Reload SSS with D-Pad Up/Down (v1.1)
 Checks for D-pad Up/Down inputs, and reloads the current scene with a different SSS file.
 [Punkline, DRGN]
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 ---- 0x2586DC ----- 540005AD -> Branch
 
 # 803f0a20	address of 'u' character in ascii string for "MnSlMap.usd"
-# 803FA2E4 	sss page id (needs to be updated)
+# 803EC5C7	address of 'u' character in ascii string for "SdMenu.usd"
+# 803f11ac	address of 'u' character in ascii string for "SdSlChr.usd"
+# 803FA2E4	SSS page id
 # 80335B74	update scene code (dynamic; will change)
+# 803FA1B0	base address for all pages' RSS flags
+# 8045C388	SSS flags currently used by the game
 
-# Load the byte describing which SSS is active
+# Load the byte describing which SSS is active (current MnSlMap loaded)
 lis r11, 0x803F
 ori r11, r11, 0x0A20 # r11 = address of 'u' character in ascii string for "MnSlMap.usd"
 lbz r3, 0(r11)
@@ -20,7 +24,7 @@ beq CHECK_DPAD_UP # Skip checking for D-pad down if on the 4th SSS
 # Check for D-Pad Down  (r0 contains the current player's button input)
 andi. r12, r0, 4
 beq CHECK_DPAD_UP # D-Pad Down not pressed
-addi r3, r3, 1 # increment the SSS byte
+addi r4, r3, 1 # increment the SSS byte
 b CHANGE_SSS
 
 CHECK_DPAD_UP:
@@ -29,15 +33,38 @@ beq END # Skip checking for D-pad up if on the 1st SSS; done checking input
 # Check for D-Pad Up
 andi. r12, r0, 8
 beq END
-subi r3, r3, 1 # decrement the SSS byte
+subi r4, r3, 1 # decrement the SSS byte
 
 CHANGE_SSS:
 # Update the index byte in "MnSlMap._sd", for the new SSS file name
-stb r3, 0(r11)
-# Update the SSS page ID byte
+stb r4, 0(r11)
+# Update the SSS page ID byte (used for memory card saving and onBoot loading)
 lis r11, 0x803F
 ori r11, r11, 0xA2E4
-stb r3, 0(r11)
+stb r4, 0(r11)
+# Update the SdMenu._sd file string
+lis r12, 0x803e
+ori r12, r12, 0xc5c7	# load address of the 'u' in the extension
+stb r4, 0(r12)
+# Update the SdSlChr._sd file string (no longer needed? might be able to depricate)
+lis r12, 0x803f
+ori r12, r12, 0x11ac	# load address of the 'u' in the extension
+stb r4, 0(r12)
+
+# Store RSS flags for the previous page (to all pages' allocation)
+subi r11, r11, 0x134	# load base address to all pages' RSS flags (803FA1B0)
+lis r12, 0x8045
+ori r12, r12, 0xC388	# load address of currenly used RSS flags
+lwz r5, 0(r12)		# load current RSS flags
+subi r3, r3, 0x30       # convert old SSS page number to 1-index
+mulli r3, r3, 0x4       # convert page # to a multiple of 4 byte offset
+stwx r5, r11, r3	# store (at r11+r3)
+
+# Load RSS flags for the current/new page (from all pages' allocation)
+subi r4, r4, 0x30       # convert new SSS page number to 1-index
+mulli r4, r4, 0x4       # convert page # to a multiple of 4 byte offset
+lwzx r11, r11, r4	# load new flags from all pages' allocation
+stw r11, 0(r12)		# store to 'current' flags location
 
 # Reload the scene
 li r12,2
@@ -50,52 +77,6 @@ stb r12, 0x80479D35-0x10000@l(r11)
 END:
 andi. r0,r0,512
 .long 0 # Return branch
-
-
-# v Unused / Scratchpad
-
-
-# # Load the byte describing which SSS is active
-# lis r11, 0x803F
-# ori r11, r11, 0x0A20 # r11 = address of 'u' character in ascii string for "MnSlMap.usd"
-# lbz r3, 0(r11)
-# cmpwi r3, 0x34
-# beq CHECK_DPAD_UP # Skip checking for D-pad down if on the 4th SSS
-
-# # Check for D-Pad Down  (r0 contains the current player's button input)
-# andi. r12, r0, 4
-# beq CHECK_DPAD_UP # D-Pad Down not pressed
-# addi r3, r3, 1 # increment the SSS byte
-# b CHANGE_SSS
-
-# CHECK_DPAD_UP:
-# cmpwi r3, 0x31
-# beq END # Skip checking for D-pad up if on the 1st SSS; done checking input
-# # Check for D-Pad Up
-# andi. r12, r0, 8
-# beq END
-# subi r3, r3, 1 # decrement the SSS byte
-
-# CHANGE_SSS:
-# # Update the index byte in "MnSlMap._sd", for the new SSS file name
-# stb r3, 0(r11)
-
-# # Reload the scene
-# li r12,2
-# lis r11, 0x80479D35+0x10000@h
-# stb r12, -0x49F1(r13)
-# stb r12, 0x80479D35-0x10000@l(r11)
-# # trigger ID (2) is stored in r13 global
-# # target scene ID + 1 (2) is stored in
-
-# # Update the SSS page ID byte
-# lis r11, 0x803F
-# ori r11, r11, 0xA2E4
-# stb r3, 0(r11)
-
-# END:
-# andi. r0,r0,512
-# .long 0 # Return branch
 
 
 

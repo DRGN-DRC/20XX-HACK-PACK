@@ -579,11 +579,11 @@ loc_0x598:
 loc_0x5B4:
   li r17, 0x0
 
-loc_0x5B8:
+loc_0x5B8:                  # r14 = 803FA3D4
   stw r17, 2028(r16)
   lwz r15, -608(r14)        # loading from 803FA174 (default value here is a float of 1.0)
   stw r15, 2036(r16)
-  lbz r15, -237(r14)        # loading SSS reload indicator (byte at 803fa2e7); if non-0, indicates a new SSS should be loaded
+  lbz r15, -237(r14)        # loading SSS reload indicator (byte at 803fa2e7); if non-0, indicates a new SSS should be loaded (would be the new/target SSS page ID)
   lis r17, 0x8047
   ori r17, r17, 0x9D64
   cmpwi r15, 0x0            # check whether a new SSS should be loaded. depricated; remove in new version
@@ -593,29 +593,29 @@ loc_0x5B8:
   lis r20, 0x8045           # 8045C388; random stage select flags from memory card data?
   ori r20, r20, 0xC388
   lwz r21, 0(r20)           # load random stage select flags?
-  lbz r18, -240(r14)        # load current/last SSS page
-  subi r18, r18, 0x30       # convert SSS page number to 1-index
+  lbz r18, -240(r14)        # load current SSS page ID byte (at 803FA2E4); this is actually the "last page" ID, or the page the SSS was on when it left
+  subi r18, r18, 0x30       # convert last SSS page number to 1-index
   mulli r18, r18, 0x4       # converting SSS page to a multiple of 4 byte index
   subi r19, r14, 0x224      # load 803FA1B0 to r19
-  stwx r21, r19, r18        # save current random stage select flags to allocation for current page number
+  stwx r21, r19, r18        # save current random stage select flags to allocation for the old/last page number
   stb r15, -240(r14)        # update current SSS page
-  subi r18, r15, 0x30
+  subi r18, r15, 0x30       # convert new SSS to 1-indexed
   mulli r18, r18, 0x4
-  lwzx r21, r18, r19
-  stw r21, 0(r20)
+  lwzx r21, r18, r19        # load RSS flags for new SSS page
+  stw r21, 0(r20)           # store RSS flags (to memory card data region?)
   li r15, 0x1
-  stb r15, 0(r17)
+  stb r15, 0(r17)           # store 0x1 to 80479D64
   li r15, 0x0
-  stb r15, -237(r14)         # clear SSS reload indicator
-  lbz r15, -240(r14)
+  stb r15, -237(r14)        # clear SSS reload indicator
+  lbz r15, -240(r14)        # load current SSS page ID byte (at 803FA2E4)
   lis r16, 0x803F
-  stb r15, -14905(r16)
-  stb r15, 4524(r16)
+  stb r15, -14905(r16)      # store current SSS page ID to address of 'u' character in string for "SdMenu.usd" (803EC5C7)
+  stb r15, 4524(r16)        # store current SSS page ID to address of 'u' character in string for "SdSlChr.usd" (803f11ac)
 
 loc_0x634:
-  lbz r15, -240(r14)
+  lbz r15, -240(r14)        # load current SSS page ID byte (at 803FA2E4)
   lis r16, 0x803F
-  stb r15, 2592(r16)
+  stb r15, 2592(r16)        # store current SSS page ID byte to address of 'u' character in string for "MnSlMap.usd" (803F0A20). no longer needed?
 
 loc_0x640:
   lis r14, 0x8048           # Load 80479D60

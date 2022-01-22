@@ -105,12 +105,12 @@ word_load r3,r3,DebugMenu.MnSlChrTexture
 addi r3,r3,0x30	# don't go above 9 for now...
 byte_store r3,r4,MnSlChrASCII
 
-## SdMenu & SdSlChr._at##
+## Update SdMenu & SdSlChr file extensions (former contains RSSS names) ##
 lis	r3,0x8040
-lbz	r3,-0x5D1C(r3)	# load current hacked stage byte
+lbz	r3,-0x5D1C(r3)		# load current hacked stage byte @ 803FA2E4
 lis	r4,0x803f
-stb	r3,-0x3A39(r4)	# SdMenu._at @ 803ec5c7
-stb	r3,0x11ac(r4)	# SdSlChr._at @ 803f11ac
+stb	r3,-0x3A39(r4)		# store in string SdMenu._at @ 803ec5c7
+stb	r3,0x11ac(r4)		# store in string SdSlChr._at @ 803f11ac
 
 
 ### Unlock Features ###

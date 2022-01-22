@@ -13,7 +13,7 @@ NTSC 1.02 --- 0x80003304 ----
  -> 
 
 # Cursor position storage area
-0000000000000000
+00000000 00000000
 
 ------------- 0x8025A3BC ---- C022C9E8 -> Branch
 
@@ -54,7 +54,7 @@ NTSC 1.02 --- 0x80003304 ----
 
 
 START:
-  lis r16, 0x8046     # aim at p1 input-c
+  lis r16, 0x8046     # aim at current player input (-0xC since r15 is not 0-indexed)
   ori r16,r16, 0xb0fc
   mulli r17,r15,0xc 
   lwzx r17,r17,r16    # load input of current player
