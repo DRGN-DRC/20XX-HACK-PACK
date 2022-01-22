@@ -206,6 +206,33 @@ NTSC 1.02 ---- 0x258720 ----- 8804000B -> Branch
 # Main Logic; looks up data from the
 # Stage Swap Table and prepares file loading
 
+/*
+Stage swap data starts @ 803FBC80 in RAM (0x3f8c80 DOL)
+- each stage entry is 0x30 in length
+- order is external stage ID
+
+AAAAAAAA AAAAAAAA CCCCCCCC DDDDDDDD
+EEEEEEEE FFFFFFFF GGGGGGGG HHHHHHHH
+IIIIIIII JJJJJJJJ KKKKKKKK LLLLLLLL
+
+MnSlMap means the order is MnSlMap.1sd, .2sd, .3sd, .4sd.
+
+A = stage name text (for human reading purposes)
+C = stage swap ID (external), MnSlMap bytes
+D = custom stage flags, MnSlMap bytes, gets sent to 803fa2e5
+E-H = byte overwrite RAM pointer, MnSlMap words
+I = byte overwrite value, MnSlMap bytes
+J-L = random byte overwrite values (max 4), MnSlMap words (.2sd to .4sd)
+
+
+
+8025a998 00000eb8 8025a998 0 SceneLoad_SSS	<- loaded first. loads MnSlMap file
+8025b744 0000010c 8025b744 0 SceneLoad_SSS
+
+
+803f0a18
+*/
+
 # -----------------------
 # Main Stage Swap Code -
 # Inject @ 8025bb40
