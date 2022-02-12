@@ -134,6 +134,7 @@ code flags:							string offset:
 0x2255A0		Buffed Hylian Sheild			80FAEEDA
 0x2255A4    802289C4	Instant Zelda/Shiek Transform		80FAEEF8
 0x2255A8    802289C8	Samus - Shoots Random Items		80FAEF20
+0x2255AC    802289CC	Falcon - Shinesplosion
 - Reserving space for more character codes here
 
 'Live' or in-use flags are kept here:

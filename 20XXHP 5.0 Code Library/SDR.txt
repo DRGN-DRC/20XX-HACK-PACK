@@ -742,7 +742,7 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 
 	-==-
 
-
+!
 SD Remix - Falcon Kick No Textures
 - no textures during shinesplosion
 [Achilles]
@@ -813,7 +813,7 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 
 	-==-
 
-
+!
 SDR Falcon Airdodge out of Up-B
 [Achilles]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
