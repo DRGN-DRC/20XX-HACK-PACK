@@ -342,7 +342,7 @@ mr	r3, r26 # original code line
 b 0
 
 <PageTextProps> # xCoord, yCoord
-40F00000 C0FE6666 # 7.5, -7.95
+40EE6666 C105EB85 # 7.45, -8.37
 00000000          # Text struct pointer placeholder
 
 	-==-
