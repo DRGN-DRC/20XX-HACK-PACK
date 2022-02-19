@@ -821,12 +821,8 @@ lwz	r4,0x10(r5)		# load Action state ID
 cmpwi r4,0x165		# grounded down-b state only
 bne-	END
 
-lis	r4,0x803c
-lbz	r4,0x759d(r4)	# load PlCa._at
-cmpwi	r4,0x73
-bne-	END
-
-blr					#skip this function if SD Remix
+# Skip CFalcon/Ganon_DownB_TextureDisplay function
+blr
 
 END:
 mflr	r0
