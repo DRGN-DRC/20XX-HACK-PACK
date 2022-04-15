@@ -444,9 +444,10 @@ NTSC 1.02 ---- 0x3B8DDC -----
 	-==-
 
 
-Music Plays at 20% Volume When All Controllers Are Idle For 1 Minute
+Music Volume Reduction on Idle (v1.1)
+Music Plays at 25% Volume When All Controllers Are Idle For 1 Minute
 <https://smashboards.com/threads/music-plays-at-20-volume-when-all-controllers-are-idle-for-1-minute.450078/>
-[UnclePunch]
+[UnclePunch, Punkline]
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 ---- 0x37451C ----- 7C600279 -> Branch
 
@@ -468,9 +469,9 @@ A1F0000A B1EE0002
 89F00008 2C0F0001
 41820038 3DC0804D
 61CE3884 A1EE0002
-B1F0000A 39E00019
+B1F0000A 55EFF0BE
 B1EE0002 39E00001
 99F00008 48000014
 4E800021 00000000
 00000000 00000000
-7C600279 00000000
+7C600279 48000000
