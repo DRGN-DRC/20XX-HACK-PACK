@@ -12,6 +12,16 @@ PAL ------- 0x1BE160 ---- 887F0004 -> 38600002 ---- (lbz r3,4(r31) -> li r0,2)
 	-==-
 
 
+Every Frame Code branch
+Points to a function in RAM at 80FD0230, which is stored in the CSS file at 0x3E3B10. Handles many important CSS and SSS features.
+[Achilles]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 ---- 0x25FF30 ----- 4E800020 -> 48D6CEE0
+
+
+	-==-
+
+
 CSS B Button Return Cursor Fix
 - works for all characters
 [Achilles]
@@ -32,7 +42,7 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 
 Hold Start to Force Load CSS
 - hold for two seconds
-- only works in multiplayer mode
+- only works in multiplayer mode, with Time matches
 [Achilles]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x80262614 --- BA6100B4 -> Branch
@@ -779,7 +789,7 @@ Refers to flag at 0x802288E0.
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 --- 0x8025C00C ---- 80010014 -> Branch
 
-3FE08023 83FF88E0
+3FE08040 83FFBA24
 2C1F0000 41A2001C
 2C05004C 4082000C
 3863FFDE 48000008
@@ -788,7 +798,7 @@ NTSC 1.02 --- 0x8025C00C ---- 80010014 -> Branch
 
 ------------- 0x8026339C ---- 8001001C -> Branch
 
-3C608023 806388E0
+3C608040 8063BA24
 2C030000 41A20188
 8062FDB0 2C030000
 4182017C 3DC08000
@@ -841,9 +851,9 @@ B0E6001E 38E00020
 20160000 8001001C
 00000000
 
-------------- 0x802288E0 ----
+------------- 0x803FBA24 ----
 
-00000000
+41100000
 
  -> 
 
@@ -887,3 +897,22 @@ NTSC 1.02 --- 0x802605fc ---- 38C00001 -> 38C00003 # Unplugging Closes CSS Door
 BA810008 80010104
 38210100 7C0803A6
 881F0004 48000000
+
+
+	-==-
+
+
+Save When Transitioning from Debug Menu to CSS
+[DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801a4fa4 ---- 80790000 -> Branch
+
+3C608047 60639D30
+80830030 2C040002
+40A2002C 88830002
+2C040006 40A20020
+A0830000 2C040202
+40A20014 3C608043
+60633324 38800001
+90830000 80790000
+48000000

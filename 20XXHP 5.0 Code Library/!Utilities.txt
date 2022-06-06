@@ -46,8 +46,8 @@ NTSC 1.02 --- 0x801a507c ---- 8019000C -> Branch
 # Injects into "updateFunction", near the start of its loop.
 # Crash code should execute every frame, once the scene reaches the specified frame.
 
-# Check the scene's current frame to see if we should execute
-lis r15, 0x80479D30@h		# Load address of scene controller
+# Load address of the scene controller
+lis r15, 0x80479D30@h
 ori r15, r15, 0x80479D30@l
 
 # Check if the current scene is within a match to see if we should execute
