@@ -64,26 +64,25 @@ cmpwi r5,0x3037		# '07'
 beq- UPDATE_MEMCARD_VERSION
 b END_MEM_CARD 		# Version is sus
 
+
 MEMORY_CARD_LOAD:	# Load data from the memory card region to the DOL regions
 li r5,0x1558		# Total number of bytes to load for 20XX debug flags
 subi r3,r3,4
 subi r4,r4,4
 
 MEM_CARD_REPEAT:
-MEM_CARD_SKIP_DEBUGMENU:
-lis r6,0x803f
+lis r6,0x803f		# load start of the Debug Menu data region (this area will be skipped)
 ori r6,r6,0xa4cc
-cmpw r3,r6
-blt- MEM_CARD_SKIP_DEBUGMENU_END
+cmpw r3,r6			# check if in first section
+blt- MEM_CARD_REPEAT_CONTINUE
 lis r6,0x803f
-ori r6,r6,0xa848
-cmpw r3,r6
-bge- MEM_CARD_SKIP_DEBUGMENU_END
-MEM_CARD_SKIP:
-addi r3,r3,4
+ori r6,r6,0xa848	# address of the second DOL flags section
+cmpw r3,r6			# check if in second section
+bge- MEM_CARD_REPEAT_CONTINUE
 
+# Skip over the Debug Menu data region
+addi r3,r3,4
 b MEM_CARD_REPEAT
-MEM_CARD_SKIP_DEBUGMENU_END:
 
 MEM_CARD_REPEAT_CONTINUE:
 lwzu r6,4(r4) # load data from memory card

@@ -11,30 +11,19 @@
 # Change log:
 #
 #	Version 1.1
+#		- Now skips directly to Debug Menu flag checks if running on the SSS
 #		- Added CSS Icon Texture swaps (introduced in 20XX v5.0)
 #
 #	Version 1.0
 #		- Initial release
 
 
-
 .macro setPointer reg1, reg2, headerOffset, dataOffset
 
   lis \reg1, \headerOffset @h			# load address of the image or palette data header
   ori \reg1, \reg1, \headerOffset @l
-  lis \reg2, \dataOffset @h			# load address value of the image or palette data
+  lis \reg2, \dataOffset @h				# load address value of the image or palette data
   ori \reg2, \reg2, \dataOffset @l
-
-/*
-  # Add the CSS file offset (MnSlChr) to the struct or data offsets
-   addis \reg1, \reg1, 0x80BE
-   addi \reg1, \reg1, 0x7720
-   addi \reg1, \reg1, 0x5000
-   addis \reg2, \reg2, 0x80BE
-   addi \reg2, \reg2, 0x7720
-   addi \reg2, \reg2, 0x5000
-*/
-
   stw \reg2, 0(\reg1)			# set the image data pointer in the header
 
 .endm
@@ -49,17 +38,24 @@ loc_0x0:
   stw r3, 16(r15)
   stw r4, 20(r15)
   stw r5, 24(r15)
-  lis r4, 0x8048
-  lbz r4, -25296(r4)
-  cmpwi r4, 0x6
-  beq- loc_0x69C
+  lis r4, 0x8048		# Load 80479D30; address of Scene Controller struct
+  lbz r4, -25296(r4)	# Load byte for current major scene
+  cmpwi r4, 0x6			# Check if in the Debug Menu (scene ID 6)
+  beq- StartDebugMenuFlagChecks
+
+# Check if running on the SSS. This is done when switching SSS pages in order to update stage file names
+  lis r4, 0x8048			# Load 80479D30; address of Scene Controller struct
+  lbz r4, -25293(r4)		# Load byte for current minor scene
+  cmpwi r4, 1
+  beq- StartDebugMenuFlagChecks
+
   li r15, 0x0
   li r16, 0x0
   lis r18, 0x8048
   ori r19, r18, 0x7FD
-  stw r15, 1752(r18)
-  stw r15, 1756(r18)
-  lbz r17, 1992(r18)
+  stw r15, 1752(r18)	# Store 0 to 804806D8
+  stw r15, 1756(r18)	# Store 0 to 804806DC
+  lbz r17, 1992(r18)	# Load byte from 804807C8
   ori r18, r18, 0x6D7
   cmpwi r17, 0x1
   beq- loc_0xA4
@@ -538,36 +534,36 @@ loc_0x534:
   addi r14, r14, 0x1
   cmpwi r14, 0x6
   blt- loc_0x420
-  lis r14, 0x803F
-  ori r14, r14, 0xA3D4
+  lis r14, 0x803F			# Load an address to access flags
+  ori r14, r14, 0xA3D4		# This address lies in the DOL flag space, section 1
   lbz r19, 181(r15)
   cmpwi r19, 0x3
-  beq- loc_0x55C
+  beq- CheckToLoadSmallPercents
 
 loc_0x554:
   li r19, 0x18
-  b loc_0x598
+  b LoadSmallPercents
 
-loc_0x55C:
+CheckToLoadSmallPercents:
   lbz r19, 145(r15)
   cmpwi r19, 0x3
   bne- loc_0x554
   li r19, 0x1C
-  lwz r20, -408(r14)
+  lwz r20, -408(r14)		# 803FA23C; Debug Menu flag for "Always Small Percents"
   cmpwi r20, 0x1
-  beq- loc_0x598
-  lwz r20, -404(r14)
+  beq- LoadSmallPercents
+  lwz r20, -404(r14)		# 803FA240; Debug Menu flag for "Small Percents in Teams Mode"
   cmpwi r20, 0x1
   bne- loc_0x594
   lis r20, 0x8048
   lbz r20, 1992(r20)
   cmpwi r20, 0x1
-  beq- loc_0x598
+  beq- LoadSmallPercents
 
 loc_0x594:
   li r19, 0x10
 
-loc_0x598:
+LoadSmallPercents:
   stb r19, -96(r15)
   lis r16, 0x8048
   lwz r15, -336(r14)
@@ -583,10 +579,10 @@ loc_0x5B8:                  # r14 = 803FA3D4
   stw r17, 2028(r16)
   lwz r15, -608(r14)        # loading from 803FA174 (default value here is a float of 1.0)
   stw r15, 2036(r16)
-  lbz r15, -237(r14)        # loading SSS reload indicator (byte at 803fa2e7); if non-0, indicates a new SSS should be loaded (would be the new/target SSS page ID)
+  lbz r15, -237(r14)        # loading SSS reload indicator (byte at 803FA2E7). depricated. if non-0, indicates a new SSS should be loaded (would be the new/target SSS page ID)
   lis r17, 0x8047
   ori r17, r17, 0x9D64
-  cmpwi r15, 0x0            # check whether a new SSS should be loaded. depricated; remove in new version
+  cmpwi r15, 0x0            # check whether a new SSS should be loaded. depricated; should be able to remove this in new versions
   beq- loc_0x634
   cmpwi r15, 0xFD
   bge- loc_0x640
@@ -615,44 +611,44 @@ loc_0x5B8:                  # r14 = 803FA3D4
 loc_0x634:
   lbz r15, -240(r14)        # load current SSS page ID byte (at 803FA2E4)
   lis r16, 0x803F
-  stb r15, 2592(r16)        # store current SSS page ID byte to address of 'u' character in string for "MnSlMap.usd" (803F0A20). no longer needed?
+  stb r15, 0xA20(r16)       # store current SSS page ID byte to address of 'u' character in string for "MnSlMap.usd" (803F0A20)
 
 loc_0x640:
-  lis r14, 0x8048           # Load 80479D60
-  lwz r14, -25248(r14)
+  lis r14, 0x8048
+  lwz r14, -25248(r14)      # Load the word at 80479D60
   cmpwi r14, 0x0
-  bne- loc_0x69C
+  bne- StartDebugMenuFlagChecks
   lis r14, 0x804C           # loading button input address for P1
   ori r14, r14, 0x1FAC
   li r15, 0x0
   li r16, 0x0
 
-loc_0x660:
+loc_0x660:					# Loop through the button input structs for players 1-4; check if any player is pressing _
   mulli r17, r15, 0x44
   lwzx r17, r17, r14
   or r16, r17, r16
   addi r15, r15, 0x1
   cmpwi r15, 0x4
   bne- loc_0x660
-  rlwinm. r16, r16, 0, 27, 27
-  beq- loc_0x69C
+  rlwinm. r16, r16, 0, 27, 27	# Mask out all bits except bit 27
+  beq- StartDebugMenuFlagChecks			# Check if r16 is 0, meaning the target button wasn't pressed for any player
   li r16, 0x2
-  stb r16, -18858(r13)
-  lis r15, 0x8048
-  lbz r15, -25296(r15)
+  stb r16, -18858(r13)		# store byte (0x2) to 804D6CF6
+  lis r15, 0x8048			# Load 80479D30; address of Scene Controller struct
+  lbz r15, -25296(r15)		# Load byte for current major scene
   addi r15, r15, 0x1
   lis r16, 0x803F
-  stb r15, 2631(r16)
+  stb r15, 0xA47(r16)		# Store to 803F0A47
 
-loc_0x69C:
-  lis r14, 0x803F
-  ori r14, r14, 0xA3D4
+StartDebugMenuFlagChecks:
+  lis r14, 0x803F			# Load an address to access flags
+  ori r14, r14, 0xA3D4		# This address lies in the DOL flag space, section 1
   lis r15, 0x8040
   lwz r15, -20624(r15)
   addi r15, r15, 0x30
   lis r16, 0x803F
   stb r15, 4444(r16)
-  lwz r15, -4(r14)
+  lwz r15, -4(r14)			# 803FA3D4
   lis r16, 0x3DBA
   ori r16, r16, 0xE148
   cmpwi r15, 0x0
@@ -664,7 +660,7 @@ loc_0x69C:
 
 loc_0x6DC:
   stw r16, -7832(r2)
-  lwz r15, 2772(r14)
+  lwz r15, 2772(r14)		# 803FAEA8
   lis r16, 0x8026
   ori r16, r16, 0xB748
   lis r17, 0x4182
@@ -681,30 +677,30 @@ loc_0x6DC:
 loc_0x714:
   stw r17, 0(r16)
   stw r18, 16(r16)
-  lis r3, 0x801A
+  lis r3, 0x801A		# Load address for 'MenuController_CheckSinglePlayer' function
   ori r3, r3, 0x4340
   mtlr r3
-  lis r3, 0x8047
+  lis r3, 0x8047		# Load Menu Controller Major ID
   ori r3, r3, 0x9D30
   lbz r3, 0(r3)
   blrl 
-  cmpwi r3, 0x1
+  cmpwi r3, 0x1			# Check if in the main menu
   beq- loc_0x83C
-  lbz r15, -237(r14)
+  lbz r15, -237(r14)	# 803FA2E7; 'next SSS page' byte
   cmpwi r15, 0xFE
   beq- loc_0x76C
   cmpwi r15, 0xFD
   beq- loc_0x83C
-  lwz r15, -132(r14)
+  lwz r15, -132(r14)	# 803FA350
   cmpwi r15, 0x0
   beq- loc_0x83C
-  lbz r15, -237(r14)
+  lbz r15, -237(r14)	# 803FA2E7; 'next SSS page' byte
   cmpwi r15, 0xFE
   blt- loc_0x83C
 
 loc_0x76C:
   li r16, 0xFD
-  stb r16, -237(r14)
+  stb r16, -237(r14)	# 803FA2E7; 'next SSS page' byte
   lis r17, 0x804D
   ori r17, r17, 0x6CF6
   li r16, 0x1
@@ -715,7 +711,7 @@ loc_0x76C:
 
 loc_0x790:
   lis r15, 0x803F
-  ori r15, r15, 0xAED8
+  ori r15, r15, 0xAED8		# Lies in DOL flag space, section 2
   mulli r17, r16, 0x14
   add r17, r17, r15
   lwz r15, 0(r17)
@@ -767,10 +763,10 @@ loc_0x830:
 loc_0x83C:
   lis r16, 0x8008
   ori r16, r16, 0xD694
-  lwz r15, -108(r14)
+  lwz r15, -108(r14)		# 803FA368
   cmpwi r15, 0x1
   beq- loc_0x858
-  lwz r18, -120(r14)
+  lwz r18, -120(r14)		# 803FA35C
   b loc_0x85C
 
 loc_0x858:
@@ -778,7 +774,7 @@ loc_0x858:
 
 loc_0x85C:
   sth r18, 2(r16)
-  lwz r15, -124(r14)
+  lwz r15, -124(r14)		# 803FA358
   cmpwi r15, 0x1
   bne- loc_0x878
   lis r19, 0xFC00
@@ -794,7 +790,7 @@ loc_0x880:
   lis r16, 0x804D
   ori r17, r16, 0x8278
   ori r16, r16, 0x8270
-  lwz r15, -84(r14)
+  lwz r15, -84(r14)			# 803FA380; Characters Face Screen flag
   cmpwi r15, 0x1
   bne- loc_0x8A4
   li r18, 0x0
@@ -806,7 +802,7 @@ loc_0x8A4:
 
 loc_0x8AC:
   stw r18, 0(r16)
-  lwz r15, -88(r14)
+  lwz r15, -88(r14)			# 803FA37C; T-Posing Characters flag
   cmpwi r15, 0x1
   bne- loc_0x8C4
   li r18, 0x0
@@ -818,7 +814,7 @@ loc_0x8C4:
 loc_0x8C8:
   stw r18, 0(r17)
   lis r18, 0x8021
-  lwz r15, -36(r14)
+  lwz r15, -36(r14)			# 803FA3B0
   cmpwi r15, 0x1
   bne- loc_0x8E4
   lis r16, 0x6000
@@ -831,19 +827,19 @@ loc_0x8E4:
 loc_0x8EC:
   stw r16, 5188(r18)
   lis r18, 0x801E
-  lwz r15, -44(r14)
+  lwz r15, -44(r14)			# 803FA3A8; Disable Yoshi's Shy Guys flag
   cmpwi r15, 0x1
-  bne- loc_0x908
-  lis r16, 0x6000
+  bne- ShyGuysEnabled
+  lis r16, 0x6000			# Disable Shy Guys (load nop)
   b loc_0x910
 
-loc_0x908:
+ShyGuysEnabled:
   lis r16, 0x4800
   ori r16, r16, 0xD1
 
 loc_0x910:
   stw r16, 13128(r18)
-  lwz r15, -528(r14)
+  lwz r15, -528(r14)		# 803FA1C4
   lis r16, 0x8027
   ori r16, r16, 0xCF8C
   lis r17, 0x8028
@@ -865,7 +861,7 @@ loc_0x94C:
   sth r19, 25502(r17)
   ori r17, r17, 0x8B28
   stw r20, 0(r17)
-  lwz r15, -424(r14)
+  lwz r15, -424(r14)		# 803FA22C
   lis r16, 0x800D
   lis r17, 0x981F
   ori r17, r17, 0x2220
@@ -878,7 +874,7 @@ loc_0x978:
   stw r17, 5628(r16)
   lis r18, 0x8026
   ori r18, r18, 0x9638
-  lwz r15, -428(r14)
+  lwz r15, -428(r14)		# 803FA228
   cmpwi r15, 0x1
   beq- loc_0x9A0
   lis r17, 0xD01F
@@ -890,17 +886,17 @@ loc_0x9A0:
 
 loc_0x9A4:
   stw r17, 0(r18)
-  lwz r15, -420(r14)
+  lwz r15, -420(r14)		# 803FA230; Disable Star KO flag
   lis r18, 0x800D
   ori r18, r18, 0x32CC
   cmpwi r15, 0x1
-  beq- loc_0x9CC
+  beq- DisableStarKO
   lis r19, 0x4800
   ori r17, r19, 0xDED
   ori r19, r19, 0x14D9
   b loc_0x9D8
 
-loc_0x9CC:
+DisableStarKO:
   lis r17, 0x4BFF
   ori r17, r17, 0xFF94
   addi r19, r17, 0x24
@@ -909,7 +905,7 @@ loc_0x9D8:
   stw r17, 0(r18)
   subi r18, r18, 0x24
   stw r19, 0(r18)
-  lwz r15, -416(r14)
+  lwz r15, -416(r14)		# 803FA234; Taunt Canceling flag
   lis r18, 0x800D
   ori r18, r18, 0xEE70
   lis r19, 0x800C
@@ -931,7 +927,7 @@ loc_0xA14:
 loc_0xA24:
   stw r16, 0(r18)
   stw r17, 0(r19)
-  lwz r15, -396(r14)
+  lwz r15, -396(r14)		# 803FA248; PAL Stock Icon Size flag
   addi r15, r15, 0x30
   lis r17, 0x804D
   stb r15, 14320(r17)
@@ -942,58 +938,58 @@ loc_0xA24:
   ori r18, r18, 0x2A6
   lis r19, 0x4800
   ori r19, r19, 0xAD
-  lis r3, 0x801A
+  lis r3, 0x801A		# Load address for 'MenuController_CheckSinglePlayer' function
   ori r3, r3, 0x4340
   mtlr r3
-  lis r3, 0x8047
+  lis r3, 0x8047		# Load Menu Controller Major ID
   ori r3, r3, 0x9D30
   lbz r3, 0(r3)
-  cmpwi r3, 0x1C
-  beq- loc_0xA84
-  blrl 
+  cmpwi r3, 0x1C		# Check if in Training Mode
+  beq- CheckForJapesVariation	# Check for variations for Training Mode
+  blrl 					# Not in Training Mode; check if in single player mode
   cmpwi r3, 0x1
-  beq- loc_0xAD8
+  beq- SelectDefaultJapes	# Select Default Japes if in single player
 
-loc_0xA84:
-  lis r15, 0x803F
-  lbz r15, 2592(r15)
-  cmpwi r15, 0x32
-  bne- loc_0xAD8
-  lis r18, 0x4E80
+CheckForJapesVariation:
+  lis r15, 0x803F		# Load current SSS page ID byte; address of 'u' character in string for "MnSlMap.usd" (803F0A20)
+  lbz r15, 0xA20(r15)
+  cmpwi r15, 0x32		# Check if the current SSS is the second page (.2at)
+  bne- SelectDefaultJapes
+  lis r18, 0x4E80		# Replacing an instruction for a blr later
   ori r18, r18, 0x20
-  lis r19, 0x6000
-  lwz r15, -128(r14)
+  lis r19, 0x6000		# Probably loading a nop to disable something
+  lwz r15, -0x80(r14)	# Load Debug Menu value for 'Jungle Japes Hacked' option
   cmpwi r15, 0x0
-  bne- loc_0xAB4
+  bne- JapesNotOnePlatform
 
-loc_0xAAC:
-  li r15, 0x31
-  b loc_0xADC
+SelectSinglePlatformJapes:
+  li r15, 0x31		# Hacked, with platform (1at)
+  b StoreJapesSelection
 
-loc_0xAB4:
+JapesNotOnePlatform:	# Japes is NOT set to "ONE PLATFORM" variation; check for "OMEGA"
   cmpwi r15, 0x1
-  bne- loc_0xAC4
+  bne- JapesNotOmega
 
-loc_0xABC:
-  li r15, 0x32
-  b loc_0xADC
+SelectOmegaJapes:
+  li r15, 0x32		# Omega (2at)
+  b StoreJapesSelection
 
-loc_0xAC4:
-  lis r15, 0x804D
-  lbz r15, 24467(r15)
+JapesNotOmega:			# Must be set to "RANDOM"
+  lis r15, 0x804D		# Load 804D5F93
+  lbz r15, 0x5F93(r15)
   cmpwi r15, 0x80
-  blt- loc_0xAAC
-  b loc_0xABC
+  blt- SelectSinglePlatformJapes
+  b SelectOmegaJapes
 
-loc_0xAD8:
-  li r15, 0x30
+SelectDefaultJapes:
+  li r15, 0x30		# Default (0at)
 
-loc_0xADC:
-  stb r15, 21210(r16)
-  stw r18, 11676(r17)
-  stw r19, 11212(r17)
+StoreJapesSelection:
+  stb r15, 0x52DA(r16)	# Store to 803E52DA; first character of Jungle Japes file extension (GrGd._at)
+  stw r18, 0x2D9C(r17)	# Store blr to 80202D9C
+  stw r19, 0x2BCC(r17)	# Store nop to 80202BCC
   lis r18, 0x802F
-  lwz r15, -400(r14)
+  lwz r15, -400(r14)	# 803FA244; Disable Percent Game Logos (insignias) flag
   cmpwi r15, 0x1
   beq- loc_0xB04
   lis r17, 0x7C08
@@ -1008,7 +1004,7 @@ loc_0xB0C:
   stw r17, 24144(r18)
   lis r18, 0x8008
   ori r18, r18, 0xCF70
-  lwz r15, -592(r14)
+  lwz r15, -592(r14)		# 803FA184; Disable Aerial Attacks
   cmpwi r15, 0x1
   beq- loc_0xB30
   lis r17, 0x7C08
@@ -1025,7 +1021,7 @@ loc_0xB38:
   ori r18, r18, 0xD698
   lis r19, 0x8009
   ori r19, r19, 0x694C
-  lwz r15, -588(r14)
+  lwz r15, -588(r14)		# 803FA188; Disable Helpless State
   cmpwi r15, 0x1
   beq- loc_0xB6C
   lis r16, 0x8003
@@ -1045,7 +1041,7 @@ loc_0xB7C:
   stw r17, 0(r19)
   lis r18, 0x8009
   ori r18, r18, 0x9894
-  lwz r15, -596(r14)
+  lwz r15, -596(r14)		# 803FA188; Disable Spot Dodge
   cmpwi r15, 0x1
   beq- loc_0xBA4
   lis r17, 0x7C08
@@ -1058,7 +1054,7 @@ loc_0xBA4:
 
 loc_0xBAC:
   stw r17, 0(r18)
-  lwz r15, -580(r14)
+  lwz r15, -580(r14)		# 803FA190; Infinite Aerial Jumps
   lis r16, 0x800C
   ori r16, r16, 0xC300
   cmpwi r15, 0x1
@@ -1087,7 +1083,7 @@ loc_0xBF8:
   stw r19, -1280(r16)
   stw r20, -968(r16)
   lis r18, 0x8037
-  lwz r15, 5920(r14)
+  lwz r15, 5920(r14)		# 803FBAF4; outside of DOL flag save sections
   cmpwi r15, 0x1
   bne- loc_0xC2C
   lis r16, 0x3880
@@ -1139,7 +1135,7 @@ loc_0xC98:
 
 loc_0xCA0:
   stw r16, 27652(r18)
-  lwz r15, -344(r14)
+  lwz r15, -344(r14)		# 803FA27C; Disable Targets and Flippers
   lis r16, 0x801C
   lis r17, 0x7C08
   ori r17, r17, 0x2A6
@@ -1155,7 +1151,7 @@ loc_0xCC4:
   ori r18, r18, 0xFDDC
   lis r17, 0x7C08
   ori r17, r17, 0x2A6
-  lwz r15, -604(r14)
+  lwz r15, -604(r14)		# 803FA178
   cmpwi r15, 0x0
   beq- loc_0xCF0
   lis r17, 0x4E80
@@ -1164,17 +1160,17 @@ loc_0xCC4:
 loc_0xCF0:
   stw r17, 0(r18)
   lis r18, 0x804D
-  lwz r15, -144(r14)
+  lwz r15, -144(r14)		# 803FA344
   stb r15, 13987(r18)
-  lwz r15, -148(r14)
+  lwz r15, -148(r14)		# 803FA340
   stb r15, 13999(r18)
-  lwz r15, -152(r14)
+  lwz r15, -152(r14)		# 803FA33C
   stb r15, 14015(r18)
-  lwz r15, -156(r14)
+  lwz r15, -156(r14)		# 803FA338
   stb r15, 14007(r18)
   lis r18, 0x8008
   ori r18, r18, 0x924E
-  lwz r15, -456(r14)
+  lwz r15, -456(r14)		# 803FA20C; Damage Staling in Develop Mode
   cmpwi r15, 0x1
   beq- loc_0xD34
   li r17, 0x3
@@ -1380,10 +1376,10 @@ loc_0xF98:
 loc_0xFB0:
   lis r18, 0x801C
   li r16, 0x0
-  lis r3, 0x801A
+  lis r3, 0x801A		# Load address for 'MenuController_CheckSinglePlayer' function
   ori r3, r3, 0x4340
   mtlr r3
-  lis r3, 0x8047
+  lis r3, 0x8047		# Load Menu Controller Major ID
   ori r3, r3, 0x9D30
   lbz r3, 0(r3)
   cmpwi r3, 0x1C
@@ -1407,16 +1403,16 @@ loc_0xFEC:
 
 loc_0x1008:
   stb r16, 22443(r18)
-  lis r3, 0x801A
+  lis r3, 0x801A		# Load address for 'MenuController_CheckSinglePlayer' function
   ori r3, r3, 0x4340
   mtlr r3
-  lis r3, 0x8047
+  lis r3, 0x8047		# Load Menu Controller Major ID
   ori r3, r3, 0x9D30
   lbz r3, 0(r3)
-  cmpwi r3, 0x1C
+  cmpwi r3, 0x1C		# Check if in Training Mode
   beq- loc_0x1038
   blrl 
-  cmpwi r3, 0x1
+  cmpwi r3, 0x1			# Check if in Main Menu
   beq- loc_0x10BC
 
 loc_0x1038:

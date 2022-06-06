@@ -1,0 +1,36 @@
+
+
+Save When Transitioning from Debug Menu to CSS
+[DRGN]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801a4fa4 ---- 80790000 -> Branch
+
+# Injects into "updateFunction"
+
+# Load address of the scene controller
+lis r3, 0x80479D30@h
+ori r3, r3, 0x80479D30@l
+
+# Check if on frame 2
+lwz r4, 0x30(r3)		# Load scene-processed frame count
+cmpwi r4, 2
+bne+ OrigLine
+
+# Check if transitioned from the Debug Menu
+lbz r4, 2(r3)			# Load previous major scene ID
+cmpwi r4, 6			# Checking that the previous scene was Debug Menu
+bne+ OrigLine
+lhz r4, 0(r3)			# Load current and pending major scene IDs
+cmpwi r4, 0x0202		# Checking current & pending IDs together
+bne+ OrigLine
+
+# Trigger a game save (flag picked up by MemoryCard_CheckToSaveData)
+lis r3, 0x8043
+ori r3, r3, 0x3324
+li r4, 1
+stw r4, 0(r3)
+
+OrigLine:
+lwz r3, 0 (r25)
+END:
+b 0
