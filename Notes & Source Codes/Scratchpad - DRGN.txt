@@ -4,7 +4,7 @@ My own R&D combined with random notes of interest from others, mostly specific t
 
 	TOC (can CTRL-F for these):
 
-		General / Dolphin
+		General / Memory Card
 		DOL 20XX Differences
 		On the CSS (MnSlChr)
 		Unique Closed Ports (UCP_14_9 Notes)
@@ -17,12 +17,13 @@ My own R&D combined with random notes of interest from others, mostly specific t
 		Animation File Preloading
 
 
-             /-------------------\
-=============  General / Dolphin  =====================================
-             \-------------------/		+ Mem card/flag info
+             /-----------------------\
+=============  General / Memory Card  =====================================
+             \-----------------------/		+ Mem card/flag info
 
 
-20XX version number changes need to be updated in 3 places:
+20XX version number changes need to be updated in these locations:
+	Disc Image Name, Short Title, and Long Title (boot.bin and opening.bnr files)
 	0x3A4CDD in MnSlChr (for Debug Menu display)
 	Texture on CSS upper-right (in MnSlChr @0x12760)
 	In DOL at 803FA154|0x3F7154; checked by OnBoot code
@@ -30,6 +31,8 @@ My own R&D combined with random notes of interest from others, mostly specific t
 	  - includes "20XX" string, followed by bytes for project#/major/minor/patch
 	  - cannot do major/minor/patch numbers >9 without updating "Enable OSReport Print on Crash"
 	  - included with the "Debug Menu Region Overwrites" mod
+
+SD Remix version number needs to be updated in the texture in IfComSD.dat
 
 The version shown in OSReport prints is sourced from the DOL location.
 
@@ -86,9 +89,9 @@ https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.
 	- Every Frame Code copies flag data from DOL space to memory card RAM space
 	- Default 20XX flags are stored in MnSlChr at 0x3E2010
 	- The DOL space is broken into two sections:		Ranges restored by 'Reset 20XX' code:
-		803FA154|0x3F7154	0x378 bytes		803FA174-803FA4E4
-		803FA848|0x3F7848	0x11DC bytes		803FA840-803FBC68
-	- Debug menu data is between the two, at 803FA4CC to 803FA848 (0x37C bytes long)
+		803FA154|0x3F7154	0x380 bytes		803FA174-803FA4E4
+		803FA848|0x3F7848	0x11E0 bytes		803FA840-803FBC68
+	- Debug menu data is between the two, at 803FA4D0 to 803FA848 (0x378 bytes long)
 	- It seems not all of this space is actually used
 
 # Initial copy in RAM; one contiguous region
@@ -98,22 +101,15 @@ https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v4-07-7-04-17.
 8046B0EC   End of memcard data (61892/F1C4 total); last byte saved/restored is at B0E8
 	   B0EC-9B94= 0x1558 bytes
 
-# In DOL space; broken into two sections
-0x3F7174  803FA174   Start of 20XX flags, section 1; 0x358 bytes
-			A154+1558=B6AC
-0x3F74CC  803FA4CC   End of section 1
 
-0x3F7848  803FA848   Start of section 2; 0x11DC bytes
-		   	A848+11DC=BA24
-0x3F8A24  803FBA24   End of memcard data/20XX flags space (inclusive; the word here is the last saved)
+	The flags in the next two sections are not saved to memory card:
 
-
-code flags:							string offset:
+value offset (dol|ram):		code name:			string offset:
 
 # New code flags in DOL (802288E0 - 
-0x2254C0    802288E0	Display Time at Top Right of CSS
+0x2254C0    802288E0	Free / Not used
 0x2254C4		Disable Wobbling
-0x2254C8		All Floors Are Drop-Through
+0x2254C8    802288E8	All Floors Are Drop-Through
 0x2254CC		low-poly mode
 0x2254D0    802288F0	big heads mode
 0x2254D4    802288F4	2D characters
@@ -134,18 +130,64 @@ code flags:							string offset:
 0x2255A0		Buffed Hylian Sheild			80FAEEDA
 0x2255A4    802289C4	Instant Zelda/Shiek Transform		80FAEEF8
 0x2255A8    802289C8	Samus - Shoots Random Items		80FAEF20
-0x2255AC    802289CC	Falcon - Shinesplosion
+0x2255AC    802289CC	Falcon - Shinesplosion			80FAEF3E
 - Reserving space for more character codes here
 
-'Live' or in-use flags are kept here:
-Section 1 (803FA174|0x3F7174 to 803FA4CC|0x3F74CC; 0x358 bytes)
+
+	Flags below are saved to memory card and restored on boot:
+
+Section 1 (803FA154|0x3F7154 to 803FA4D0|0x3F74D0; 0x380 bytes)
+
 0x3F7154    803FA154	"20XX" string
 0x3F7158    803FA158	version (the 4 bytes are project#/major/minor/patch)
+-
+0x3F7174		Game Speed Multiplier
+-
+0x3F7180		Disable Spot Dodge
+0x3F7184    803FA184	Disable Aerial Attacks
+0x3F7188		Disable Helpless State
+0x3F718C		Disable Grounded Jump
+0x3F7190		Infinite Aerial Jumps
+0x3F7194    803FA194	Blastzone Wrapping
+0x3F7198    803FA198	Mushroom Kingdom Adventure (stage variations)
+-
+0x3F71A0    803FA1A0	Stocks Enter Text Mode At _
+0x3F71A4    803FA1A4	Custom Y-axis HUD Offset
+0x3F71A8    803FA1A8	Custom Stock Icon Location
 -
 0x3F71B4    803FA1B4	Random Stage Select flags for pages 1 through 4 (0x10 bytes)
 						^ the game's reference is at 8045C388
 -
-0x3F7210		UCF
+0x3F720C    803FA20C	Damage Staling in Develop Mode
+0x3F7210    803FA210	UCF
+0x3F7214    803FA214	Always Draw Collision Links
+0x3F7218    803FA218	Force Simple Stage Geometry
+0x3F721C    803FA21C	Disable FD BG Transitions
+-
+0x3F7230    803FA230	Disable Star KO
+0x3F7234    803FA234	Taunt Canceling
+-
+0x3F723C    803FA23C	Always Small Percents
+0x3F7240    803FA240	Small Percents in Teams Mode
+0x3F7244    803FA244	Disable Percent Game Logos (insignias)
+0x3F7248    803FA248	PAL Stock Icon Size
+-
+0x3F725C    		Teams Stock Steal
+-
+0x3F7280    803FA280	Target Test VS Stage
+0x3F7284		Disable Screen Rumble
+-
+0x3F727C    803FA27C	Disable Targets and Flippers
+-
+0x3F728C    803FA28C	P4 Custom Sheild Color RGB (0xC bytes, ordered BGR)
+0x3F7298		P4 Custom Sheild Color (On/Off flag)
+0x3F729C		P3 Custom Sheild Color RGB (0xC bytes, ordered BGR)
+0x3F72A8		P3 Custom Sheild Color (On/Off flag)
+0x3F72AC		P2 Custom Sheild Color RGB (0xC bytes, ordered BGR)
+0x3F72B8		P2 Custom Sheild Color (On/Off flag)
+0x3F72BC		P1 Custom Sheild Color RGB (0xC bytes, ordered BGR)
+0x3F72C8		P1 Custom Sheild Color (On/Off flag)
+-
 0x3F72D0		DK Always Full Giant Punch
 0x3F72D4		Luigi Always Misfire
 0x3F72D8		Fire Emblem Sword Swing Colors
@@ -157,13 +199,53 @@ Section 1 (803FA174|0x3F7174 to 803FA4CC|0x3F74CC; 0x358 bytes)
 -
 0x3F7310    803FA310	Battlefield Rainbow Water BG
 -
+0x3F7354    803FA354	Jungle Japes Hacked
+-
 0x3F7360    803FA360	Greece Stage Variations
 -
-0x3F73B4		Rainbow FD
+0x3F736C    803FA36C	Disable Tap Jump - P1
+0x3F7370		Disable Tap Jump - P2
+0x3F7374		Disable Tap Jump - P3
+0x3F7378		Disable Tap Jump - P4
+0x3F737C    803FA37C	T-Posing Characters
+0x3F7380    803FA380	Characters Face Screen
 -
-0x3F7F60		Sheik Always Full Needles
+0x3F7388    803FA388	Frame Counter Display (in-game)
+-
+0x3F7394    803FA394	Neutral Spawn Points
+0x3F7398    803FA398	Custom FD Color (BLUE)
+0x3F739C    803FA39C	Custom FD Color (GREEN)		<- could probably rewrite the code to condense these to 3 bytes
+0x3F73A0    803FA3A0	Custom FD Color (RED)
+0x3F73A4    803FA3A4	Custom FD Color (On/Off)
+0x3F73A8    803FA3A8	Disable Yoshi's Shy Guys
+0x3F73AC    803FA3AC	Fountain of Dreams - Lagless
+-
+0x3F73B0    803FA3B0	Disable DL64 Wind
+0x3F73B4    803FA3B4	Rainbow FD
+-
+0x3F73D0		Widescreen Mode
+0x3F73D4		Skip Results Screen
+0x3F73D8		20XX Toggles (flag to enable/disable in-game toggles)
+-
+0x3F73B4    803FA3B4	Rainbow FD
+-
+0x3F74CC    803FA4CC			(last value saved/restored to/from memory card)
+
+
+Section 2 (803FA848|0x3F7848 to 803FBA28|0x3F8A28; 0x11E0 bytes)
+
+0x3F7850    803FA850	Custom BF 1 - Top/Left/Right Platform settings (0x24 bytes)
+0x3F7874    803FA874	Custom BF 2 - Top/Left/Right Platform settings (0x24 bytes)
+0x3F7898    803FA898	Custom BF 3 - Top/Left/Right Platform settings (0x24 bytes)
+-
+0x3F7EB0    803FAEB0	Timer scale
+0x3F7EB4		Timer position (x/y values; 8 bytes)
+-
+0x3F7F60    803FAF60	Sheik Always Full Needles
 0x3F7F64		Mewtwo Always Full Shadow Ball
 0x3F7F68		Peach Down-B Pull
+-
+0x3F8A24    803FBA24	Display Time at Top Right of CSS	(last value saved/restored to/from memory card)
 
 Default flags are kept in the CSS file, at 0x3E2010 - 0x3E2380
 
@@ -358,6 +440,8 @@ Closed Port Door alignment fix:
 0x3A280C	8 existing RT entries adjusted for relocated structure offsets (0x20 bytes)
 
 0x3A4CDD	Debug Menu version string updated to "VERSION 5.0"
+
+0x3A4FB0	Seems to be used for backing-up/restoring registers for the EFC for some reason
 
 0x3AB078	Menu Item for CSS screens option count increased to 4
 
@@ -1252,27 +1336,50 @@ Pointer Table based on Char ID; 803c11d8|0x3BE1D8
 
 
 
-Pointer table to character 'Pl__.dat' files and their symbols: 803C1F40|0x3BEF40
-needs verification, but seems to be:
+Pointer table to character data files ('Pl__.dat') and their symbols: 803C1F40|0x3BEF40
+
   - 0x21 entries
   - indexed by internal character ID
   - each entry is two pointers:
 	0x0: 'Pl__.dat' string
 	0x4: 'ftData[char]' symbol string
 
+	Here's the full table:
+	    Pl__.dat:	    symbol:		ID	Char
 
-	Pl__.dat string offsets (in table order):
-		803C57D5  00	Mario
-		803C7BED  01	Fox
-		803C759D  02	Falcon
-		803CBDFD  03	DK
-		803CA30D  04	Kirby
-			  05	Bowser
-
-		803CC365	Sheik
-	
-		803CD615	Popo
-		803CFC9D	Zelda
+		80 3C 57 D0 	80 3C 57 DC 	00	Mario
+		80 3C 7B E8 	80 3C 7B F4 	01	Fox
+		80 3C 75 98 	80 3C 75 A4 	02	Falcon
+		80 3C BD F8 	80 3C BE 04 	03	DK
+		80 3C A3 08 	80 3C A3 14 	04	Kirby
+		80 3C F0 A0 	80 3C F0 AC 	05	Bowser
+		80 3C 80 B8 	80 3C 80 C4 	06
+		80 3C C3 60 	80 3C C3 6C 	07
+		80 3C CA D0 	80 3C CA DC 	08
+		80 3C D0 78 	80 3C D0 84 	09
+		80 3C D6 10 	80 3C D6 1C 	0A
+		80 3C DB 78 	80 3C DB 84 	0B
+		80 3C E0 B8 	80 3C E0 C4 	0C
+		80 3C E5 10 	80 3C E5 1C 	0D
+		80 3C EA 98 	80 3C EA A4 	0E
+		80 3D 02 F0 	80 3D 02 FC 	0F
+		80 3D 0D 80 	80 3D 0D 8C 	10
+		80 3D 08 A8 	80 3D 08 B4 	11
+		80 3C F8 20 	80 3C F8 2C 	12
+		80 3C FC 98 	80 3C FC A4 	13
+		80 3D 12 40 	80 3D 12 4C 	14
+		80 3D 15 D8 	80 3D 15 E4 	15
+		80 3D 1C A8 	80 3D 1C B4 	16
+		80 3D 21 E8 	80 3D 21 F4 	17
+		80 3D 28 E8 	80 3D 28 F4 	18
+		80 3D 2C D8 	80 3D 2C E4 	19
+		80 3D 32 80 	80 3D 32 8C 	1A
+		80 3D 40 70 	80 3D 40 7C 	1B
+		80 3D 48 18 	80 3D 48 24 	1C
+		80 3D 34 E8 	80 3D 34 F4 	1D
+		80 3D 35 68 	80 3D 35 74 	1E
+		80 3D 38 E8 	80 3D 38 F4 	1F
+		80 3D 39 B8 	80 3D 39 C4 	20
 
 
 
@@ -1317,7 +1424,22 @@ AB	171	103	120
 =============  On the Debug Menu  ==================================
              \-------------------/
 
-Debug Menu line items have a 'target function' pointer at 0x
+Debug Menu top-level item table starts at 0x3F74E0 (in NTSC v1.02, including 20XX)
+
+Any particular debug menu screen is defined by a "menu item table".
+A single line (menu item) structure is defined as follows:
+
+	0x00: Int	Item type
+	0x04: Pointer	Target function (for type 1). Runs when pressing A/B on the item
+	0x08: Pointer	String pointer (for this line's text)
+	0x0C: Pointer	Left/Right string list (for type 2; for option strings)
+
+	0x10: Pointer	Current value pointer (for types 2, 3, and 8)
+	0x14: Pointer	Submenu pointer
+	0x18: Float	Number of Left/Right options
+	0x1C: Float	Amount to increase/decrease current value
+
+More info can be found here: https://smashboards.com/threads/custom-debug-submenu-engine-for-devs-only.398050/
 
 
 3a4a00		all floors code, menu item offset
@@ -1325,8 +1447,6 @@ target function: 80F91160 for temp test
 	target function executes AFTER item's current value is updated
 	seems that r15-r19 are safe to use, as Achilles uses these
 
-
-hold X+A to reset 20XX
 
 Debug Menu 'Target Function' addresses and functions:
 
