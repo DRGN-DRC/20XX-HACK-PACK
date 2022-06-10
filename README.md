@@ -10,16 +10,18 @@ The primary point of interest here is the Code Library (the "20XXHP 5.0 Code Lib
 
 ![Usage](/imgs/Usage.png)
 
-To install new custom code to 20XX, you need the latest build of [MCM (The Melee Code Manager)](https://smashboards.com/threads/melee-code-manager-v4-4-easily-add-mods-to-your-game.416437/). To begin, download that and the Code Library from this repo, and unzip them both. You also need a vanilla NTSC 1.02 DOL (you'll need to obtain this on your own).
+To install new custom code to 20XX, you need the latest build of [MCM (The Melee Code Manager)](https://smashboards.com/threads/melee-code-manager-v4-4-easily-add-mods-to-your-game.416437/). To begin, download that and the "20XXHP 5.0 Code Library" folder from this repo, and unzip them both. You will also need a vanilla NTSC 1.02 DOL (which you can extract from a vanilla copy of the game using MCM or DTW).
 
-1. Open MCM
-2. Click on the Mods Library Selection button in the top-right (books icon)
-3. Click "Add Another Library Path", and navigate to where you saved the 20XX Code Library
-4. Once you've added the new library, it should be selected by default. Click Ok to close the window
-5. Once the new library has loaded, use the "Open" button or drag-and-drop your vanilla DOL onto the program
+1. Add whatever codes you'd like to the 20XX Code Library you downloaded (see [here](https://smashboards.com/threads/melee-code-manager-v4-4-1-easily-add-mods-to-your-game.416437/post-20075377) for details)
+2. Open MCM
+3. Click on the Mods Library Selection button in the top-right (books icon)
+4. Click "Add Another Library Path", and navigate to where you saved the 20XX Code Library
+5. Once you've added the new library, it should be selected by default. Click Ok to close the window
+6. Once the new library has loaded, use the "Open" button or drag-and-drop your vanilla DOL onto the program
 7. Click the "Code-Space Options" button, enable the "20XXHP 5.0 Regions" for use, and close the window
 8. Hold Shift and Click "Select All"; this will select all of the codes in the library for installation
 9. Click "Save As..." to create a new DOL file, so you don't overwrite your vanilla copy
+10. Import the DOL you just created to your game using MCM or DTW
 
 ![Credits](/imgs/Credits.png)
 
