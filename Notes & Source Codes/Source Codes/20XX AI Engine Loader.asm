@@ -9,9 +9,10 @@ Loads the AI Engine code into the Object Heap (OSHeap 1 / HSD Heap 0) on scene-c
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 --- 0x8016E91C --- 80010024 -> Branch
 
-
 .include "CommonMCM.s"
 .include "melee"; melee
+
+# Backup current registers to the stack
 backupall
 
 # Load the AI Engine binary file
@@ -60,13 +61,9 @@ restoreall
 lwz r0,36(r1)
 b 0
 
+
 <AiEngineFileString>
-# "AI_Engine.bin" string (need a known address for this)
-41495F45 6E67696E
-652E6269 6E00
-
-
-<AiEngineFileString> # Need a known address for this string
+# Need a known address for this string
 .string "AI_Engine.bin"
 
 
