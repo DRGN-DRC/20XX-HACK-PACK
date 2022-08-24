@@ -1,4 +1,27 @@
 
+To v5.0.1:
+
+	- Changes to the Random Stage Select Screen:
+	    - Fixed per-page random stage selection settings for pages 2-4
+	    - Now shows actual stage names for the current page
+	    - Now shows the current page number in the top-right
+	- The game now saves when transitioning from the Debug Menu to the CSS
+	- SD Remix updated to version 5.1
+	- SDR Falcon's "Shinesplosion" moved from SDR Falcon variant to the Debug Menu*
+	- SD Remix Bowser down-throw fixed
+	- The option "Display Time at Top Right of CSS" is now saved to the memory card
+	- Alt. character icons (Sheik, Giga Bowser, etc.) fixed on the "4.07-Style" CSSs
+	- Fixed the version number displayed on the 4.07-Style CSSs (still said 4.07++)
+	- Fixed music volume reduction code not reducing volume when volume set very low
+	- Fixed various stage variation selection codes on the 2nd stage select screen
+	- Fixed texture rendering problems for Great Plateau Tower on console
+	- Fixed texture rendering problems for Mirror Chamber on console
+	- Falco right alt. costume changed to the 'Murican Eagle costume
+	- Flipper life/duration increased from 8 seconds to 1 minute**
+	- Metal Box effect duration increased from 10s to 30s
+	- Fixed Linux build script (with help from phonos and Mage)
+
+
 To v5.0:
 
 	- New MCM Library (major code refactoring), which opens this up to much easier future modding*
