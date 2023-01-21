@@ -1,4 +1,28 @@
 
+To v5.0.2:
+
+	- Fixed a bug causing a crash on SSS after using the Debug Menu w/memory card
+	- Added a "Freeze Pokemon Stadium" option to the Debug Menu
+	- The Pokemon Stadium fixed-transformation stages now work with any Stadium skin*
+	- The Custom Platform Battlefield stages now work with other Battlefield skins*
+	- Updated SDR Infographic to show correct SDR version (5.1)
+	- Reduced the delay after selecting Progressive Scan on boot by half
+	- Random Stage Select Screen now populates correctly if accessing it from the CSS
+	- Fixed Samus' grab/zair crashing on console
+	- Fixed the Yoshi's Surf stage crashing on console
+	- Fixed Animelee Stadium's platforms ignoring transformations (Thanks, Primal!)
+	- Fixed Beach Dreamland 64 (previously only appeared in the Debug Menu)
+	- Falco's blue CSP (& trim colors) updated to match his blue left alt costume
+	- Fixed the "Animations" sub-menu headline in the Debug Menu
+	- Removed some unused files (GmTitle.dat & GmTitle.usd)
+
+* Previously, certain random neutral stages were not compatible with the Custom
+Battlefield Platforms stage variations or the Pokemon Stadium fixed-transformation 
+stages, so you would need to select the Default skin (or a similar one) for those 
+stages to use those features. This could cause a crash if Custom Battlefield 1/2/3 was 
+selected with the wrong skin, or cause fixed-form Stadiums to be stuck in the base form.
+
+
 To v5.0.1:
 
 	- Changes to the Random Stage Select Screen:
@@ -64,7 +88,7 @@ To v5.0:
 ** The new alt. music has a 15% chance to play. Or any player may hold L on stage load to force it to play. The affected stages are Princess Peach's Castle, Rainbow Cruise, Kongo Jungle, Jungle Japes, Green Greens, Corneria, Venom, Flat Zone, Brinstar, Brinstar Depths, Fourside, Mute City, PokeFloats, Dreamland 64, Yoshi's Island 64, and Kongo Jungle 64. Note that playlists will take priority for any stage that uses one.
 *** Character Select Portraits (CSPs) were previously slightly visible behind the closed port doors when a player port was turned off.
 
-† I've documented exactly which character costumes and stages have been changed or added in the "20XXHP Costume List.xls" file, which you can find in this GitHub repo.
+† I've documented which character costumes and stages have been changed or added in the "20XXHP Costume List.xls" file, which you can find in the GitHub repo (https://github.com/DRGN-DRC/20XX-HACK-PACK).
 
 
 To 4.07:

@@ -24,6 +24,17 @@ FF00000000000000FFFFFFFF00000000
 	-==-
 
 
+Reduced Delay After Selecting Progressive Scan
+Reduces it by half (from 300 frames down to 150)
+<https://smashboards.com/threads/10-frame-delay-after-selecting-progressive-scan-instead-of-300.450118/>
+[UnclePunch]
+Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
+NTSC 1.02 --- 0x801AD848 ---- 2800012C -> 28000096
+
+
+	-==-
+
+
 OnBoot Function, v1.2
 - unlock features
 - PAL mode check

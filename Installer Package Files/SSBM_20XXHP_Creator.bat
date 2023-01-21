@@ -2,23 +2,18 @@
 :: xdelta program created by Josh Macdonald
 :: This script and xdelta patch files created by DRGN.
 ::
-:: Script version 3.0
+:: Script version 4.0
 
 @echo off
 title 20XX HP Creator
 color 0A
 
-set newVersion=5.0.1
-set oldVersion=5.0.0
+set newVersion=5.0.2
+set new20xxIsoMD5=d926ba5b39551f5245fd655bc1dfeb3f
 
-set vanillaPatch=SSBM, 20XXHP %newVersion% patch (NTSC 1.02 base).xdelta
-set twentyExExPatch=SSBM, 20XXHP %newVersion% patch (20XXHP %oldVersion% base).xdelta
-
+set patchFile=SSBM, 20XXHP %newVersion% patch.xdelta
 set xDeltaExe=xdelta3-3.0.11-x86_64.exe
 set finishedDiscFilename=SSBM, 20XXHP %newVersion%.iso
-
-set old20xxIsoMD5=b67c7f8c107107b9db7e6d00a2b40817
-set new20xxIsoMD5=c8c019de7bcf08e096804802a9fd0693
 
 set vanillaIsoMD5=0e63d4223b01d9aba596259dc155a174
 set ntsc101IsoMD5=67136bd167b471e0ad72e98d10cf4356
@@ -30,18 +25,18 @@ set vimm102IsoMD5=570f5ba46604d17f2d9c4fabe4b8c34d
 set sourceDisc=%~1
 set xDeltaPath=%~dp0%xDeltaExe%
 set outputPath=%~dp0%finishedDiscFilename%
-set sourceType=
 
 
 echo.
-echo                   /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
-echo                  /$$__  $$ /$$$_  $$1 $$  / $$1 $$  / $$
-echo                  1__/ \ $$1 $$$$\ $$1  $$/ $$/1  $$/ $$/
-echo                    /$$$$$$/1 $$ $$ $$\  $$$$/  \  $$$$/ 
-echo                   /$$____/ 1 $$\ $$$$  ^>$$  $$   ^>$$  $$ 
-echo                  1 $$      1 $$ \ $$$ /$$/\  $$ /$$/\  $$
-echo                  1 $$$$$$$$1  $$$$$$/1 $$  \ $$1 $$  \ $$
-echo                  1________/ \______/ 1__/  1__/1__/  1__/
+echo.
+echo            /$$$$$$   /$$$$$$  /$$   /$$ /$$   /$$
+echo           /$$__  $$ /$$$_  $$^| $$  / $$^| $$  / $$
+echo          ^|__/  \ $$^| $$$$\ $$^|  $$/ $$/^|  $$/ $$/
+echo            /$$$$$$/^| $$ $$ $$ \  $$$$/  \  $$$$/ 
+echo           /$$____/ ^| $$\ $$$$  ^>$$  $$   ^>$$  $$ 
+echo          ^| $$      ^| $$ \ $$$ /$$/\  $$ /$$/\  $$
+echo          ^| $$$$$$$$^|  $$$$$$/^| $$  \ $$^| $$  \ $$
+echo          ^|________/ \______/ ^|__/  ^|__/^|__/  ^|__/
 echo.
 echo.
 echo      Welcome to the 20XX HP Creator!
@@ -51,13 +46,12 @@ echo      Welcome to the 20XX HP Creator!
 if NOT "%sourceDisc%"=="" goto :sourceProvided
 
 echo.
-echo  To create the 20XX ISO, you must give this script a source disc.
-echo  Your source disc should be a vanilla (unmodified) NTSC 1.02 ISO, or
-echo  you may use an unmodified copy of the 20XX HP, v%oldVersion%.
+echo  To create the 20XX ISO/disc, you must have a copy of a 
+echo  vanilla (unmodified) NTSC 1.02 disc.
 echo.
-echo  To use this script, drag-and-drop your source disc onto this 
-echo  script's file icon in the folder. Or you may drag-and-drop your 
-echo  source disc onto this window and press Enter.
+echo  Drag-and-drop your vanilla source disc onto this script's 
+echo  file icon, or drag-and-drop your source disc into this 
+echo  window and then press Enter.
 echo. 
 :getSourceDisc
 :: Get user input and remove double quotes
@@ -87,43 +81,20 @@ echo.
 echo  The hash checking utility, CertUtil, was not found on your system!
 echo.
 echo  If you're confident that your source disc is correct (a vanilla NTSC 1.02
-echo  disc or 20XX HP v%oldVersion%, without modifications) then you can try to build
-echo  anyway, but there is no guarantee that the resulting disc will be correct
-echo  or functional.
+echo  disc) then you can try to build anyway, and the resulting disc may be fine.
+echo  However, there will be no way to verfify it besides playtesting it.
+echo.
+echo  If your source disc is not a vanilla copy of the game or has any modifications, 
+echo  it's likely that the resulting disc will not be correct or functional.
 echo.
 echo  Would you like to try to force the build anyway? (y/n)
 echo.
 set /p confirmation=
 
-if [%confirmation%]==[y] goto :chooseSource
-if [%confirmation%]==[yes] goto :chooseSource
+if [%confirmation%]==[y] goto :buildISO
+if [%confirmation%]==[yes] goto :buildISO
 :: If anything else was entered, abort and exit.
 goto :eof
-
-
-
-	:: Without CertUtil, have the user explain out the given source disc
-
-:chooseSource
-
-echo.
-echo  Please specify the kind of source disc that you provided:
-echo.
-echo      1) Vanilla NTSC 1.02
-echo      2) 20XX HP %oldVersion%
-echo.
-set /p sourceType=
-
-
-
-	:: Validate above input; ensure a patch file has been chosen
-if [%sourceType%]==[1] goto :buildISO
-if [%sourceType%]==[2] goto :buildISO
-echo.
-echo  Invalid input. You must choose one of the options below
-echo  to continue. This will determine which patch file to use.
-goto :chooseSource
-
 
 
 	:: Verify that the given file is a vanilla 1.02 copy of SSBM,
@@ -142,10 +113,9 @@ for /F "skip=1 delims=*" %%i in ('CertUtil -hashfile "%sourceDisc%" MD5') do if 
 
 :: Remove spaces from the hash string to normalize output from different versions of CertUtil, and then compare them
 set thisFileHash=%thisFileHash: =%
-if [%thisFileHash%]==[%vanillaIsoMD5%] set sourceType=1
-if [%thisFileHash%]==[%old20xxIsoMD5%] set sourceType=2
-if NOT [%sourceType%]==[] goto :validISO
+if [%thisFileHash%]==[%vanillaIsoMD5%] goto :validISO
 
+:: The hash didn't match NTSC 1.02. Display the hash and see if we can identify it.
 echo.
 echo      MD5 hash: %thisFileHash%
 echo.
@@ -157,41 +127,43 @@ if [%thisFileHash%]==[%vimm102IsoMD5%] goto :vimm102Detected
 :: Unrecognized disc
 echo  The given disc is an unrecognized revision or has been modified.
 echo  This build process is only designed to work with an unmodified 
-echo  vanilla copy of the game or an unmodified 20XX HP v%oldVersion%.
+echo  vanilla copy of the game.
 goto :askToBuild
 
 :ntsc101Detected
 echo  The given disc appears to be an NTSC v1.01 revision. However,
 echo  this build process is only designed to work with an unmodified 
-echo  vanilla copy of the game or an unmodified 20XX HP v%oldVersion%.
+echo  vanilla copy of the game.
+echo.
 echo  You can check the ReadMe.txt file for potential conversion solutions.
 goto :askToBuild
 
 :ntsc100Detected
 echo  The given disc appears to be an NTSC v1.00 revision. However,
 echo  this build process is only designed to work with an unmodified 
-echo  vanilla copy of the game or an unmodified 20XX HP v%oldVersion%.
+echo  vanilla copy of the game.
+echo.
 echo  You can check the ReadMe.txt file for potential conversion solutions.
 goto :askToBuild
 
 :palv100Detected
 echo  The given disc appears to be a PAL v1.00 revision. However,
 echo  this build process is only designed to work with an unmodified 
-echo  vanilla copy of the game or an unmodified 20XX HP v%oldVersion%.
+echo  vanilla copy of the game.
+echo.
 echo  You can check the ReadMe.txt file for potential conversion solutions.
 goto :askToBuild
 
 :vimm102Detected
-echo  The given disc appears to be a compressed NTSC 1.02 revision
-echo  from Vimm's Lair. However, this build process is only designed 
-echo  to work with an unmodified vanilla copy of the game or an 
-echo  unmodified 20XX HP v%oldVersion%. You may be able to convert it
-echo  back using a process linked to in the ReadMe.txt file.
+echo  The given disc appears to be a compressed NTSC 1.02 revision from 
+echo  Vimm's Lair. However, this build process is only designed to work 
+echo  with an unmodified vanilla copy of the game. You may be able to 
+echo  convert it back using a process linked to in the ReadMe.txt file.
 
 :askToBuild
 echo.
-echo  You can ignore this and build the new ISO anyway, but it's 
-echo  pretty likely that you'll run into problems.
+echo  You can ignore this and build the new ISO anyway, 
+echo  but it's pretty likely that you'll run into problems.
 echo.
 echo  Would you like to build a new ISO anyway? (y/n)
 echo.
@@ -199,7 +171,7 @@ set /p continue=
 
 if %continue%==n goto :Exit
 if %continue%==no goto :Exit
-goto :chooseSource
+goto :buildISO
 
 
 
@@ -217,16 +189,12 @@ echo  Constructing 20XXHP %newVersion%. Please stand by . . .
 
 cd /d %~dp0
 
-if [%sourceType%]==[1] set patchPath=%~dp0%vanillaPatch%
-if [%sourceType%]==[2] set patchPath=%~dp0%twentyExExPatch%
-
-"%xDeltaPath%" -d -s "%sourceDisc%" "%patchPath%" "%outputPath%"
+"%xDeltaPath%" -d -s "%sourceDisc%" "%~dp0%patchFile%" "%outputPath%"
 
 if not [%ERRORLEVEL%]==[0] goto :Error
 
 echo.
 echo      Construction complete!
-
 
 
 	:: If the hash checking utility is available, and the build was not forced, 
@@ -266,7 +234,7 @@ goto :Exit
 
 :Error
 echo.
-echo  There was an unknown problem in creating the hash.
+echo  There was an unknown problem in creating the new disc.
 echo  xDelta error code: %ERRORLEVEL%
 echo.
 echo  You may want to make sure xDelta has write permissions.

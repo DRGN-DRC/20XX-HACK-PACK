@@ -13,9 +13,8 @@ Download and extract the .zip file to some directory on your machine.
 	  Step 2
 	==========
 
-To create your copy of 20XX, you need to start with a vanilla (original/unmodified) 
-NTSC version 1.02 copy of Melee OR the previous 20XX HP release (e.g. if this is for
-building version 5.0.1, you may use 20XX version 5.0.0).
+To create a copy of 20XX, you need to have a vanilla (original/unmodified) 
+NTSC version 1.02 copy of Melee. This is copyrighted, so you'll have to get this on your own! 
 
 If you don't know what version your vanilla ISO is, or need to convert it to a different version, see here: 
 http://smashboards.com/threads/ssbm-version-converter-patcher-32-bit-beta-released.295223/page-2#post-20195941
@@ -23,23 +22,24 @@ http://smashboards.com/threads/ssbm-version-converter-patcher-32-bit-beta-releas
 Or if you have a Vimms disc, you may be able to convert it back to the original disc using the method here:
 https://www.smashladder.com/guides/view/26cn/melee/hashes-of-melee-isos#Vanilla-Hashes
 
+
 	==========
 	  Step 3
 	==========
-
 
 		For Windows:
 		------------
 
 Simply drag-and-drop your Vanilla 1.02 Melee ISO onto the "SSBM_20XXHP_Creator.bat" file.
+
 Done!
 
-OR, use the following command:
+
+Or you can use the following command:
 
 	"SSBM_20XXHP_Creator.bat" [sourceDisc] 	
 
-You'll need to replace [sourceDisc] with the path/filename to your 20XX or vanilla/source disc.
-
+You'll need to replace [sourceDisc] with the path/filename to your vanilla source disc.
 
 
 		For Linux:
@@ -52,7 +52,7 @@ Open a terminal window and run the following commands:
 	./SSBM_20XXHP_Creator.sh "dir/ssbm_1.02.iso"
 
 In the commands above, you'll need to replace "/to/the/directory/with/your/script" with the 
-path to your script, and "dir/ssbm_1.02.iso" to the path/filename of your source ISO.
+path to your script, and "dir/ssbm_1.02.iso" to the path/filename of your source disc.
 
 
 		For Mac:
@@ -60,7 +60,6 @@ path to your script, and "dir/ssbm_1.02.iso" to the path/filename of your source
 
 You can use a small program to apply the patch instead, found here:
 http://projects.sappharad.com/tools/multipatch.html
-
 
 
 
@@ -82,6 +81,22 @@ http://projects.sappharad.com/tools/multipatch.html
     4.07++:		17756217401a39227feea1ebb8542376
     5.0:		b67c7f8c107107b9db7e6d00a2b40817
     5.0.1:		c8c019de7bcf08e096804802a9fd0693
+    5.0.2:		d926ba5b39551f5245fd655bc1dfeb3f
+
+
+	- Resources -
+
+Changelog:
+https://github.com/DRGN-DRC/20XX-HACK-PACK/blob/main/Changelog.txt
+
+
+You can find the official thread here:
+https://smashboards.com/threads/the-20xx-melee-training-hack-pack-v5-0-1-6-9-2022.351221/
+
+
+You can also submit bugs, propose/make changes, or find the source code at the GitHub repo here:
+https://github.com/DRGN-DRC/20XX-HACK-PACK
+
 
 
 	- Credits -
@@ -89,6 +104,6 @@ http://projects.sappharad.com/tools/multipatch.html
 :: 20XXHP created by Achilles, up to version 4.07++
 :: 20XXHP updates to v5.0 and up by DRGN
 :: xdelta program created by Josh Macdonald
-:: Batch converter script and xdelta files created by DRGN.
-:: 20xx-[version]-convert.sh script created by shuall, DRGN
+:: Batch build script and xdelta files created by DRGN.
+:: Linux build script created by shuall, phonos, DRGN, and Mage
 

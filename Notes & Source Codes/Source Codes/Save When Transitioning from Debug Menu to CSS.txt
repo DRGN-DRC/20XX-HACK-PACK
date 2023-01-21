@@ -1,6 +1,6 @@
 
 
-Save When Transitioning from Debug Menu to CSS
+Save When Transitioning from Debug Menu to CSS (v1.1)
 [DRGN]
 Revision ---- DOL Offset ---- Hex to Replace ---------- ASM Code -
 NTSC 1.02 --- 0x801a4fa4 ---- 80790000 -> Branch
@@ -22,6 +22,16 @@ cmpwi r4, 6			# Checking that the previous scene was Debug Menu
 bne+ OrigLine
 lhz r4, 0(r3)			# Load current and pending major scene IDs
 cmpwi r4, 0x0202		# Checking current & pending IDs together
+bne+ OrigLine
+
+# Ensure currently on the CSS (checking minor ID)
+lbz r4, 3(r3)			# Load current minor scene ID
+cmpwi r4, 0			# Check if minor scene is CSS
+bne+ OrigLine
+
+# Check previous minor scene; must be 0 (2=return from game; 4=return from results screen)
+lbz r4, 4(r3)			# Load current minor scene ID
+cmpwi r4, 0			
 bne+ OrigLine
 
 # Trigger a game save (flag picked up by MemoryCard_CheckToSaveData)

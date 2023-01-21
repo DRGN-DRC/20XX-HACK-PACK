@@ -1,18 +1,15 @@
 
 #!/bin/sh
 # This script created by shuall, phonos, DRGN, and Mage
-# Script version 2.0
+# Script version 3.0
 
-version=5.0.1
-lastversion=5.0.0
+version=5.0.2
 sourceMd5="0e63d4223b01d9aba596259dc155a174"
-modmd5="c8c019de7bcf08e096804802a9fd0693"
-lastversionmd5="b67c7f8c107107b9db7e6d00a2b40817"
+modmd5="d926ba5b39551f5245fd655bc1dfeb3f"
 
 infile="$1"
 outfile="SSBM, 20XXHP ${version}.iso"
-delta="SSBM, 20XXHP ${version} patch (NTSC 1.02 base).xdelta"
-lastdelta="SSBM, 20XXHP ${version} patch (20XXHP ${lastversion} base).xdelta"
+delta="SSBM, 20XXHP ${version} patch.xdelta"
 
 
 # make sure you have these binaries installed somewhere
@@ -67,17 +64,14 @@ else
 	exit
 fi
 
-printf "\nVerifying that the given file is a vanilla NTSC v1.02 copy of SSBM or version $lastversion of 20XX. This will take a few moments...\n"
+printf "\nVerifying that the given file is a vanilla NTSC v1.02 copy of SSBM. This will take a few moments...\n"
 
 filehash=$(${md5sum} -b "$infile" |cut -d' ' -f1) 
 
 if [ "$filehash" = "$sourceMd5" ]; then
 	printf "The ISO has been verified!\n\n"
-elif [ "$filehash" = "$lastversionmd5" ]; then
-	printf "The ISO for the most recent version has been verified!\n\n"
-	delta=$lastdelta
 else
-	printf "Unable to verify the source file ISO Hash. Please make sure you are providing either the most recent copy of 20XX or a vanilla NTSC 1.02 copy of the game. Would you like to continue anyways? (y/n)"
+	printf "Unable to verify the source file ISO Hash. Please make sure you are providing a vanilla NTSC 1.02 copy of the game. Would you like to continue anyways? (y/n)"
 	read cont;
 	if [ "$cont" != "y" ]; then
 		exit
@@ -97,6 +91,6 @@ if [ "$check" = "y" ]; then
 	if checkhash "$outfile" "$modmd5"; then
 		printf "SUCCESS\n\n"
 	else
-		printf "WARNING: The hash for the output file does NOT match the expected hash for the current version of the mod. It is very unlikely that this script was successful. Please use this output file at your own risk."
+		printf "WARNING: The hash for the output file does NOT match the expected hash for the current version of the mod. It is very unlikely that this script was successful. Please use the output disc at your own risk."
 	fi
 fi

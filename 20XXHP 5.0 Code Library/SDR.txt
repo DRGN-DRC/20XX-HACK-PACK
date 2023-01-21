@@ -724,7 +724,8 @@ Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 
 
 Modified Subaction - Self Damage/Heal
-- updated version of this code, with no static overwrites https://smashboards.com/threads/new-melee-syntax-school-you-can-write-character-commands-now.402587/#post-19190895
+This is an updated version of this code from the one posted on SWF, with no static overwrites.
+<https://smashboards.com/threads/new-melee-syntax-school-you-can-write-character-commands-now.402587/#post-19190895>
 [Achilles]
 Version -- DOL Offset ------ Hex to Replace ---------- ASM Code
 1.02 ----- 0x80072C14 --- 80840000 -> Branch

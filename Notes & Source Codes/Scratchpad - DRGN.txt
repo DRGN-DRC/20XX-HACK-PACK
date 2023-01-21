@@ -245,6 +245,7 @@ Section 2 (803FA848|0x3F7848 to 803FBA28|0x3F8A28; 0x11E0 bytes)
 0x3F7F64		Mewtwo Always Full Shadow Ball
 0x3F7F68		Peach Down-B Pull
 -
+0x3F8A20    803FBA20	Freeze Pokemon Stadium
 0x3F8A24    803FBA24	Display Time at Top Right of CSS	(last value saved/restored to/from memory card)
 
 Default flags are kept in the CSS file, at 0x3E2010 - 0x3E2380
@@ -1462,7 +1463,10 @@ REG SUB LOADER		common target function for type 2 menu items
 80301C80 = Debug Menu OnLeave/Enter function?
 
 
-2FE9E8 | 80301E08	Goes to DebugMenu_CreditsGameStart
+2FE9E8 | 80301E08	Goes to DebugMenu_CreditsGameStart; this function also handles 
+			the 20XX Debug Menu infographics (originally the "Coming Soon" image), 
+			which uses custom line item data. Search for this function's address 
+			in Achilles' scratchpad for more info.
 
 
 Song Preview target function
