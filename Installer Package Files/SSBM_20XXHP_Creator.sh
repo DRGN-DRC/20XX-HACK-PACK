@@ -16,6 +16,10 @@ delta="SSBM, 20XXHP ${version} patch.xdelta"
 xdelta=xdelta3
 md5sum=md5sum
 
+# Package managers for auto installing dependencies
+APT_GET_CMD=$(which apt-get 2>/dev/null)  # Debian/Ubuntu
+DNF_CMD=$(which dnf 2>/dev/null)          # Fedora/RHEL
+PACMAN_CMD=$(which pacman 2>/dev/null)    # Arch
 
 checkhash () {
 	printf "    This will take a few moments.... "
@@ -29,17 +33,49 @@ checkhash () {
 build () {
 	# Confirm that xdelta is installed
 	if [ ! -n "`command -v $xdelta 2>/dev/null`" ] ; then
-		echo >&2 "xdelta does not appear to be installed. Attempting to install now. Please enter your user password when prompted to install. "
-		sudo apt-get install $xdelta
-		if [ ! -n "`command -v $xdelta 2>/dev/null`" ] ; then
-			echo >&2 "Unable to install Xdelta. Please attempt to install xdelta manually and try again. Make sure you have an internet connection first and try again or try the command: 'sudo apt-get install $xdelta'"
-			exit
+		echo >&2 "xdelta does not appear to be installed. Attempting to install now."
+		# apt-get
+		if [[ ! -z $APT_GET_CMD ]]; then
+			echo >&2 "apt-get detected."
+			echo -n "Run sudo apt-get install $xdelta? (y/N): "
+			read check;
+			if [ "$check" = "y" ]; then
+				echo >&2 "Running sudo apt-get install $xdelta..."
+				sudo apt-get -y -qq install $xdelta 2>/dev/null
+			else
+				echo >&2 "xdelta not installed. Exiting..."
+				exit 1;
+			fi
+		# dnf
+ 		elif [[ ! -z $DNF_CMD ]]; then
+ 			echo >&2 "dnf detected."
+			echo -n "Run sudo dnf install xdelta? (y/N): "
+			read check;
+			if [ "$check" = "y" ]; then
+				echo >&2 "Running sudo dnf install xdelta..."
+ 				sudo dnf install -y -q xdelta 2>/dev/null # note: package name is xdelta, not xdelta3
+			else
+				echo >&2 "xdelta not installed. Exiting..."
+				exit 1;
+			fi
+		# pacman
+ 		elif [[ ! -z $PACMAN_CMD ]]; then
+ 			echo >&2 "pacman detected."
+			echo -n "Run sudo pacman -S $xdelta (y/N): "
+			read check;
+			if [ "$check" = "y" ]; then
+				echo >&2 "Running sudo pacman -S $xdelta..."
+ 				yes | sudo pacman -S --noconfirm $xdelta 2>/dev/null
+			else
+				echo >&2 "xdelta not installed. Exiting..."
+				exit 1;
+			fi
 		fi
 	fi
 
 	# Check if there's an existing file, and whether the user wants to overwrite it
 	if [ -f "$outfile" ]; then
-		printf "File $outfile already exists. Overwrite? (y/n) "
+		printf "File $outfile already exists. Overwrite? (y/N) "
 		read overwrite
 		if [ "$overwrite" != "y" ]; then
 			exit
@@ -50,7 +86,7 @@ build () {
 	printf "Constructing 20XXHP ${version}.\n"
 	printf "    Please stand by.... "
 
-	$xdelta -f -d -s "$infile" "$delta" "$outfile" 2>/dev/null
+	xdelta -f -d -s "$infile" "$delta" "$outfile" 2>/dev/null
 }
 
 if [ "$infile" = "" ]; then
@@ -71,7 +107,7 @@ filehash=$(${md5sum} -b "$infile" |cut -d' ' -f1)
 if [ "$filehash" = "$sourceMd5" ]; then
 	printf "The ISO has been verified!\n\n"
 else
-	printf "Unable to verify the source file ISO Hash. Please make sure you are providing a vanilla NTSC 1.02 copy of the game. Would you like to continue anyways? (y/n)"
+	printf "Unable to verify the source file ISO Hash. Please make sure you are providing a vanilla NTSC 1.02 copy of the game. Would you like to continue anyways? (y/N)"
 	read cont;
 	if [ "$cont" != "y" ]; then
 		exit
@@ -85,7 +121,7 @@ else
 	exit
 fi
 
-printf "Would you like to check the hash of your new 20XX copy? (y/n): "
+printf "Would you like to check the hash of your new 20XX copy? (y/N): "
 read check;
 if [ "$check" = "y" ]; then
 	if checkhash "$outfile" "$modmd5"; then
