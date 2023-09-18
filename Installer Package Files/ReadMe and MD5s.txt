@@ -105,5 +105,5 @@ https://github.com/DRGN-DRC/20XX-HACK-PACK
 :: 20XXHP updates to v5.0 and up by DRGN
 :: xdelta program created by Josh Macdonald
 :: Batch build script and xdelta files created by DRGN.
-:: Linux build script created by shuall, phonos, DRGN, and Mage
+:: Linux build script created by shuall, phonos, DRGN, Mage and Nosen92
 
